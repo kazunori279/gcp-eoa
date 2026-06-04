@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Era of Agents — Hands-on Workshop Series</title>
+<style>
+  :root {
+    --blue: #4285F4; --green: #34A853; --yellow: #FBBC04; --red: #EA4335;
+    --bg: #f8f9fa; --card: #ffffff; --text: #202124; --text2: #5f6368;
+    --border: #dadce0; --hover: #f1f3f4; --radius: 12px;
+    --build: #4285F4; --scale: #34A853; --optimize: #FBBC04; --govern: #EA4335;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Google Sans', 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1a73e8 0%, #174ea6 100%); color: white; padding: 48px 0 36px; }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .header h1 { font-size: 2rem; font-weight: 500; margin-bottom: 8px; }
+  .header p { font-size: 1.05rem; opacity: 0.9; max-width: 700px; }
+  .stats-row { display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-val { font-size: 2rem; font-weight: 700; }
+  .stat-label { font-size: 0.8rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Tabs */
+  .tabs { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-top: -2px; background: white; border-radius: var(--radius) var(--radius) 0 0; padding: 0 8px; }
+  .tab-btn { padding: 14px 24px; border: none; background: none; font-size: 0.95rem; font-weight: 500; color: var(--text2); cursor: pointer; position: relative; transition: color 0.2s; }
+  .tab-btn:hover { color: var(--text); background: var(--hover); border-radius: 8px 8px 0 0; }
+  .tab-btn.active { color: var(--blue); }
+  .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: var(--blue); border-radius: 3px 3px 0 0; }
+  .tab-panel { display: none; background: white; border-radius: 0 0 var(--radius) var(--radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tab-panel.active { display: block; }
+
+  /* Search & Filter */
+  .controls { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .search-box { flex: 1; min-width: 240px; padding: 10px 16px 10px 40px; border: 1px solid var(--border); border-radius: 24px; font-size: 0.95rem; outline: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%235f6368' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") 12px center no-repeat; transition: border-color 0.2s; }
+  .search-box:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(66,133,244,0.15); }
+  .pill-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .pill:hover { background: var(--hover); }
+  .pill.active { color: white; border-color: transparent; }
+  .pill[data-pillar="all"].active { background: var(--blue); }
+  .pill[data-pillar="Build"].active { background: var(--build); }
+  .pill[data-pillar="Scale"].active { background: var(--scale); }
+  .pill[data-pillar="Optimize"].active { background: #e8a000; color: #333; }
+  .pill[data-pillar="Govern"].active { background: var(--govern); }
+
+  /* Workshop Cards */
+  .pillar-section { margin-bottom: 32px; }
+  .pillar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  .pillar-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+  .pillar-header h2 { font-size: 1.3rem; font-weight: 500; }
+  .pillar-count { font-size: 0.8rem; color: var(--text2); background: var(--hover); padding: 2px 10px; border-radius: 12px; }
+
+  .workshop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .workshop-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: all 0.2s; position: relative; cursor: default; }
+  .workshop-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #b0b8c1; transform: translateY(-1px); }
+  .workshop-card .title { font-size: 1rem; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+  .workshop-card .desc { font-size: 0.875rem; color: var(--text2); margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .workshop-card .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
+  .badge-level { background: #e8f0fe; color: #1967d2; }
+  .badge-time { background: #e6f4ea; color: #137333; }
+  .badge-owner { background: #fef7e0; color: #995700; }
+  .badge-link { background: #f3e8fd; color: #7627bb; text-decoration: none; }
+  .badge-link:hover { background: #e8d5f5; }
+  .pillar-stripe { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: var(--radius) var(--radius) 0 0; }
+
+  /* Past Events Table */
+  .events-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; }
+  .events-table thead th { background: var(--hover); padding: 12px 16px; text-align: left; font-weight: 500; color: var(--text2); border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 1; }
+  .events-table tbody td { padding: 10px 16px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .events-table tbody tr:hover td { background: #f8f9ff; }
+  .events-table tbody tr:last-child td { border-bottom: none; }
+  .event-date { white-space: nowrap; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .event-attendees { font-variant-numeric: tabular-nums; text-align: right; font-weight: 500; }
+  .event-total { background: var(--hover); font-weight: 600; }
+  .events-table a { color: var(--blue); text-decoration: none; }
+  .events-table a:hover { text-decoration: underline; }
+
+  /* Summary Cards */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .summary-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
+  .summary-card .num { font-size: 2.2rem; font-weight: 700; }
+  .summary-card .label { font-size: 0.85rem; color: var(--text2); margin-top: 4px; }
+
+  /* Levels Legend */
+  .levels { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .level-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text2); }
+  .level-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--text2); }
+  .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
+
+  /* Guidelines */
+  .guide-section { margin-bottom: 32px; }
+  .guide-section:last-child { margin-bottom: 0; }
+  .guide-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .guide-heading h2 { font-size: 1.25rem; font-weight: 500; }
+  .guide-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .guide-card { background: var(--hover); border-radius: var(--radius); padding: 24px 28px; }
+  .guide-card p { margin-bottom: 16px; color: var(--text2); font-size: 0.95rem; }
+  .guide-card p:last-child { margin-bottom: 0; }
+  .guide-list { list-style: none; padding: 0; }
+  .guide-list li { position: relative; padding: 10px 0 10px 28px; border-bottom: 1px solid var(--border); font-size: 0.93rem; color: var(--text); }
+  .guide-list li:last-child { border-bottom: none; }
+  .guide-list li::before { content: ''; position: absolute; left: 0; top: 18px; width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+  .guide-list .sub { padding-left: 48px; color: var(--text2); font-size: 0.88rem; }
+  .guide-list .sub::before { width: 6px; height: 6px; left: 28px; background: var(--border); }
+  .guide-contact { display: inline-flex; align-items: center; gap: 4px; background: #e8f0fe; color: #1967d2; padding: 2px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+  .guide-contact:hover { background: #d2e3fc; }
+  .guide-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 768px) { .guide-cols { grid-template-columns: 1fr; } }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header h1 { font-size: 1.5rem; }
+    .stats-row { gap: 20px; }
+    .tab-btn { padding: 12px 16px; font-size: 0.85rem; }
+    .workshop-grid { grid-template-columns: 1fr; }
+    .events-table { font-size: 0.8rem; }
+    .events-table thead th, .events-table tbody td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>Era of Agents — Hands-on Workshop Series</h1>
+    <p>Workshop catalog and event history for the Google Cloud "Era of Agents" hands-on workshop program (2024 – 2026).</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val">38</div><div class="stat-label">Workshop Topics</div></div>
+      <div class="stat"><div class="stat-val">4</div><div class="stat-label">Pillars</div></div>
+      <div class="stat"><div class="stat-val">35</div><div class="stat-label">Past Events</div></div>
+      <div class="stat"><div class="stat-val">2,035</div><div class="stat-label">Total Attendees</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="catalog">Workshop Catalog</button>
+    <button class="tab-btn" data-tab="guidelines">Guidelines</button>
+    <button class="tab-btn" data-tab="events">Past Events</button>
+  </div>
+
+  <!-- ===== TAB 1: WORKSHOP CATALOG ===== -->
+  <div id="catalog" class="tab-panel active">
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="Search workshops..." autocomplete="off">
+      <div class="pill-filter">
+        <button class="pill active" data-pillar="all">All</button>
+        <button class="pill" data-pillar="Build">Build</button>
+        <button class="pill" data-pillar="Scale">Scale</button>
+        <button class="pill" data-pillar="Optimize">Optimize</button>
+        <button class="pill" data-pillar="Govern">Govern</button>
+      </div>
+    </div>
+
+    <div class="levels">
+      <div class="level-item"><div class="level-dot" style="background:#1967d2"></div> 100 — Introductory</div>
+      <div class="level-item"><div class="level-dot" style="background:#137333"></div> 200 — Moderate</div>
+      <div class="level-item"><div class="level-dot" style="background:#e8a000"></div> 300 — Advanced</div>
+      <div class="level-item"><div class="level-dot" style="background:#c5221f"></div> 400 — Specialized</div>
+    </div>
+
+    <div id="workshop-list"></div>
+    <div id="empty-state" class="empty-state" style="display:none">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <p>No workshops match your search.</p>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: GUIDELINES ===== -->
+  <div id="guidelines" class="tab-panel">
+    <div class="guide-cols">
+
+      <div class="guide-section">
+        <div class="guide-heading">
+          <div class="guide-icon" style="background:#e8f0fe; color:#1967d2;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <h2>For Workshop Organizers &amp; Speakers</h2>
+        </div>
+        <div class="guide-card">
+          <ul class="guide-list">
+            <li><strong>Pick any workshop content</strong> to fit your requirements and expectations from the audience.</li>
+            <li><strong>Using Qwiklabs?</strong> Check "Getting Started with Qwiklabs". The "Generative AI Explorer" course will download all notebooks available here.</li>
+            <li><strong>Speakers are responsible</strong> for checking that notebooks work in the lab environment — credits, quota limits, IAM, and especially availability of GPU and TPU resources. If you see any issues or questions, please contact the content owners.</li>
+            <li><strong>Collecting feedback:</strong> please copy and use the feedback form for collecting feedback from participants.</li>
+            <li><strong>Tier 1/2 or online events:</strong> please contact <a class="guide-contact" href="mailto:lavinigam@google.com">Lavi Nigam</a> or <a class="guide-contact" href="mailto:kazsato@google.com">Kaz Sato</a> for coordination and support.</li>
+            <li>If you feel we need to add slides/materials for a specific workshop, please let us know!</li>
+            <li>If you need new workshop material or want to use materials in the parking lot, please let us know!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-heading">
+          <div class="guide-icon" style="background:#fef7e0; color:#995700;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM6 20V4h5v7h7v9H6z"/></svg>
+          </div>
+          <h2>For Content Owners</h2>
+        </div>
+        <div class="guide-card">
+          <p>Content owners are expected to:</p>
+          <ul class="guide-list">
+            <li><strong>Be the owner:</strong> Update each workshop's columns and be the point of contact for each workshop material.</li>
+            <li><strong>Nominate speaker candidates:</strong> Ideally cover different timezones. Add the name to the "Speaker" column.</li>
+            <li><strong>Choose and maintain "workshop-ready" notebooks/materials</strong> that are:
+              <ul class="guide-list" style="margin-top:8px;">
+                <li class="sub"><strong>Self-contained as textbooks:</strong> Include not only code cells but also instruction texts, diagrams, videos (if needed), or links to external demos. Speakers and audience should be able to learn the topic as smoothly as reading a book.</li>
+                <li class="sub"><strong>"Live" and maintained:</strong> Works with the latest models, APIs, and SDKs.</li>
+                <li class="sub"><strong>Conforming with the notebook style guide.</strong></li>
+                <li class="sub"><strong>Portable:</strong> Supports Colab Enterprise and Workbench, works with Qwiklab projects and their limited quota/resources, and written in easy English for non-English audiences.</li>
+              </ul>
+            </li>
+            <li><strong>Set the status to "Ready"</strong> once you confirm everything is updated and ready to be used for the workshop.</li>
+            <li><strong>Add new workshop ideas</strong> to the parking lot area and let <a class="guide-contact" href="mailto:lavinigam@google.com">Lavi Nigam</a> or <a class="guide-contact" href="mailto:kazsato@google.com">Kaz Sato</a> know!</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: PAST EVENTS ===== -->
+  <div id="events" class="tab-panel">
+    <div class="summary-grid">
+      <div class="summary-card"><div class="num" style="color:var(--blue)">35</div><div class="label">Events Held</div></div>
+      <div class="summary-card"><div class="num" style="color:var(--green)">2,035</div><div class="label">Total Attendees</div></div>
+      <div class="summary-card"><div class="num" style="color:var(--yellow)">11</div><div class="label">Countries / Cities</div></div>
+      <div class="summary-card"><div class="num" style="color:var(--red)">7</div><div class="label">Speakers</div></div>
+    </div>
+
+    <div style="overflow-x:auto; border: 1px solid var(--border); border-radius: var(--radius);">
+    <table class="events-table">
+      <thead><tr><th>Date</th><th>Event</th><th>PoC</th><th style="text-align:right">Attendees</th><th>Material</th></tr></thead>
+      <tbody>
+        <tr><td class="event-date">2024-01-26</td><td>Gen AI Hands-on Workshop Tokyo</td><td>Kaz Sato</td><td class="event-attendees">144</td><td></td></tr>
+        <tr><td class="event-date">2024-04-06</td><td>AI Day for Startups — Ahmedabad</td><td>Romin Irani</td><td class="event-attendees">75</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-04-15</td><td>AI Day for Startups — Bangalore (91Springboard)</td><td>Romin Irani</td><td class="event-attendees">23</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-04-27</td><td>AI Day for Startups — Hubali</td><td>Romin Irani</td><td class="event-attendees">49</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-05-03</td><td>AI Day for Startups — Mumbai</td><td>Romin Irani</td><td class="event-attendees">80</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-05-13</td><td>Partner Generative AI Day</td><td>Sannya Dang</td><td class="event-attendees">116</td><td></td></tr>
+        <tr><td class="event-date">2024-05-14</td><td>CVS Health — Era of Gemini Engineering Day @ Google NYC</td><td>Priyanka Vergadia</td><td class="event-attendees">80</td><td></td></tr>
+        <tr><td class="event-date">2024-05-15</td><td>AI Day for Startups — Hyderabad</td><td>Romin Irani</td><td class="event-attendees">110</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-05-17</td><td>AI Day for Startups — Bangalore (IIM NSRCEL)</td><td>Romin Irani</td><td class="event-attendees">85</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-05-20</td><td>AI Day for Startups — Delhi</td><td>Romin Irani</td><td class="event-attendees">44</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-05-24</td><td>AI Day for Startups — Chennai</td><td>Romin Irani</td><td class="event-attendees">66</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-06-12</td><td>Introduction to Generative AI for DevRel</td><td>Jason Davenport</td><td class="event-attendees">—</td><td></td></tr>
+        <tr><td class="event-date">2024-06-14</td><td>AI Day for Startups — Trivandrum</td><td>Romin Irani</td><td class="event-attendees">72</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-06-22</td><td>Google I/O Extended 2024 — Cloud (Mumbai)</td><td>Romin Irani</td><td class="event-attendees">84</td><td></td></tr>
+        <tr><td class="event-date">2024-06-27</td><td>Era of Gemini — Cloud Summit Korea</td><td>Lavi Nigam</td><td class="event-attendees">60</td><td></td></tr>
+        <tr><td class="event-date">2024-06-27</td><td>AI Day for Startups — Kochi</td><td>Romin Irani</td><td class="event-attendees">52</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-07-06</td><td>AI Day for Startups — Pune</td><td>Romin Irani</td><td class="event-attendees">60</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-07-31</td><td>AICamp — Bay Area</td><td>Lavi Nigam</td><td class="event-attendees">80</td><td>Intro to Multimodal RAG</td></tr>
+        <tr><td class="event-date">2024-08-02</td><td>AI Day for Startups — Bengaluru</td><td>Romin Irani</td><td class="event-attendees">19</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-08-10</td><td>Google I/O Extended 2024 Cairo</td><td>Romin Irani</td><td class="event-attendees">62</td><td>Intro to Multimodal RAG</td></tr>
+        <tr><td class="event-date">2024-08-17</td><td>Buildthon '24 by MIT Kumbhathon</td><td>Romin Irani</td><td class="event-attendees">181</td><td>Getting started with Vertex AI Gemini 1.5 Pro &amp; Flash</td></tr>
+        <tr><td class="event-date">2024-08-21</td><td>Google AI Training — Era of Gemini — UHG (Customer)</td><td>Sarita Joshi, Lavi Nigam</td><td class="event-attendees">40</td><td></td></tr>
+        <tr><td class="event-date">2024-08-25</td><td>Code the Cloud Japan</td><td>Kaz Sato</td><td class="event-attendees">—</td><td></td></tr>
+        <tr><td class="event-date">2024-09-23</td><td>TFUG Thrissur</td><td>Romin Irani</td><td class="event-attendees">94</td><td>Function Calling in Gemini</td></tr>
+        <tr><td class="event-date">2024-10-20</td><td>DevFest Gandhinagar</td><td>Romin Irani</td><td class="event-attendees">49</td><td>Grounding with Gemini in Vertex AI</td></tr>
+        <tr><td class="event-date">2024-11-07</td><td>Google for Startups AI Academy 2024 — Kochi</td><td>Romin Irani</td><td class="event-attendees">62</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-11-13</td><td>Google for Startups AI Academy 2024 — Chennai</td><td>Romin Irani</td><td class="event-attendees">63</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-11-16</td><td>DevFest Catania</td><td>Romin Irani</td><td class="event-attendees">10</td><td>Function Calling in Gemini</td></tr>
+        <tr><td class="event-date">2024-11-21</td><td>Google for Startups AI Academy 2024 — Ahmedabad</td><td>Romin Irani</td><td class="event-attendees">53</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-11-23</td><td>JavaFest 2024 — Chennai</td><td>Romin Irani</td><td class="event-attendees">53</td><td>Function Calling in Gemini</td></tr>
+        <tr><td class="event-date">2024-11-28</td><td>Google for Startups AI Academy 2024 — Delhi</td><td>Romin Irani</td><td class="event-attendees">46</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-12-01</td><td>DevFest Yogyakarta 2024</td><td>Romin Irani</td><td class="event-attendees">23</td><td>Responsible AI</td></tr>
+        <tr><td class="event-date">2024-12-05</td><td>Google for Startups AI Academy 2024 — Hyderabad</td><td>Romin Irani</td><td class="event-attendees">—</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-12-12</td><td>Google for Startups AI Academy 2024 — Mumbai</td><td>Romin Irani</td><td class="event-attendees">—</td><td>Multimodal Use Cases</td></tr>
+        <tr><td class="event-date">2024-12-17</td><td>Google for Startups AI Academy 2024 — Bengaluru</td><td>Romin Irani</td><td class="event-attendees">—</td><td>Multimodal Use Cases</td></tr>
+        <tr class="event-total"><td></td><td></td><td>Total</td><td class="event-attendees">2,035</td><td></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding: 32px 24px; color: var(--text2); font-size: 0.8rem;">
+  Source: Era of Agents Hands-on Workshop Series spreadsheet &middot; Last updated June 2026
+</div>
+
+<script>
+const WORKSHOPS = [
+  { pillar:"Build", title:"Era of Agents Keynote", level:"100", time:"15", owner:"Dave Elliott", desc:"Keynote level presentation which lays the foundation for an agentic future.", links:[] },
+  { pillar:"Build", title:"Intro to Gemini and Agent Platform", level:"100", time:"30", owner:"", desc:"Introduction and overview of the Gemini models and Agent Platform.", links:[] },
+  { pillar:"Build", title:"What are Agents and Agentic Engineering", level:"100", time:"", owner:"", desc:"", links:[] },
+  { pillar:"Build", title:"Low-Code Design with Agent Studio", level:"", time:"", owner:"", desc:"Using the visual canvas to design, prototype, and manage agent reasoning loops.", links:[] },
+  { pillar:"Build", title:"Constructing Applications with App Builder", level:"", time:"", owner:"", desc:"Using the built-in App Builder in Agent Studio to construct agentic applications.", links:[] },
+  { pillar:"Build", title:"Accelerating Agent Platform Development with Antigravity 2.0, Claude Code and Codex", level:"", time:"", owner:"", desc:"Introducing google/skills, ADK/ACLI Skills, and MCP servers for accelerating Agent Platform development.", links:[] },
+  { pillar:"Build", title:"Modern Web Development with Managed Agents API", level:"", time:"", owner:"", desc:"How to use Managed Agents API with Gemini, E2E testing with Chrome DevTools MCP for Agents, WebMCP and Modern Web Guidance.", links:[] },
+  { pillar:"Build", title:"Pro-Code Agents with Agent Development Kit (ADK) & Tooling", level:"", time:"", owner:"", desc:"Building sophisticated agents using the modular, model-agnostic framework, assisted by Antigravity on Agent Platform, Agents CLI, and Agents API.", links:[] },
+  { pillar:"Build", title:"Pro-Code Experimentation with Notebooks", level:"", time:"", owner:"", desc:"Using Workbench/Colab Enterprise and Colab for agent development, prototyping, and data exploration.", links:[] },
+  { pillar:"Build", title:"Working with 3P Agent Frameworks", level:"", time:"", owner:"", desc:"How the platform supports and integrates with third-party agent frameworks.", links:[] },
+  { pillar:"Build", title:"ADK Advanced: Graph-Based & Collaborative Agents", level:"", time:"", owner:"", desc:"Building deterministic workflows and complex architectures with coordinator agents and multiple sub-agents.", links:[] },
+  { pillar:"Build", title:"ADK Advanced: Dynamic Workflows & Agent Skills", level:"", time:"", owner:"", desc:"Using code-based logic for complex branching and enabling agents to dynamically discover and execute domain-specific skills.", links:[] },
+  { pillar:"Build", title:"Real-Time Voice Agents with Gemini Live API & ADK", level:"", time:"", owner:"", desc:"Building responsive, voice-first multimodal agents with bi-directional streaming. Covers Gemini Live API and ADK Gemini Live API Toolkit.", links:[] },
+  { pillar:"Build", title:"Accelerating Development with Agent Garden", level:"", time:"", owner:"", desc:'Using the library of prebuilt, customizable "atomic" agents to serve as building blocks.', links:[] },
+  { pillar:"Build", title:"Selecting Models in Model Garden", level:"", time:"", owner:"", desc:"Accessing the best model for all modalities (Google 1P, 3P, and Open Weight models).", links:[] },
+  { pillar:"Build", title:"Multimodal Capabilities & Generative Media", level:"", time:"", owner:"", desc:"Integrating audio, video, and image generation with agents using models like Veo, Imagen, and Lyria.", links:[] },
+  { pillar:"Build", title:"Connecting to Data & Grounding", level:"", time:"", owner:"", desc:"Connecting models and agents to enterprise data and up-to-date world knowledge.", links:[{label:"Notebook",url:"https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/grounding/intro-grounding-gemini.ipynb"}] },
+  { pillar:"Build", title:"Data Grounding with RAG Engine", level:"", time:"", owner:"", desc:"Securely connecting private enterprise data to LLMs.", links:[{label:"Notebook",url:"https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/rag-engine/intro_rag_engine.ipynb"}] },
+  { pillar:"Build", title:"AI-Native Search with Agent Retrieval", level:"", time:"", owner:"", desc:"Vector search engine with comprehensive storage (aka Vector Search 2.0).", links:[{label:"Notebook",url:"https://github.com/GoogleCloudPlatform/generative-ai/blob/main/embeddings/vector-search-2-intro.ipynb"}] },
+  { pillar:"Build", title:"Integrating Enterprise Data with Federated Connectors", level:"", time:"", owner:"", desc:"Using connectors to access data in Salesforce, Jira, Slack, GitHub, HubSpot, Workday, etc.", links:[] },
+  { pillar:"Build", title:"Standardizing with Model Context Protocol (MCP)", level:"", time:"", owner:"", desc:"Transforming platform features into standard MCP tools to access them anywhere.", links:[] },
+  { pillar:"Build", title:"Advanced Protocols: A2A, A2UI, AP2, UCP", level:"", time:"", owner:"", desc:"Protocols for Agent-to-Agent collaboration, Agent-to-UI interaction, and Agent Payments.", links:[] },
+  { pillar:"Build", title:"Action Execution with Computer Use", level:"", time:"", owner:"", desc:"Enabling agents to interact with computer interfaces via secure sandbox.", links:[] },
+  { pillar:"Scale", title:"Orchestrating with Vertex AI Agent Builder", level:"", time:"", owner:"", desc:"The core service for building and orchestrating the platform’s capabilities.", links:[] },
+  { pillar:"Scale", title:"High-Performance Deployment with Agent Runtime", level:"", time:"", owner:"", desc:"Fully managed, serverless environment for deploying agents with fast starts and BYOC support.", links:[] },
+  { pillar:"Scale", title:"Managing State with Agent Platform Sessions", level:"", time:"", owner:"", desc:"Handling stateful data and context in multi-turn conversations.", links:[] },
+  { pillar:"Scale", title:"Persistent Memory with Agent Memory Bank", level:"", time:"", owner:"", desc:"Extracting and storing user preferences over time (long-term memory).", links:[] },
+  { pillar:"Scale", title:"Secure Execution with Agent Sandbox", level:"", time:"", owner:"", desc:"Safely generating and executing scripts in an isolated environment.", links:[] },
+  { pillar:"Scale", title:"Handling Long-Running Operations (LROs)", level:"", time:"", owner:"", desc:"Support for agents that handle complex tasks over hours or days.", links:[] },
+  { pillar:"Optimize", title:"Quality Assessment with Agent Evaluation", level:"", time:"", owner:"", desc:"Assessing agent quality with Multi-turn AutoRaters and Online Evaluations.", links:[] },
+  { pillar:"Optimize", title:"Stress-Testing with Agent Simulation", level:"", time:"", owner:"", desc:"Generating realistic user interactions and simulating environment responses.", links:[] },
+  { pillar:"Optimize", title:"Visibility with Agent Observability", level:"", time:"", owner:"", desc:"Monitoring performance through turnkey dashboards and multi-agent topology graphs.", links:[] },
+  { pillar:"Optimize", title:"Automated Optimization with Agent Optimizer", level:"", time:"", owner:"", desc:"Automatically fixing and refining agents based on real-world failures.", links:[] },
+  { pillar:"Govern", title:"Universal Discovery with Agent Registry & Skill Registry", level:"", time:"", owner:"", desc:"Centrally registering and promoting reuse of agents, skills, MCP servers, and endpoints.", links:[] },
+  { pillar:"Govern", title:"Access Control with Agent Identity", level:"", time:"", owner:"", desc:"Assigning unique, cryptographically-attested SPIFFE identities to agents.", links:[] },
+  { pillar:"Govern", title:"Policy Enforcement with Agent Gateway", level:"", time:"", owner:"", desc:"Central control tower to define and enforce security policies across all tools.", links:[] },
+  { pillar:"Govern", title:"Content & Inline Protection with Model Armor", level:"", time:"", owner:"", desc:"Safeguarding interactions against prompt injection and data leakage.", links:[] },
+  { pillar:"Govern", title:"Anomaly Detection & Compliance", level:"", time:"", owner:"", desc:"Continuous monitoring to detect suspicious activity and ensure compliance.", links:[] },
+];
+
+const PILLAR_COLORS = { Build:"#4285F4", Scale:"#34A853", Optimize:"#FBBC04", Govern:"#EA4335" };
+const PILLAR_ICONS = { Build:"\u{1F528}", Scale:"\u{1F680}", Optimize:"\u{2699}️", Govern:"\u{1F6E1}️" };
+const PILLAR_ORDER = ["Build","Scale","Optimize","Govern"];
+
+function render(filter, query) {
+  const container = document.getElementById("workshop-list");
+  const empty = document.getElementById("empty-state");
+  let html = "";
+  let totalVisible = 0;
+
+  for (const pillar of PILLAR_ORDER) {
+    if (filter !== "all" && filter !== pillar) continue;
+    const items = WORKSHOPS.filter(w => w.pillar === pillar).filter(w => {
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return w.title.toLowerCase().includes(q) || w.desc.toLowerCase().includes(q) || w.owner.toLowerCase().includes(q);
+    });
+    if (items.length === 0) continue;
+    totalVisible += items.length;
+
+    html += `<div class="pillar-section">
+      <div class="pillar-header">
+        <div class="pillar-icon" style="background:${PILLAR_COLORS[pillar]}">${pillar[0]}</div>
+        <h2>${pillar}</h2>
+        <span class="pillar-count">${items.length} workshop${items.length > 1 ? "s" : ""}</span>
+      </div>
+      <div class="workshop-grid">`;
+
+    for (const w of items) {
+      const levelBadge = w.level ? `<span class="badge badge-level">${w.level}</span>` : "";
+      const timeBadge = w.time ? `<span class="badge badge-time">${w.time} min</span>` : "";
+      const ownerBadge = w.owner ? `<span class="badge badge-owner">${w.owner}</span>` : "";
+      const linkBadges = w.links.map(l => `<a href="${l.url}" target="_blank" class="badge badge-link">${l.label}</a>`).join("");
+
+      html += `<div class="workshop-card">
+        <div class="pillar-stripe" style="background:${PILLAR_COLORS[w.pillar]}"></div>
+        <div class="title">${w.title}</div>
+        ${w.desc ? `<div class="desc">${w.desc}</div>` : ""}
+        <div class="meta">${levelBadge}${timeBadge}${ownerBadge}${linkBadges}</div>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  container.innerHTML = html;
+  empty.style.display = totalVisible === 0 ? "block" : "none";
+}
+
+// Tab switching
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// Pillar filtering
+let activePillar = "all";
+document.querySelectorAll(".pill").forEach(pill => {
+  pill.addEventListener("click", () => {
+    document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    activePillar = pill.dataset.pillar;
+    render(activePillar, document.getElementById("search").value);
+  });
+});
+
+// Search
+document.getElementById("search").addEventListener("input", e => {
+  render(activePillar, e.target.value);
+});
+
+// Initial render
+render("all", "");
+</script>
+</body>
+</html>
