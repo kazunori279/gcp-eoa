@@ -2,6 +2,8 @@
 
 Workshop catalog and event history for the Google Cloud "Era of Agents" hands-on workshop program (2024–2026).
 
+**[View the dashboard](https://kazunori279.github.io/gcp-eoa/eoa-workshops.html)**
+
 ## Contents
 
 - **[eoa-workshops.html](eoa-workshops.html)** — Self-contained interactive dashboard with:
