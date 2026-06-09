@@ -388,6 +388,7 @@
       <button class="tab-btn" data-tab="expected" role="tab">Expected Output</button>
       <button class="tab-btn" data-tab="matrix" role="tab">Test Matrix</button>
       <button class="tab-btn" data-tab="results" role="tab">Results</button>
+      <button class="tab-btn" data-tab="e2e" role="tab">E2E with ADK</button>
     </div>
 
     <!-- Tab 1: Test Approach -->
@@ -871,6 +872,199 @@ never invent a train, proactively compute reroutes."
         <p>Items 2-5 are low severity &mdash; the subagent made reasonable choices in all cases. The context blocks are strong enough for a successful build.</p>
       </div>
     </div>
+
+    <!-- Tab 6: E2E with ADK -->
+    <div id="e2e" class="tab-panel">
+      <div class="callout callout-success">
+        <div class="callout-title">End-to-End Test PASSED &mdash; Agent Runs with Real ADK + Gemini</div>
+        A subagent simulating Antigravity (AGY) built the full project from context blocks alone, installed <code>google-adk</code> via <code>uv</code>, and ran the agent against the live Gemini API. The agent correctly called all 3 tools and returned a concrete reroute recommendation.
+      </div>
+
+      <div class="card">
+        <h3>Test Setup</h3>
+        <p>Unlike the structural test (Results tab), this test used the <strong>real ADK framework and Gemini API</strong>:</p>
+        <ul>
+          <li><code>uv init --no-readme && uv add google-adk</code> &mdash; real package installation</li>
+          <li><code>google.adk.agents.LlmAgent</code> &mdash; real ADK agent class</li>
+          <li><code>google.adk.runners.InMemoryRunner</code> &mdash; real ADK runner</li>
+          <li><code>gemini-3.5-flash</code> model via <code>GOOGLE_API_KEY</code> &mdash; real Gemini API calls</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Validation Checks</h3>
+        <table class="test-matrix">
+          <thead><tr><th>#</th><th>Check</th><th>Result</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><code>uv add google-adk</code></td>
+              <td>Package installed successfully</td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Agent import</td>
+              <td><code>from agent import root_agent</code> &rarr; <code>LlmAgent</code> instance</td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Agent name</td>
+              <td><code>root_agent.name</code> = <code>"rush_hour"</code></td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Model config</td>
+              <td><code>root_agent.model</code> = <code>"gemini-3.5-flash"</code></td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Tool 1 called</td>
+              <td><code>get_scheduled_departures("London St Pancras", "13:00")</code></td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Tool 2 called</td>
+              <td><code>check_disruptions(station_name="London St Pancras")</code></td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Tool 3 called</td>
+              <td><code>compute_reroute("London St Pancras", "Paris Gare du Nord", "13:31")</code></td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Correct diagnosis</td>
+              <td>Agent identified 13:31 service (ES9013) as cancelled</td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Concrete reroute</td>
+              <td>Recommended next Eurostar ES9017 (15:31, delayed to ~15:51) with 0 changes</td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Clear action</td>
+              <td>Response ended with one specific recommended action</td>
+              <td><span class="badge badge-pass">PASS</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Agent Trace</h3>
+        <p>The agent's reasoning trace for the test query <em>"My 13:31 St Pancras to Paris service is affected &mdash; how do I still get to Paris?"</em>:</p>
+        <div class="ctx-block">1. [TOOL CALL] get_scheduled_departures("London St Pancras", "13:00")
+   &rarr; Found scheduled departures including ES9013 at 13:31
+
+2. [TOOL CALL] check_disruptions(station_name="London St Pancras")
+   &rarr; Found 5 disruptions: ES9013 cancelled, 4 others delayed
+
+3. [TOOL CALL] compute_reroute("London St Pancras", "Paris Gare du Nord", "13:31")
+   &rarr; Found alternative: ES9017 (15:31, delayed ~20min), 0 changes
+
+4. [RESPONSE] Identified ES9013 as cancelled, recommended ES9017 as
+   the next direct Eurostar with specific times and zero changes.</div>
+      </div>
+
+      <div class="card">
+        <h3>Generated Code</h3>
+        <p>The subagent used the correct ADK APIs, discovered via MCP tool lookups:</p>
+        <table class="test-matrix">
+          <thead><tr><th>File</th><th>Key Detail</th></tr></thead>
+          <tbody>
+            <tr><td><code>agent/agent.py</code></td><td><code>google.adk.agents.LlmAgent</code> with <code>model="gemini-3.5-flash"</code>, system instruction, 3 tools</td></tr>
+            <tr><td><code>agent/__init__.py</code></td><td>Exports <code>root_agent</code> (ADK convention)</td></tr>
+            <tr><td><code>agent/tools.py</code></td><td>3 tools with type hints, GTFS joins, BFS rerouting</td></tr>
+            <tr><td><code>test_agent.py</code></td><td><code>InMemoryRunner</code> + <code>run_async</code> for programmatic testing</td></tr>
+            <tr><td><code>pyproject.toml</code></td><td><code>google-adk</code> dependency, installed via <code>uv add</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Key Findings</h3>
+        <ul>
+          <li><strong><code>gemini-3.5-flash</code> is a valid model ID</strong> &mdash; it works with the Gemini API. The "do not change it" note is correct and necessary</li>
+          <li><strong>ADK API discovery was needed</strong> &mdash; the subagent used MCP tools to look up <code>LlmAgent</code>, <code>InMemoryRunner</code>, and <code>run_async</code>. The context blocks don't specify these API details, but Antigravity in the real workshop has the same capability</li>
+          <li><strong>The reconciliation pattern works</strong> &mdash; the agent reliably called Tool 1 + Tool 2 before answering, then Tool 3 for the reroute, exactly as specified in the system instruction</li>
+          <li><strong>Context blocks are workshop-ready</strong> &mdash; no gaps prevented the agent from building and running successfully</li>
+        </ul>
+      </div>
+
+      <div class="flow-wrap">
+        <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#198754"/>
+            </marker>
+          </defs>
+          <!-- Context blocks -->
+          <rect x="20" y="10" width="160" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="100" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">Context Blocks</text>
+          <text x="100" y="48" text-anchor="middle" font-size="9" fill="#6c757d">intro + m0 + m1</text>
+
+          <line x1="190" y1="35" x2="230" y2="35" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- AGY -->
+          <rect x="240" y="10" width="140" height="50" rx="8" fill="#fff3e0" stroke="#fd7e14" stroke-width="2"/>
+          <text x="310" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">AGY Subagent</text>
+          <text x="310" y="48" text-anchor="middle" font-size="9" fill="#6c757d">simulated Antigravity</text>
+
+          <line x1="390" y1="35" x2="430" y2="35" stroke="#198754" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- uv + ADK -->
+          <rect x="440" y="10" width="160" height="50" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+          <text x="520" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#198754">uv + google-adk</text>
+          <text x="520" y="48" text-anchor="middle" font-size="9" fill="#6c757d">real package install</text>
+
+          <line x1="610" y1="35" x2="650" y2="35" stroke="#198754" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- Agent -->
+          <rect x="660" y="10" width="120" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="720" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">LlmAgent</text>
+          <text x="720" y="48" text-anchor="middle" font-size="9" fill="#6c757d">gemini-3.5-flash</text>
+
+          <!-- Down arrow from agent -->
+          <line x1="720" y1="70" x2="720" y2="100" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- Test query -->
+          <rect x="560" y="105" width="320" height="40" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="720" y="122" text-anchor="middle" font-size="10" font-weight="600" fill="#7c3aed">"My 13:31 St Pancras to Paris is affected..."</text>
+          <text x="720" y="137" text-anchor="middle" font-size="9" fill="#6c757d">InMemoryRunner &rarr; run_async</text>
+
+          <!-- Down arrow -->
+          <line x1="720" y1="155" x2="720" y2="175" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- Tool calls -->
+          <rect x="440" y="180" width="120" height="35" rx="6" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1"/>
+          <text x="500" y="202" text-anchor="middle" font-size="9" font-weight="600" fill="#1a73e8">Tool 1: schedule</text>
+
+          <rect x="580" y="180" width="120" height="35" rx="6" fill="#fde8ea" stroke="#dc3545" stroke-width="1"/>
+          <text x="640" y="202" text-anchor="middle" font-size="9" font-weight="600" fill="#dc3545">Tool 2: disruptions</text>
+
+          <rect x="720" y="180" width="120" height="35" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="1"/>
+          <text x="780" y="202" text-anchor="middle" font-size="9" font-weight="600" fill="#198754">Tool 3: reroute</text>
+
+          <!-- Down arrow -->
+          <line x1="640" y1="225" x2="640" y2="245" stroke="#198754" stroke-width="2" marker-end="url(#arrow2)"/>
+
+          <!-- Response -->
+          <rect x="440" y="250" width="340" height="25" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+          <text x="610" y="267" text-anchor="middle" font-size="10" font-weight="700" fill="#198754">Take ES9017 at 15:31 (delayed ~15:51), 0 changes</text>
+        </svg>
+      </div>
+    </div>
+
   </div>
 </div>
 
