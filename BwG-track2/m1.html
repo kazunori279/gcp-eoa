@@ -1090,7 +1090,8 @@ workshop-project/
 ### Prompt 1 — Scaffold (7 min)
 "Scaffold a new ADK agent project for a transit assistant that will
 answer commuter questions during a service disruption. Use Python,
-gemini-3.5-flash as the model, and uv for dependency management."
+gemini-3.5-flash as the model (this is the correct model ID — do not
+change it), and uv for dependency management."
 
 ### Prompt 2 — Add tools (12 min)
 "Add three tools to the agent:
@@ -1135,6 +1136,7 @@ Reconciles GTFS schedule × disruption feed → verified reroutes.
 ## Stack
 - Framework: Google ADK | Model: gemini-3.5-flash | Python 3.11+ | uv
 - Scaffold with: agents-cli scaffold skill
+- Note: gemini-3.5-flash is the correct model ID — do not change it.
 
 ## Data (already in place from M0)
 - data/gtfs/ — stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt

@@ -752,7 +752,7 @@ never invent a train, proactively compute reroutes."
 
       <div class="callout callout-success">
         <div class="callout-title">Result: 12/12 PASS</div>
-        All validation checks passed. The agent context snippets are sufficient for a coding agent to produce a structurally complete, syntactically valid ADK agent.
+        All validation checks passed after adding "do not change it" note to the model name. The agent context snippets are sufficient for a coding agent to produce a structurally complete, syntactically valid ADK agent with the correct model.
       </div>
 
       <h2 style="margin-top:1.5rem">Assumptions &amp; Gaps Log</h2>
@@ -824,8 +824,8 @@ never invent a train, proactively compute reroutes."
     <!-- Tab 5: Results -->
     <div id="results" class="tab-panel">
       <div class="callout callout-success">
-        <div class="callout-title">12/12 Checks Passed &mdash; Context Blocks Are Sufficient</div>
-        The subagent successfully built a complete ADK agent project from the context snippets alone. All files exist, all foreign keys are consistent, all code is syntactically valid, and all 3 tool signatures match the spec.
+        <div class="callout-title">12/12 PASS &mdash; Context Blocks Are Sufficient</div>
+        The subagent successfully built a complete ADK agent project from the context snippets alone. All files exist, all foreign keys are consistent, all code is syntactically valid, all 3 tool signatures match the spec, and <code>gemini-3.5-flash</code> is correctly used after adding the "do not change it" note.
       </div>
 
       <div class="card">
@@ -839,7 +839,7 @@ never invent a train, proactively compute reroutes."
             <tr><td><code>data/gtfs/stop_times.txt</code></td><td>111 stop-time entries with realistic journey durations</td><td><span class="badge badge-pass">GOOD</span></td></tr>
             <tr><td><code>data/gtfs/calendar.txt</code></td><td>3 service patterns (WEEKDAY, WEEKEND, DAILY)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
             <tr><td><code>data/disruptions.json</code></td><td>Signal failure at St Pancras, 4 affected trips (1 cancelled, 3 delayed)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
-            <tr><td><code>agent/agent.py</code></td><td>Agent with model, system instruction (6 rules), 3 tools registered</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>agent/agent.py</code></td><td>Agent with model <code>gemini-3.5-flash</code> (correctly followed "do not change it" note), system instruction, 3 tools</td><td><span class="badge badge-pass">GOOD</span></td></tr>
             <tr><td><code>agent/tools.py</code></td><td>325 lines, 3 tools with type hints, docstrings, BFS reroute</td><td><span class="badge badge-pass">GOOD</span></td></tr>
             <tr><td><code>agent/__init__.py</code></td><td>Exports <code>root_agent</code> (ADK convention)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
             <tr><td><code>pyproject.toml</code></td><td><code>google-adk&gt;=1.0.0</code>, Python &gt;=3.11, hatchling build</td><td><span class="badge badge-pass">GOOD</span></td></tr>
@@ -849,25 +849,26 @@ never invent a train, proactively compute reroutes."
 
       <div class="card">
         <h3>Smoke Test Results</h3>
-        <p>The subagent ran functional smoke tests on the generated tools with the synthetic data:</p>
+        <p>Functional smoke tests ran directly on the generated tools with the synthetic data:</p>
         <ul>
-          <li><code>get_scheduled_departures("St Pancras", "13:00", "17:00")</code> &rarr; returned ES9012, ES9005, ES9007</li>
-          <li><code>check_disruptions(station_name="St Pancras")</code> &rarr; returned all 4 disrupted trips</li>
-          <li><code>compute_reroute("St Pancras", "Paris Gare du Nord", "13:00")</code> &rarr; correctly skipped cancelled ES9005, returned ES9007 (16:31 departure, arriving 18:55, 0 changes)</li>
+          <li><code>get_scheduled_departures("St Pancras", "13:00", "17:00")</code> &rarr; 6 departures found, including EUR9005 at 13:31 (the affected train)</li>
+          <li><code>check_disruptions(station_name="St Pancras")</code> &rarr; 4 disruptions: EUR9005 cancelled, EUR9014 cancelled, EUR9012 delayed +45min, EUR9007 delayed +30min</li>
+          <li><code>compute_reroute("St Pancras", "Paris Gare du Nord", "13:00")</code> &rarr; skipped cancelled EUR9005, found route via delayed EUR9012 to Lille then EUR9007 to Paris, arriving 17:51, 1 change, 287 min total</li>
         </ul>
-        <p>The test query "My 13:31 St Pancras to Paris service is affected" would match trip ES9005 (13:31 departure, cancelled), and the reroute correctly finds the next available Eurostar.</p>
+        <p>The test query "My 13:31 St Pancras to Paris service is affected" matches trip EUR9005 (13:31 departure, cancelled). The reroute correctly avoids it and finds a viable 2-train alternative through Lille.</p>
       </div>
 
       <div class="card">
         <h3>Recommendations for Workshop Materials</h3>
-        <p>Based on the 8 assumptions the subagent had to make, consider these improvements:</p>
+        <p>Based on the assumptions the subagent had to make, consider these remaining improvements:</p>
         <ol>
+          <li><del><strong>Model name</strong></del> &mdash; <strong>FIXED.</strong> Added "do not change it" note to m1 context blocks. Subagent now correctly uses <code>gemini-3.5-flash</code></li>
           <li><strong>Add ADK export convention</strong> to m1 context: mention that <code>__init__.py</code> should export <code>root_agent</code></li>
           <li><strong>Clarify "remove disrupted"</strong> in <code>compute_reroute</code> spec: specify whether to exclude only cancelled trips or also delayed ones</li>
-          <li><strong>Specify BFS metric</strong>: "earliest arrival" vs "fewest changes" vs "shortest distance"</li>
-          <li><strong>Clarify <code>time_window_end</code> optionality</strong>: the <code>?</code> suffix notation in m1 is inconsistent with the 3-param signature in intro</li>
+          <li><strong>Specify reroute algorithm metric</strong>: "earliest arrival" vs "fewest changes" &mdash; the subagent chose Dijkstra by earliest arrival, while BFS would find fewest-stops routes</li>
+          <li><strong>Define <code>disruptions.json</code> schema</strong> explicitly: single event with <code>affected_trips[]</code> array, or array of independent disruptions?</li>
         </ol>
-        <p>Items 1-4 are low severity &mdash; the subagent made reasonable choices in all cases. The context blocks are already strong enough for a successful build.</p>
+        <p>Items 2-5 are low severity &mdash; the subagent made reasonable choices in all cases. The context blocks are strong enough for a successful build.</p>
       </div>
     </div>
   </div>
