@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rush Hour — Track 2 Workshop Introduction</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --accent: #1a73e8;
+    --accent-light: #e8f0fe;
+    --danger: #dc3545;
+    --danger-light: #fde8ea;
+    --success: #198754;
+    --success-light: #d1e7dd;
+    --warning: #fd7e14;
+    --warning-light: #fff3e0;
+    --govern: #7c3aed;
+    --govern-light: #ede9fe;
+    --optimize: #0891b2;
+    --optimize-light: #e0f7fa;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a237e 0%, #1565c0 50%, #0097a7 100%);
+    color: #fff;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--danger) 0 60px, var(--warning) 60px 120px, var(--success) 120px 180px, var(--accent) 180px 240px);
+  }
+  .hero-track { font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; opacity: .8; margin-bottom: .5rem; }
+  .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: .5rem; }
+  .hero h1 .emoji { font-size: 2rem; }
+  .hero-sub { font-size: 1.15rem; opacity: .9; max-width: 700px; margin: 0 auto; }
+
+  /* Layout */
+  .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+  .tab-btn {
+    padding: .75rem 1.25rem;
+    border: none;
+    background: none;
+    font-family: var(--font);
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: .75rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .card h3 .icon { font-size: 1.3rem; }
+
+  /* Alert / callout */
+  .callout {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    border-left: 4px solid;
+  }
+  .callout-danger { background: var(--danger-light); border-color: var(--danger); }
+  .callout-info { background: var(--accent-light); border-color: var(--accent); }
+  .callout-success { background: var(--success-light); border-color: var(--success); }
+  .callout-warning { background: var(--warning-light); border-color: var(--warning); }
+  .callout-title { font-weight: 700; margin-bottom: .35rem; }
+
+  /* Timeline / phase bar */
+  .phase-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .phase-chip {
+    text-align: center;
+    padding: .65rem .4rem;
+    border-radius: var(--radius);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+  }
+  .phase-build { background: var(--accent-light); color: var(--accent); }
+  .phase-scale { background: var(--success-light); color: var(--success); }
+  .phase-govern { background: var(--govern-light); color: var(--govern); }
+  .phase-optimize { background: var(--optimize-light); color: var(--optimize); }
+  .phase-engage { background: var(--warning-light); color: #b45309; }
+
+  /* Beat table */
+  .beat-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: .88rem;
+  }
+  .beat-grid > div { padding: .6rem .75rem; border-bottom: 1px solid var(--border); }
+  .beat-grid > div:nth-last-child(-n+3) { border-bottom: none; }
+  .beat-grid .bh { background: #f1f3f5; font-weight: 700; font-size: .82rem; }
+  .beat-num { font-weight: 800; color: var(--accent); }
+
+  /* Station map SVG */
+  .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
+  .map-wrap svg { max-width: 100%; height: auto; }
+
+  /* Prereq checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    font-size: .93rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon {
+    width: 22px; height: 22px; flex-shrink: 0;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .check-icon.checked { background: var(--accent); }
+  .check-icon.checked::after { content: "✓"; color: #fff; font-size: .75rem; font-weight: 800; }
+
+  /* Code / prompt blocks */
+  .prompt-block {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: .85rem;
+    line-height: 1.55;
+    margin: .75rem 0;
+    position: relative;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .prompt-label {
+    position: absolute;
+    top: .4rem; right: .6rem;
+    font-size: .65rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .prompt-block .kw { color: #569cd6; }
+  .prompt-block .str { color: #ce9178; }
+
+  code {
+    background: #eef1f5;
+    padding: .15rem .4rem;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: .88em;
+  }
+
+  /* Data table */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+    margin: .75rem 0;
+  }
+  table.data th, table.data td {
+    padding: .55rem .75rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  table.data th { background: #f1f3f5; font-weight: 700; }
+  table.data tr:hover td { background: #f8f9fa; }
+
+  /* Agent context block */
+  .agent-ctx {
+    background: #1b2838;
+    color: #c5e1f5;
+    border: 2px solid #2d4a6f;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    font-family: var(--mono);
+    font-size: .82rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .agent-ctx-label {
+    display: inline-block;
+    background: #2d4a6f;
+    color: #e0f0ff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: .2rem .6rem;
+    border-radius: 4px;
+    margin-bottom: .75rem;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    top: .4rem;
+    right: .5rem;
+    background: #333;
+    color: #aaa;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: .2rem .5rem;
+    font-size: .7rem;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+  .copy-btn:hover { background: #444; color: #ddd; }
+  .agent-section { position: relative; }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 1.6rem; }
+    .phase-bar { grid-template-columns: repeat(3, 1fr); }
+    .beat-grid { font-size: .8rem; }
+    .container { padding: 1rem .75rem; }
+  }
+
+  h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: .5rem; }
+  p { margin-bottom: .75rem; }
+  strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-track">Build with Gemini World Tour &middot; Track 2 &middot; Platform Builders</div>
+  <h1>"Rush Hour"</h1>
+  <p class="hero-sub">Build a Transit-Crisis Agent on the Gemini Enterprise Agent Platform<br>
+  ~2 hours &middot; hands-on &middot; vibe-build in Antigravity, then reveal the platform</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TABS
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="container">
+
+  <div class="phase-bar">
+    <div class="phase-chip phase-build">M1 &middot; BUILD</div>
+    <div class="phase-chip phase-scale">M2 &middot; SCALE</div>
+    <div class="phase-chip phase-govern">M3 &middot; GOVERN</div>
+    <div class="phase-chip phase-optimize">M4 &middot; OPTIMIZE</div>
+    <div class="phase-chip phase-engage">M5 &middot; ENGAGE</div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="mission" role="tab">The Mission</button>
+    <button class="tab-btn" data-tab="cockpit" role="tab">Your Cockpit</button>
+    <button class="tab-btn" data-tab="data" role="tab">The Data</button>
+    <button class="tab-btn" data-tab="journey" role="tab">Journey Map</button>
+    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       TAB 1: THE MISSION
+       ───────────────────────────────────────────────────────────── -->
+  <div id="tab-mission" class="tab-panel active">
+    <h2>The Crisis Briefing</h2>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">Signal Failure at London St Pancras</div>
+      <p>Peak evening departures. A signal failure at the St Pancras throat has halted all cross-border services.
+      Hundreds of travelers, one question repeated a thousand ways: <strong>"Will I still make it — and how?"</strong></p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F4AC;</span> Why a Chatbot Fails Here</h3>
+      <p>A plain LLM knows the rulebook, but not whether <em>your</em> train is actually running <em>right now</em>.
+      It will confidently recite timetable policy — then hallucinate a service that was cancelled an hour ago.</p>
+      <p>An <strong>agent</strong> is different: it has <strong>tools</strong> that can query the published schedule
+      (<em>what should happen</em>), read the disruption feed (<em>what is happening</em>), and <strong>compute</strong>
+      the join of those two — giving you a deterministic, verifiable answer: the delay, and a concrete reroute.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F3AF;</span> Your Deliverable</h3>
+      <p>By the end of this workshop you will have built a <strong>governed, deployed, optimized agent</strong>
+      that a non-technical ops manager can simply chat with in Gemini Enterprise:</p>
+      <div class="prompt-block"><span class="prompt-label">user prompt</span>"Trains out of St Pancras are disrupted — what do I tell travelers heading to Paris?"</div>
+      <p>And the agent will answer with a concrete, verified reroute — not a guess.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F528;</span> The Core Pattern: Schedule &times; Disruption Reconciliation</h3>
+      <p>Everything your agent does comes down to one join:</p>
+
+      <div class="map-wrap">
+        <svg viewBox="0 0 640 140" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
+          <defs>
+            <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6" fill="#1a73e8"/>
+            </marker>
+          </defs>
+          <rect x="10" y="20" width="170" height="60" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="95" y="42" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">GTFS Schedule</text>
+          <text x="95" y="60" text-anchor="middle" font-family="system-ui" font-size="10" fill="#555">"what should happen"</text>
+
+          <rect x="235" y="20" width="170" height="60" rx="10" fill="#fde8ea" stroke="#dc3545" stroke-width="1.5"/>
+          <text x="320" y="42" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#dc3545">Disruption Feed</text>
+          <text x="320" y="60" text-anchor="middle" font-family="system-ui" font-size="10" fill="#555">"what is happening"</text>
+
+          <line x1="180" y1="50" x2="233" y2="50" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#ah)"/>
+
+          <rect x="450" y="10" width="180" height="80" rx="10" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+          <text x="540" y="35" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#198754">Reconciled Answer</text>
+          <text x="540" y="52" text-anchor="middle" font-family="system-ui" font-size="10" fill="#555">delay + reroute</text>
+          <text x="540" y="68" text-anchor="middle" font-family="system-ui" font-size="10" fill="#555">deterministic, verifiable</text>
+
+          <line x1="405" y1="50" x2="448" y2="50" stroke="#198754" stroke-width="1.5" marker-end="url(#ah)"/>
+
+          <text x="320" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#888">JOIN on trip_id / stop_id</text>
+          <line x1="320" y1="80" x2="320" y2="105" stroke="#aaa" stroke-width="1" stroke-dasharray="4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F310;</span> The Network</h3>
+      <p>The dataset covers <strong>17 stations</strong> across 5 countries (UK, France, Belgium, Netherlands, Germany)
+      on the Eurostar / cross-border rail network. This is intercity rail — we frame the crisis as a
+      <strong>cross-border reroute</strong>, not a metro/tube scenario.</p>
+
+      <div class="map-wrap">
+        <svg viewBox="0 0 600 290" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <rect x="0" y="0" width="600" height="290" rx="12" fill="#f0f4f8"/>
+          <!-- UK -->
+          <rect x="20" y="20" width="160" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="100" y="38" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">UNITED KINGDOM</text>
+          <circle cx="60" cy="58" r="5" fill="#dc3545"/>
+          <text x="72" y="62" font-family="system-ui" font-size="10" fill="#333" font-weight="700">St Pancras</text>
+          <text x="60" y="58" text-anchor="middle" font-family="system-ui" font-size="5" fill="#fff" font-weight="800">!</text>
+          <!-- disruption marker -->
+          <rect x="38" y="45" width="44" height="16" rx="3" fill="#dc3545" opacity=".12"/>
+          <!-- France -->
+          <rect x="20" y="110" width="280" height="80" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="160" y="128" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">FRANCE</text>
+          <circle cx="70" cy="155" r="4" fill="#1a73e8"/>
+          <text x="80" y="159" font-family="system-ui" font-size="10" fill="#333">Lille Europe</text>
+          <circle cx="70" cy="175" r="4" fill="#1a73e8"/>
+          <text x="80" y="179" font-family="system-ui" font-size="10" fill="#333">Paris Gare du Nord</text>
+          <circle cx="200" cy="155" r="4" fill="#1a73e8"/>
+          <text x="210" y="159" font-family="system-ui" font-size="10" fill="#333">Calais</text>
+          <!-- Belgium -->
+          <rect x="320" y="110" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="128" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">BELGIUM</text>
+          <circle cx="370" cy="150" r="4" fill="#1a73e8"/>
+          <text x="380" y="154" font-family="system-ui" font-size="10" fill="#333">Brussels Midi</text>
+          <!-- Netherlands -->
+          <rect x="320" y="20" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="38" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">NETHERLANDS</text>
+          <circle cx="370" cy="58" r="4" fill="#1a73e8"/>
+          <text x="380" y="62" font-family="system-ui" font-size="10" fill="#333">Amsterdam / Rotterdam</text>
+          <!-- Germany -->
+          <rect x="320" y="200" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="218" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">GERMANY</text>
+          <circle cx="370" cy="240" r="4" fill="#1a73e8"/>
+          <text x="380" y="244" font-family="system-ui" font-size="10" fill="#333">Cologne / Frankfurt</text>
+          <!-- Connections -->
+          <line x1="60" y1="63" x2="70" y2="151" stroke="#dc3545" stroke-width="2" stroke-dasharray="6,3"/>
+          <line x1="70" y1="159" x2="70" y2="171" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="70" y1="155" x2="196" y2="155" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="200" y1="155" x2="366" y2="150" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="370" y1="146" x2="370" y2="62" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="370" y1="154" x2="370" y2="236" stroke="#1a73e8" stroke-width="1.5"/>
+          <!-- Legend -->
+          <line x1="30" y1="265" x2="55" y2="265" stroke="#dc3545" stroke-width="2" stroke-dasharray="6,3"/>
+          <text x="60" y="269" font-family="system-ui" font-size="9" fill="#888">Disrupted</text>
+          <line x1="120" y1="265" x2="145" y2="265" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="150" y="269" font-family="system-ui" font-size="9" fill="#888">Available for reroute</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       TAB 2: YOUR COCKPIT
+       ───────────────────────────────────────────────────────────── -->
+  <div id="tab-cockpit" class="tab-panel">
+    <h2>Your Cockpit — Antigravity + agents-cli + Skills</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">The Mantra</div>
+      <p><strong>"Describe the outcome; let the skills do the wiring."</strong> You prompt in natural language.
+      The coding agent in Antigravity, powered by <code>agents-cli</code> skills, does the scaffolding,
+      deploying, evaluating, and publishing.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F680;</span> Antigravity — The Agentic IDE</h3>
+      <p>Antigravity is your cockpit for the entire session. It's an IDE with a built-in coding agent
+      that can read your project, generate code, run commands, and interact with the Agent Platform —
+      all from natural-language prompts.</p>
+      <p>You don't hand-write boilerplate. You describe what you want, and the agent builds it.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x2699;&#xFE0F;</span> agents-cli &amp; Skills</h3>
+      <p>The <code>agents-cli</code> is a CLI that comes with <strong>ADK development skills</strong> —
+      pre-built capabilities the coding agent can invoke:</p>
+      <table class="data">
+        <thead><tr><th>Skill</th><th>What it does</th><th>Used in</th></tr></thead>
+        <tbody>
+          <tr><td><code>scaffold</code></td><td>Creates a full ADK project structure from a description</td><td>M1 Build</td></tr>
+          <tr><td><code>deploy</code></td><td>Packages and deploys to Agent Runtime</td><td>M2 Scale</td></tr>
+          <tr><td><code>eval</code></td><td>Runs evaluation suite with autoraters</td><td>M4 Optimize</td></tr>
+          <tr><td><code>optimize</code></td><td>Analyzes failures and refines system instruction</td><td>M4 Optimize</td></tr>
+          <tr><td><code>publish</code></td><td>Registers agent with Gemini Enterprise</td><td>M5 Engage</td></tr>
+          <tr><td><code>observe</code></td><td>Surfaces traces, logs, metrics</td><td>Throughout</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem;">Install with:</p>
+      <div class="prompt-block"><span class="prompt-label">shell</span>uvx google-agents-cli setup</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x2705;</span> Prerequisites Checklist</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Antigravity</strong> installed and open</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>agents-cli</strong> installed with skills (<code>uvx google-agents-cli setup</code>)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Google Cloud project</strong> with Agent Platform enabled</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Access to a <strong>Gemini Enterprise</strong> app</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Python 3.11+</strong> and <strong>uv</strong></div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Model: <strong>gemini-3.5-flash</strong> (GA-stable, fast, strong tool-calling)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data bundle downloaded (see "The Data" tab)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console open in a browser tab (empty — "before" shot)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app open in a browser tab (empty — "before" shot)</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       TAB 3: THE DATA
+       ───────────────────────────────────────────────────────────── -->
+  <div id="tab-data" class="tab-panel">
+    <h2>The Data — Static GTFS + Simulated Disruption</h2>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">No Live APIs</div>
+      <p>We use <strong>static data only</strong>. This keeps the lab 100% reliable in a room of 100+ people
+      on conference Wi-Fi, and keeps the focus on the <em>platform</em>, not on flaky feeds.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F4C5;</span> The GTFS Bundle</h3>
+      <p>A <strong>static London GTFS dataset</strong> covering Eurostar / St Pancras cross-border rail:</p>
+      <table class="data">
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Coverage</td><td>17 stations across UK, France, Belgium, Netherlands, Germany</td></tr>
+          <tr><td>Schedule horizon</td><td>~10 months</td></tr>
+          <tr><td>Type</td><td>Intercity / cross-border rail (not metro/tube)</td></tr>
+          <tr><td>Source</td><td>Downloaded from provided GCS link / Drive zip</td></tr>
+          <tr><td>Key files</td><td><code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x26A0;&#xFE0F;</span> The Disruption File</h3>
+      <p>A small file that simulates the <strong>"signal failure at St Pancras"</strong> crisis.
+      You'll layer this on top of the GTFS schedule data to create the disruption scenario.</p>
+      <p>The disruption specifies:</p>
+      <ul style="margin-left:1.25rem; margin-bottom:.5rem;">
+        <li>Which <strong>trip IDs</strong> are affected (cancelled / delayed)</li>
+        <li>The <strong>delay magnitude</strong> (in minutes)</li>
+        <li>Which <strong>stops</strong> are impacted</li>
+        <li>The <strong>cause</strong> ("signal failure") and <strong>time window</strong></li>
+      </ul>
+      <p>Your agent's tools must reconcile this file against the GTFS schedule to produce answers.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F5C2;&#xFE0F;</span> Workspace Layout</h3>
+      <div class="prompt-block"><span class="prompt-label">tree</span>workshop-project/
+├── data/
+│   ├── gtfs/            # Static GTFS bundle
+│   │   ├── stops.txt
+│   │   ├── stop_times.txt
+│   │   ├── trips.txt
+│   │   ├── routes.txt
+│   │   └── calendar.txt
+│   └── disruptions.json # Simulated signal failure
+├── agent/               # ADK agent (scaffolded in M1)
+│   ├── agent.py
+│   ├── tools.py
+│   └── __init__.py
+├── pyproject.toml
+└── .env</div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       TAB 4: JOURNEY MAP
+       ───────────────────────────────────────────────────────────── -->
+  <div id="tab-journey" class="tab-panel">
+    <h2>The Journey — Build &rarr; Scale &rarr; Govern &rarr; Optimize</h2>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F3B5;</span> The 4-Beat Rhythm (Every Module)</h3>
+      <p>Each module repeats these four beats. This is the spine of the workshop:</p>
+      <div class="beat-grid">
+        <div class="bh"><span class="beat-num">#</span></div>
+        <div class="bh">What happens</div>
+        <div class="bh">Why it matters</div>
+
+        <div><span class="beat-num">1</span></div>
+        <div><strong>The Prompt</strong> — what you type into Antigravity</div>
+        <div>Proves the "do it with a prompt" promise</div>
+
+        <div><span class="beat-num">2</span></div>
+        <div><strong>Under the Hood</strong> — which skill / ADK feature ran</div>
+        <div>Demystifies the automation</div>
+
+        <div><span class="beat-num">3</span></div>
+        <div><strong>Platform Reveal</strong> — see it in the Cloud console</div>
+        <div>Proves it's a real enterprise asset</div>
+
+        <div><span class="beat-num">4</span></div>
+        <div><strong>So-What</strong> — the enterprise value</div>
+        <div>Speaks to the platform-builder audience</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F5D3;&#xFE0F;</span> Timeline</h3>
+      <table class="data">
+        <thead><tr><th>Time</th><th>Module</th><th>Headline</th><th>Format</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:10</td><td style="font-weight:700;">M0 Setup</td><td>Cockpit check, data, crisis brief, see the empty platform</td><td>Guided</td></tr>
+          <tr style="background:#e8f0fe;"><td>0:10–0:40</td><td style="font-weight:700; color:var(--accent);">M1 BUILD</td><td>Vibe-build the transit agent + tools; run locally</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#d1e7dd;"><td>0:40–1:05</td><td style="font-weight:700; color:var(--success);">M2 SCALE</td><td>Deploy to Agent Runtime; Sessions, Memory Bank, sandbox</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#ede9fe;"><td>1:05–1:30</td><td style="font-weight:700; color:var(--govern);">M3 GOVERN</td><td>Registry, Identity, Gateway, Model Armor</td><td>Guided demo</td></tr>
+          <tr style="background:#e0f7fa;"><td>1:30–1:50</td><td style="font-weight:700; color:var(--optimize);">M4 OPTIMIZE</td><td>Quality Flywheel: simulate, score, cluster, optimize</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#fff3e0;"><td>1:50–2:00</td><td style="font-weight:700; color:#b45309;">M5 ENGAGE</td><td>Publish to Gemini Enterprise; talk to your agent</td><td>Guided</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F3D7;&#xFE0F;</span> What You'll Build — Platform Artifacts</h3>
+      <div class="map-wrap">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;">
+          <defs>
+            <marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6" fill="#666"/>
+            </marker>
+          </defs>
+          <!-- BUILD -->
+          <rect x="10" y="30" width="120" height="140" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="70" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#1a73e8">BUILD</text>
+          <text x="70" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">ADK Agent</text>
+          <text x="70" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">3 Tools</text>
+          <text x="70" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">System Instruction</text>
+          <text x="70" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Local Playground</text>
+          <text x="70" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">gemini-3.5-flash</text>
+
+          <line x1="132" y1="100" x2="150" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- SCALE -->
+          <rect x="152" y="30" width="130" height="140" rx="10" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+          <text x="217" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#198754">SCALE</text>
+          <text x="217" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Runtime</text>
+          <text x="217" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Sessions</text>
+          <text x="217" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Memory Bank</text>
+          <text x="217" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Code Exec Sandbox</text>
+          <text x="217" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Serverless 0→∞</text>
+
+          <line x1="284" y1="100" x2="302" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- GOVERN -->
+          <rect x="304" y="30" width="130" height="140" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="369" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#7c3aed">GOVERN</text>
+          <text x="369" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Registry</text>
+          <text x="369" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Identity (IAM)</text>
+          <text x="369" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Gateway</text>
+          <text x="369" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Model Armor</text>
+          <text x="369" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Attack-surface control</text>
+
+          <line x1="436" y1="100" x2="454" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- OPTIMIZE -->
+          <rect x="456" y="30" width="130" height="140" rx="10" fill="#e0f7fa" stroke="#0891b2" stroke-width="1.5"/>
+          <text x="521" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#0891b2">OPTIMIZE</text>
+          <text x="521" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">User Simulation</text>
+          <text x="521" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Env Simulation</text>
+          <text x="521" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Multi-turn Autoraters</text>
+          <text x="521" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Loss Clusters</text>
+          <text x="521" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Quality Flywheel</text>
+
+          <line x1="588" y1="100" x2="606" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- ENGAGE -->
+          <rect x="608" y="55" width="82" height="90" rx="10" fill="#fff3e0" stroke="#b45309" stroke-width="1.5"/>
+          <text x="649" y="47" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="800" fill="#b45309">ENGAGE</text>
+          <text x="649" y="85" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Gemini</text>
+          <text x="649" y="100" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Enterprise</text>
+          <text x="649" y="130" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Chat UI</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       TAB 5: AGENT CONTEXT (machine-readable + human-readable)
+       ───────────────────────────────────────────────────────────── -->
+  <div id="tab-agent" class="tab-panel">
+    <h2>Agent Context — Feed This to Your Coding Agent</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">What is this tab?</div>
+      <p>This tab contains structured context blocks you can feed to your coding agent (in Antigravity
+      or any LLM-powered IDE). Copy a block and paste it into the agent's context, or point the agent
+      at this file. Each block is self-contained and designed for machine consumption.</p>
+    </div>
+
+    <!-- BLOCK 1: Project context -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F4CB;</span> Project Context</h3>
+      <p>High-level project description for agent onboarding.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-project')">Copy</button>
+      <div class="agent-ctx" id="ctx-project"><span class="agent-ctx-label">Agent Context &middot; Project</span>
+## Project: Rush Hour Transit-Crisis Agent
+
+Type: ADK (Agent Development Kit) agent on Gemini Enterprise Agent Platform
+Model: gemini-3.5-flash
+Language: Python 3.11+
+Package manager: uv
+CLI tooling: agents-cli (installed via `uvx google-agents-cli setup`)
+
+### Mission
+Build an agent that answers commuter questions during a signal failure
+at London St Pancras. The agent reconciles a GTFS schedule ("what should
+happen") against a disruption feed ("what is happening") and returns:
+- The exact delay for affected services
+- A concrete reroute via alternative stations (Lille, Brussels, etc.)
+
+### Why an agent, not a chatbot
+A plain LLM cannot query structured data, join two datasets, or compute
+a shortest-path reroute. The agent has deterministic tools that do this.
+
+### Data
+- Static GTFS bundle: 17 stations, ~10-month schedule, intercity cross-border rail
+  (UK/FR/BE/NL/DE). Files: stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt
+- Disruption file (disruptions.json): simulated signal failure at St Pancras
+  with affected trip_ids, delays, impacted stops, cause, and time window
+- NO live API calls. All data is local and static.
+
+### Key stations in the network
+St Pancras (London), Paris Gare du Nord, Lille Europe, Calais-Fréthun,
+Brussels Midi, Amsterdam Centraal, Rotterdam Centraal, Antwerp, Cologne,
+Frankfurt, and others (17 total).</div>
+    </div>
+
+    <!-- BLOCK 2: Tools spec -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F527;</span> Tools Specification</h3>
+      <p>The three tools the agent needs, with expected behavior.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-tools')">Copy</button>
+      <div class="agent-ctx" id="ctx-tools"><span class="agent-ctx-label">Agent Context &middot; Tools</span>
+## Agent Tools (3 required)
+
+### Tool 1: get_scheduled_departures
+Purpose: Look up "what SHOULD be running" from the static GTFS data.
+Inputs:
+  - station_name: str — name or ID of the station (e.g., "St Pancras")
+  - time_window_start: str — ISO time or HH:MM
+  - time_window_end: str — ISO time or HH:MM (optional, default +2h)
+Output: List of scheduled departures with trip_id, route, destination,
+        departure_time, and stop_sequence.
+Data source: GTFS files (stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt)
+Key join: stop_times.trip_id → trips.trip_id → routes.route_id
+
+### Tool 2: check_disruptions
+Purpose: Read "what IS happening" from the disruption feed.
+Inputs:
+  - station_name: str (optional — filter by affected station)
+  - trip_id: str (optional — check a specific service)
+Output: List of disruptions with trip_id, affected_stops, delay_minutes,
+        status (cancelled | delayed), cause, and time_window.
+Data source: disruptions.json
+
+### Tool 3: compute_reroute
+Purpose: Given an origin, destination, and the current disruptions,
+         find an alternative path across the 17-station network.
+Inputs:
+  - origin: str — starting station
+  - destination: str — target station
+  - departure_after: str — earliest acceptable departure time
+Output: Recommended route as a list of legs, each with departure_time,
+        arrival_time, station_from, station_to, trip_id, and route_name.
+        Total journey time and number of changes.
+Logic: Filter out disrupted services, search remaining connections
+       for a valid path (BFS/shortest-path over the station graph).
+
+### Reconciliation pattern (critical)
+The agent MUST call Tool 1 + Tool 2 before answering any disruption
+question. The join of schedule × disruption on trip_id/stop_id is
+the core pattern that makes this agent useful. Tool 3 is used when
+a reroute is needed.</div>
+    </div>
+
+    <!-- BLOCK 3: System instruction -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F4DD;</span> System Instruction Template</h3>
+      <p>Suggested system prompt for the transit agent.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-sysinstruction')">Copy</button>
+      <div class="agent-ctx" id="ctx-sysinstruction"><span class="agent-ctx-label">Agent Context &middot; System Instruction</span>
+## System Instruction for the Transit-Crisis Agent
+
+You are a transit assistant for cross-border rail services departing
+from London St Pancras. A signal failure is disrupting services.
+
+Rules:
+1. ALWAYS reconcile the published schedule against the disruption feed
+   before answering. Call get_scheduled_departures AND check_disruptions
+   for every query — never answer from memory alone.
+2. NEVER invent a train service. Only reference trips that exist in the
+   GTFS data. If no data is available, say so.
+3. When a service is disrupted, proactively call compute_reroute to
+   offer a concrete alternative. Include departure time, route, and
+   number of changes.
+4. Stay calm and factual. Travelers are stressed — be concise, clear,
+   and reassuring without overpromising.
+5. End every response with ONE clear recommended action
+   (e.g., "Take the 14:05 via Brussels Midi, arriving Paris 17:32").
+6. If the disruption feed is unavailable or returns an error, tell the
+   user you cannot confirm live status and recommend they check
+   departure boards.</div>
+    </div>
+
+    <!-- BLOCK 4: Scaffold prompt -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F3AC;</span> Ready-to-Use Prompts</h3>
+      <p>Copy these prompts into Antigravity to drive each step of Module 1.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
+      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; Prompts</span>
+## Prompts for Module 1 (BUILD)
+
+### Step 1 — Scaffold
+"Scaffold a new ADK agent project for a transit assistant that will
+answer commuter questions during a service disruption. Use Python,
+gemini-3.5-flash as the model, and uv for dependency management."
+
+### Step 2 — Add tools
+"Add three tools to the agent:
+1. get_scheduled_departures — queries the static GTFS data in data/gtfs/
+   to list departures from a given station within a time window.
+2. check_disruptions — reads data/disruptions.json and returns affected
+   services, delays, and cancellations.
+3. compute_reroute — given origin, destination, and current disruptions,
+   finds an alternative route across the station network.
+Write clear docstrings and type hints so the model can call them
+correctly. The critical pattern is reconciliation: joining schedule
+data with disruption data on trip_id and stop_id."
+
+### Step 3 — System instruction
+"Write the system instruction: stay calm and factual, always reconcile
+schedule against disruptions before answering, never invent a train,
+proactively compute reroutes, and end with one clear recommended action."
+
+### Step 4 — Test locally
+"Run the agent in the ADK local playground. Test with this query:
+'My 13:31 St Pancras to Paris service is affected — how do I still
+get to Paris?'"</div>
+    </div>
+
+    <!-- BLOCK 5: Workspace and environment -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F4C1;</span> Workspace &amp; Environment</h3>
+      <p>File layout and environment assumptions for the coding agent.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-env')">Copy</button>
+      <div class="agent-ctx" id="ctx-env"><span class="agent-ctx-label">Agent Context &middot; Environment</span>
+## Workspace Layout
+
+workshop-project/
+├── data/
+│   ├── gtfs/                # Static GTFS bundle (pre-downloaded)
+│   │   ├── stops.txt        # Station definitions (17 stations)
+│   │   ├── stop_times.txt   # Departure/arrival times per trip per stop
+│   │   ├── trips.txt        # Trip definitions with route references
+│   │   ├── routes.txt       # Route metadata (Eurostar, Thalys, etc.)
+│   │   └── calendar.txt     # Service day patterns
+│   └── disruptions.json     # Simulated disruption (signal failure)
+├── agent/                   # ADK agent code (scaffolded)
+│   ├── agent.py             # Agent definition + system instruction
+│   ├── tools.py             # Three tool functions
+│   └── __init__.py
+├── pyproject.toml           # Dependencies managed by uv
+└── .env                     # GOOGLE_CLOUD_PROJECT, model config
+
+## Environment
+- Python: 3.11+
+- Package manager: uv (not pip)
+- Model: gemini-3.5-flash
+- Framework: Google ADK (Agent Development Kit)
+- CLI: agents-cli with skills (scaffold, deploy, eval, optimize, publish)
+- IDE: Antigravity (agentic IDE)
+- No live API calls — all data is local static files
+- GTFS data is read-only — the agent never modifies it</div>
+    </div>
+
+    <!-- BLOCK 6: Full combined context -->
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F4E6;</span> Combined Context (All-in-One)</h3>
+      <p>A single block combining all the above — paste this once to fully onboard your coding agent.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; Combined</span>
+# Rush Hour: Transit-Crisis Agent — Full Context
+
+## Mission
+Build an ADK agent that answers commuter questions during a signal
+failure at London St Pancras. It reconciles a static GTFS schedule
+against a simulated disruption feed and returns verified delays and
+concrete reroutes across the 17-station cross-border rail network
+(UK/FR/BE/NL/DE).
+
+## Stack
+- Framework: Google ADK (Agent Development Kit)
+- Model: gemini-3.5-flash
+- Language: Python 3.11+ with uv
+- CLI: agents-cli (scaffold/deploy/eval/optimize/publish skills)
+- Data: local static files only, no live APIs
+
+## Data
+- data/gtfs/ — stops.txt, stop_times.txt, trips.txt, routes.txt,
+  calendar.txt — 17 stations, ~10-month intercity schedule
+- data/disruptions.json — simulated signal failure: affected trip_ids,
+  delays, impacted stops, cause, time window
+
+## Tools (3 required)
+1. get_scheduled_departures(station_name, time_window_start, time_window_end)
+   → list of scheduled departures from GTFS
+2. check_disruptions(station_name?, trip_id?)
+   → list of disruptions from disruptions.json
+3. compute_reroute(origin, destination, departure_after)
+   → alternative route avoiding disrupted services
+
+## Core pattern: Reconciliation
+The agent MUST call get_scheduled_departures + check_disruptions
+before answering. The join of schedule × disruption on trip_id/stop_id
+is what makes this an agent, not a chatbot.
+
+## System instruction rules
+1. Always reconcile schedule vs disruptions before answering
+2. Never invent a train — only reference trips in the GTFS data
+3. Proactively compute reroutes when services are disrupted
+4. Stay calm and factual; end with one clear recommended action
+5. If disruption feed is unavailable, say so and recommend boards
+
+## Test query
+"My 13:31 St Pancras to Paris service is affected — how do I still
+get to Paris?"
+Expected: agent calls all 3 tools, returns a concrete reroute.</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Copy blocks
+  function copyBlock(id) {
+    const el = document.getElementById(id);
+    // Strip the label span text and get just the content
+    const text = el.innerText.replace(/^Agent Context · [A-Za-z]+\n/, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.parentElement.querySelector('.copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
