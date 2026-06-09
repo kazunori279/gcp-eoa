@@ -11,7 +11,16 @@ Workshop catalog and event history for the Google Cloud "Era of Agents" hands-on
   - **Guidelines** — Instructions for workshop organizers, speakers, and content owners
   - **Past Events** — 35 events, 2,035+ total attendees across multiple countries
 
-Open the HTML file in any browser — no dependencies or build step required.
+### Build with Gemini World Tour — Track 2: Rush Hour
+
+2-hour hands-on workshop where participants build a transit-crisis ADK agent on the Gemini Enterprise Agent Platform.
+
+- **[Introduction](https://kazunori279.github.io/gcp-eoa/BwG-track2/intro.html)** — Mission, stack, data, and agent context
+- **[M0 · Setup](https://kazunori279.github.io/gcp-eoa/BwG-track2/m0.html)** — Environment setup and data orientation
+- **[M1 · Build](https://kazunori279.github.io/gcp-eoa/BwG-track2/m1.html)** — Core agent with 3 tools
+- **[Test Plan](https://kazunori279.github.io/gcp-eoa/BwG-track2/test_plan.html)** — Agent context validation (12/12 PASS)
+
+Open the HTML files in any browser — no dependencies or build step required.
 
 ## For AI coding agents
 
