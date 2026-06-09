@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rush Hour — Agent Context Test Plan</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --accent: #1a73e8;
+    --accent-light: #e8f0fe;
+    --danger: #dc3545;
+    --danger-light: #fde8ea;
+    --success: #198754;
+    --success-light: #d1e7dd;
+    --warning: #fd7e14;
+    --warning-light: #fff3e0;
+    --govern: #7c3aed;
+    --govern-light: #ede9fe;
+    --optimize: #0891b2;
+    --optimize-light: #e0f7fa;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* Sidebar nav */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 220px;
+    height: 100vh;
+    background: #1a1f2e;
+    color: #c5cdd8;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sidebar-header {
+    padding: 1.25rem 1rem .75rem;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .sidebar-header .title {
+    font-size: .85rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .5px;
+    line-height: 1.3;
+  }
+  .sidebar-header .subtitle {
+    font-size: .7rem;
+    color: #6b7a8d;
+    margin-top: .2rem;
+  }
+  .sidebar nav { flex: 1; padding: .5rem 0; }
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .6rem 1rem;
+    color: #8b97a8;
+    text-decoration: none;
+    font-size: .82rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .sidebar a:hover {
+    background: rgba(255,255,255,.05);
+    color: #d0d8e3;
+  }
+  .sidebar a.active {
+    background: rgba(26,115,232,.12);
+    color: #8ab4f8;
+    border-left-color: #8ab4f8;
+    font-weight: 700;
+  }
+  .sidebar a .nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sidebar a .nav-label { line-height: 1.3; }
+  .sidebar a .nav-sub {
+    display: block;
+    font-size: .7rem;
+    font-weight: 400;
+    color: #5e6b7a;
+  }
+  .sidebar a.active .nav-sub { color: #6a9bd8; }
+
+  .main-content { margin-left: 220px; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; }
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 50%, #ab47bc 100%);
+    color: #fff;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--danger) 0 60px, var(--warning) 60px 120px, var(--success) 120px 180px, var(--accent) 180px 240px);
+  }
+  .hero-track { font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; opacity: .8; margin-bottom: .5rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .5rem; }
+  .hero-sub { font-size: 1.1rem; opacity: .9; max-width: 700px; margin: 0 auto; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+  .tab-btn {
+    padding: .75rem 1.25rem;
+    border: none;
+    background: none;
+    font-family: var(--font);
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: .75rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .callout {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    border-left: 4px solid;
+  }
+  .callout-danger { background: var(--danger-light); border-color: var(--danger); }
+  .callout-info { background: var(--accent-light); border-color: var(--accent); }
+  .callout-success { background: var(--success-light); border-color: var(--success); }
+  .callout-warning { background: var(--warning-light); border-color: var(--warning); }
+  .callout-title { font-weight: 700; margin-bottom: .35rem; }
+
+  /* Agent context blocks */
+  .ctx-block {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    font-family: var(--mono);
+    font-size: .82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+    overflow-x: auto;
+  }
+  .ctx-label {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .15rem .55rem;
+    border-radius: 4px;
+    margin-bottom: .75rem;
+    font-family: var(--font);
+    letter-spacing: .5px;
+  }
+
+  /* Copy button */
+  .copy-wrap { position: relative; }
+  .copy-btn {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.15);
+    color: #bac2de;
+    padding: .3rem .65rem;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: background .15s, color .15s;
+    z-index: 2;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+
+  /* File tree */
+  .file-tree {
+    font-family: var(--mono);
+    font-size: .85rem;
+    line-height: 1.8;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+  .file-tree .dir { color: var(--accent); font-weight: 600; }
+  .file-tree .file { color: var(--text-muted); }
+  .file-tree .new { color: var(--success); font-weight: 600; }
+
+  /* Test matrix */
+  .test-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+    margin-bottom: 1.25rem;
+  }
+  .test-matrix th {
+    background: #f1f3f5;
+    font-weight: 700;
+    text-align: left;
+    padding: .6rem .75rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .test-matrix td {
+    padding: .6rem .75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .test-matrix tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: .15rem .5rem;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-weight: 700;
+  }
+  .badge-pending { background: var(--warning-light); color: #b45309; }
+  .badge-pass { background: var(--success-light); color: var(--success); }
+  .badge-fail { background: var(--danger-light); color: var(--danger); }
+  .badge-info { background: var(--accent-light); color: var(--accent); }
+
+  /* Subagent prompt preview */
+  .prompt-preview {
+    background: #f6f8fa;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    font-size: .88rem;
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+  .prompt-preview h4 {
+    color: var(--accent);
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: .5rem;
+  }
+  .prompt-preview p { margin-bottom: .75rem; }
+
+  /* Flow diagram */
+  .flow-wrap { text-align: center; margin: 1.5rem 0; overflow-x: auto; }
+  .flow-wrap svg { max-width: 100%; height: auto; }
+
+  h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+  h3 { font-size: 1.05rem; margin-bottom: .6rem; }
+  p { margin-bottom: .75rem; }
+  ul, ol { margin-bottom: .75rem; padding-left: 1.5rem; }
+  li { margin-bottom: .3rem; }
+  code { font-family: var(--mono); background: #f1f3f5; padding: .1rem .4rem; border-radius: 4px; font-size: .88em; }
+
+  /* Results section */
+  #results-content .result-file {
+    margin-bottom: 1.5rem;
+  }
+  #results-content .result-file h4 {
+    font-family: var(--mono);
+    font-size: .9rem;
+    color: var(--accent);
+    margin-bottom: .5rem;
+  }
+  #results-content pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: var(--radius);
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: .8rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="title">"Rush Hour"</div>
+    <div class="subtitle">Track 2 &middot; Platform Builders</div>
+  </div>
+  <nav>
+    <a href="intro.html">
+      <span class="nav-dot" style="background:#8ab4f8"></span>
+      <span class="nav-label">Introduction<span class="nav-sub">Overview</span></span>
+    </a>
+    <a href="m0.html">
+      <span class="nav-dot" style="background:#81c995"></span>
+      <span class="nav-label">M0 &middot; Setup<span class="nav-sub">Environment</span></span>
+    </a>
+    <a href="m1.html">
+      <span class="nav-dot" style="background:#1a73e8"></span>
+      <span class="nav-label">M1 &middot; Build<span class="nav-sub">Core Agent</span></span>
+    </a>
+    <a href="m2.html">
+      <span class="nav-dot" style="background:#198754"></span>
+      <span class="nav-label">M2 &middot; Scale<span class="nav-sub">Multi-Agent</span></span>
+    </a>
+    <a href="m3.html">
+      <span class="nav-dot" style="background:#7c3aed"></span>
+      <span class="nav-label">M3 &middot; Govern<span class="nav-sub">Guardrails</span></span>
+    </a>
+    <a href="m4.html">
+      <span class="nav-dot" style="background:#0891b2"></span>
+      <span class="nav-label">M4 &middot; Optimize<span class="nav-sub">Eval &amp; Tune</span></span>
+    </a>
+    <a href="m5.html">
+      <span class="nav-dot" style="background:#fd7e14"></span>
+      <span class="nav-label">M5 &middot; Engage<span class="nav-sub">Deploy</span></span>
+    </a>
+    <a href="test_plan.html" class="active">
+      <span class="nav-dot" style="background:#ab47bc"></span>
+      <span class="nav-label">Test Plan<span class="nav-sub">Validation</span></span>
+    </a>
+  </nav>
+</aside>
+
+<div class="main-content">
+  <header class="hero">
+    <div class="hero-track">Track 2 &middot; Quality Assurance</div>
+    <h1>Agent Context Test Plan</h1>
+    <div class="hero-sub">Validate that workshop context snippets are sufficient for a coding agent to build the transit-crisis ADK agent end-to-end</div>
+  </header>
+
+  <div class="container">
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="approach" role="tab">Test Approach</button>
+      <button class="tab-btn" data-tab="blocks" role="tab">Context Blocks</button>
+      <button class="tab-btn" data-tab="expected" role="tab">Expected Output</button>
+      <button class="tab-btn" data-tab="matrix" role="tab">Test Matrix</button>
+      <button class="tab-btn" data-tab="results" role="tab">Results</button>
+    </div>
+
+    <!-- Tab 1: Test Approach -->
+    <div id="approach" class="tab-panel active">
+      <div class="callout callout-info">
+        <div class="callout-title">What are we testing?</div>
+        Whether a coding agent (simulating Antigravity) can build a complete, syntactically valid ADK transit-crisis agent using <strong>only</strong> the agent context snippets that workshop participants copy-paste from the HTML pages.
+      </div>
+
+      <div class="card">
+        <h3>Methodology</h3>
+        <p>Launch an independent subagent with the exact text from 4 context blocks — the same content participants will paste into Antigravity. The subagent:</p>
+        <ol>
+          <li><strong>Generates synthetic GTFS data</strong> — 17 stations, ~20 trips, 5 routes, plus <code>disruptions.json</code></li>
+          <li><strong>Scaffolds the ADK project</strong> — <code>agent/</code> directory with <code>__init__.py</code>, <code>agent.py</code>, <code>tools.py</code>, and <code>pyproject.toml</code></li>
+          <li><strong>Implements 3 tools</strong> — <code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code></li>
+          <li><strong>Writes the system instruction</strong> — reconciliation rules per the context</li>
+          <li><strong>Self-validates</strong> — Python AST parse to confirm no syntax errors</li>
+        </ol>
+      </div>
+
+      <div class="flow-wrap">
+        <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Context blocks flow -->
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a73e8"/>
+            </marker>
+          </defs>
+          <!-- Source blocks -->
+          <rect x="10" y="20" width="120" height="65" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="70" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">intro.html</text>
+          <text x="70" y="58" text-anchor="middle" font-size="9" fill="#6c757d">ctx-combined</text>
+          <text x="70" y="72" text-anchor="middle" font-size="9" fill="#6c757d">Project overview</text>
+
+          <rect x="145" y="20" width="120" height="65" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="205" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">m0.html</text>
+          <text x="205" y="58" text-anchor="middle" font-size="9" fill="#6c757d">ctx-combined</text>
+          <text x="205" y="72" text-anchor="middle" font-size="9" fill="#6c757d">Post-setup state</text>
+
+          <rect x="280" y="20" width="120" height="65" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="340" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">m1.html</text>
+          <text x="340" y="58" text-anchor="middle" font-size="9" fill="#6c757d">ctx-combined</text>
+          <text x="340" y="72" text-anchor="middle" font-size="9" fill="#6c757d">Build specs</text>
+
+          <rect x="415" y="20" width="120" height="65" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="475" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">m1.html</text>
+          <text x="475" y="58" text-anchor="middle" font-size="9" fill="#6c757d">ctx-prompts</text>
+          <text x="475" y="72" text-anchor="middle" font-size="9" fill="#6c757d">4 step prompts</text>
+
+          <!-- Arrow to subagent -->
+          <line x1="270" y1="95" x2="270" y2="125" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="290" y="115" font-size="10" fill="#6c757d">feed to</text>
+
+          <!-- Subagent box -->
+          <rect x="170" y="130" width="200" height="55" rx="8" fill="#fff3e0" stroke="#fd7e14" stroke-width="2"/>
+          <text x="270" y="152" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">Independent Subagent</text>
+          <text x="270" y="170" text-anchor="middle" font-size="10" fill="#6c757d">/tmp/rush-hour-test/</text>
+
+          <!-- Arrow to output -->
+          <line x1="380" y1="157" x2="490" y2="157" stroke="#198754" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="435" y="150" font-size="10" fill="#6c757d">produces</text>
+
+          <!-- Output -->
+          <rect x="500" y="115" width="280" height="85" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+          <text x="640" y="137" text-anchor="middle" font-size="11" font-weight="700" fill="#198754">Generated Project</text>
+          <text x="640" y="155" text-anchor="middle" font-size="9" fill="#6c757d" font-family="SF Mono, monospace">data/gtfs/*.txt + disruptions.json</text>
+          <text x="640" y="170" text-anchor="middle" font-size="9" fill="#6c757d" font-family="SF Mono, monospace">agent/agent.py + tools.py</text>
+          <text x="640" y="185" text-anchor="middle" font-size="9" fill="#6c757d" font-family="SF Mono, monospace">pyproject.toml</text>
+        </svg>
+      </div>
+
+      <div class="card">
+        <h3>What this reveals</h3>
+        <ul>
+          <li><strong>Missing info</strong> — Where the subagent had to guess or make assumptions not covered by the context blocks</li>
+          <li><strong>Ambiguities</strong> — Where the subagent made reasonable but potentially wrong choices</li>
+          <li><strong>Structural issues</strong> — Where generated code doesn't follow the expected project layout</li>
+        </ul>
+        <p>Each gap becomes a TODO for improving the workshop HTML before the event.</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Constraint</div>
+        The subagent does NOT install dependencies or run the agent. It generates code and validates syntax only. The test proves instructional sufficiency, not runtime correctness.
+      </div>
+    </div>
+
+    <!-- Tab 2: Context Blocks -->
+    <div id="blocks" class="tab-panel">
+      <h2>Context Blocks Under Test</h2>
+      <p>These are the exact snippets participants copy from the Agent Context tabs. The subagent receives them concatenated as its prompt.</p>
+
+      <h3>Block 1: intro.html &mdash; ctx-combined</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" onclick="copyBlock('block-1')">Copy</button>
+        <div class="ctx-block" id="block-1"># Rush Hour: Transit-Crisis Agent &mdash; Full Context
+
+## Mission
+Build an ADK agent that answers commuter questions during a signal
+failure at London St Pancras. It reconciles a static GTFS schedule
+against a simulated disruption feed and returns verified delays and
+concrete reroutes across the 17-station cross-border rail network
+(UK/FR/BE/NL/DE).
+
+## Stack
+- Framework: Google ADK (Agent Development Kit)
+- Model: gemini-3.5-flash
+- Language: Python 3.11+ with uv
+- CLI: agents-cli (scaffold/deploy/eval/optimize/publish skills)
+- Data: local static files only, no live APIs
+
+## Data
+- data/gtfs/ &mdash; stops.txt, stop_times.txt, trips.txt, routes.txt,
+  calendar.txt &mdash; 17 stations, ~10-month intercity schedule
+- data/disruptions.json &mdash; simulated signal failure: affected trip_ids,
+  delays, impacted stops, cause, time window
+
+## Tools (3 required)
+1. get_scheduled_departures(station_name, time_window_start, time_window_end)
+2. check_disruptions(station_name?, trip_id?)
+3. compute_reroute(origin, destination, departure_after)
+
+## Core pattern: Reconciliation
+JOIN schedule &times; disruption on trip_id/stop_id
+
+## System instruction rules
+1. Always reconcile schedule vs disruptions before answering
+2. Never invent a train
+3. Proactively compute reroutes when services are disrupted
+4. Stay calm and factual; end with one clear recommended action
+5. If disruption feed unavailable, say so and recommend boards</div>
+      </div>
+
+      <h3>Block 2: m0.html &mdash; ctx-combined</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" onclick="copyBlock('block-2')">Copy</button>
+        <div class="ctx-block" id="block-2"># Module 0 Complete &mdash; Ready for Module 1 (BUILD)
+
+## Workspace (after M0)
+data/gtfs/stops.txt            &mdash; 17 stations with coordinates
+data/gtfs/stop_times.txt       &mdash; departure/arrival per trip per stop
+data/gtfs/trips.txt            &mdash; trip_id &rarr; route_id, service_id
+data/gtfs/routes.txt           &mdash; route metadata (Eurostar, Thalys, etc.)
+data/gtfs/calendar.txt         &mdash; service day patterns
+data/disruptions.json          &mdash; simulated signal failure
+
+## Key joins
+stop_times.stop_id &rarr; stops.stop_id
+stop_times.trip_id &rarr; trips.trip_id &rarr; routes.route_id
+trips.service_id &rarr; calendar.service_id
+disruptions.affected_trips[].trip_id &rarr; trips.trip_id
+
+## What to build next (M1)
+1. Scaffold ADK project
+2. Implement 3 tools
+3. Write system instruction
+4. Test with: "My 13:31 St Pancras to Paris service is affected"</div>
+      </div>
+
+      <h3>Block 3: m1.html &mdash; ctx-combined</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" onclick="copyBlock('block-3')">Copy</button>
+        <div class="ctx-block" id="block-3"># Module 1: BUILD &mdash; Full Agent Context
+
+## 3 Tools to implement in tools.py
+
+### 1. get_scheduled_departures(station_name, time_start, time_end?)
+Query GTFS for departures. Join: stops &rarr; stop_times &rarr; trips &rarr; routes.
+Return: [{trip_id, route_name, destination, departure_time}]
+
+### 2. check_disruptions(station_name?, trip_id?)
+Read disruptions.json. Filter by station or trip.
+Return: [{trip_id, affected_stops, delay_minutes, status, cause}]
+
+### 3. compute_reroute(origin, destination, departure_after)
+Build station graph from GTFS, remove disrupted trips, BFS.
+Return: {route: [{from, to, depart, arrive, trip_id}],
+         total_time, num_changes}
+
+## System instruction rules
+(same 5 rules as above)
+
+## Success = agent calls all 3 tools and recommends a specific
+alternative with times, stations, and number of changes.</div>
+      </div>
+
+      <h3>Block 4: m1.html &mdash; ctx-prompts</h3>
+      <div class="copy-wrap">
+        <button class="copy-btn" onclick="copyBlock('block-4')">Copy</button>
+        <div class="ctx-block" id="block-4">## Antigravity prompts for Module 1
+
+### Prompt 1 &mdash; Scaffold (7 min)
+"Scaffold a new ADK agent project for a transit assistant.
+Use Python, gemini-3.5-flash, uv for dependency management."
+
+### Prompt 2 &mdash; Add tools (12 min)
+"Add three tools: get_scheduled_departures, check_disruptions,
+compute_reroute. Write clear docstrings and type hints."
+
+### Prompt 3 &mdash; System instruction (4 min)
+"Write the system instruction: reconcile schedule vs disruptions,
+never invent a train, proactively compute reroutes."
+
+### Prompt 4 &mdash; Test (5 min)
+"Run in ADK local playground. Test with:
+'My 13:31 St Pancras&ndash;Paris service is affected'"</div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Expected Output -->
+    <div id="expected" class="tab-panel">
+      <h2>Expected Project Structure</h2>
+
+      <div class="file-tree">
+        <span class="dir">/tmp/rush-hour-test/</span><br>
+        &nbsp;&nbsp;<span class="dir">data/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">gtfs/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">stops.txt</span> &mdash; 17 stations with stop_id, name, lat, lon<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">stop_times.txt</span> &mdash; trip_id, stop_id, arrival, departure, sequence<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">trips.txt</span> &mdash; trip_id, route_id, service_id, headsign<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">routes.txt</span> &mdash; route_id, short_name, long_name<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">calendar.txt</span> &mdash; service_id, mon-sun, start/end dates<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="new">disruptions.json</span> &mdash; signal failure affecting 3-4 trips<br>
+        &nbsp;&nbsp;<span class="dir">agent/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="new">__init__.py</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="new">agent.py</span> &mdash; Agent definition with model, instruction, tools<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="new">tools.py</span> &mdash; 3 FunctionTool implementations<br>
+        &nbsp;&nbsp;<span class="new">pyproject.toml</span> &mdash; google-adk dependency, uv config<br>
+      </div>
+
+      <h2 style="margin-top:1.5rem">Data Consistency Requirements</h2>
+      <div class="card">
+        <h3>Foreign Key Integrity</h3>
+        <ul>
+          <li><code>stop_times.stop_id</code> values must exist in <code>stops.stop_id</code></li>
+          <li><code>stop_times.trip_id</code> values must exist in <code>trips.trip_id</code></li>
+          <li><code>trips.route_id</code> values must exist in <code>routes.route_id</code></li>
+          <li><code>trips.service_id</code> values must exist in <code>calendar.service_id</code></li>
+          <li><code>disruptions.affected_trips[].trip_id</code> must exist in <code>trips.trip_id</code></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Tool Signatures (must match)</h3>
+        <table class="test-matrix">
+          <thead><tr><th>Tool</th><th>Parameters</th><th>Returns</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>get_scheduled_departures</code></td>
+              <td><code>station_name: str</code>, <code>time_start: str</code>, <code>time_end: str = None</code></td>
+              <td><code>list[dict]</code> with trip_id, route_name, destination, departure_time</td>
+            </tr>
+            <tr>
+              <td><code>check_disruptions</code></td>
+              <td><code>station_name: str = None</code>, <code>trip_id: str = None</code></td>
+              <td><code>list[dict]</code> with trip_id, affected_stops, delay_minutes, status, cause</td>
+            </tr>
+            <tr>
+              <td><code>compute_reroute</code></td>
+              <td><code>origin: str</code>, <code>destination: str</code>, <code>departure_after: str</code></td>
+              <td><code>dict</code> with route (list of legs), total_time, num_changes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>agent.py Requirements</h3>
+        <ul>
+          <li>Uses <code>google.adk.agents.Agent</code> (or equivalent ADK class)</li>
+          <li>Sets model to <code>gemini-3.5-flash</code></li>
+          <li>Registers all 3 tools</li>
+          <li>Includes system instruction with reconciliation rules</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab 4: Test Matrix -->
+    <div id="matrix" class="tab-panel">
+      <h2>Validation Checklist</h2>
+
+      <table class="test-matrix">
+        <thead>
+          <tr><th>#</th><th>Check</th><th>Criteria</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Files exist</td>
+            <td>All 11 expected files created in <code>/tmp/rush-hour-test/</code></td>
+            <td><span class="badge badge-pass" id="chk-1">PASS</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>GTFS stops count</td>
+            <td><code>stops.txt</code> has 17 rows (stations)</td>
+            <td><span class="badge badge-pass" id="chk-2">PASS</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Trip count</td>
+            <td><code>trips.txt</code> has ~20 trips across 5+ routes</td>
+            <td><span class="badge badge-pass" id="chk-3">PASS</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>FK: stop_times &rarr; stops</td>
+            <td>Every <code>stop_id</code> in stop_times.txt appears in stops.txt</td>
+            <td><span class="badge badge-pass" id="chk-4">PASS</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>FK: stop_times &rarr; trips</td>
+            <td>Every <code>trip_id</code> in stop_times.txt appears in trips.txt</td>
+            <td><span class="badge badge-pass" id="chk-5">PASS</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>FK: disruptions &rarr; trips</td>
+            <td>Every <code>trip_id</code> in disruptions.json appears in trips.txt</td>
+            <td><span class="badge badge-pass" id="chk-6">PASS</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Syntax: tools.py</td>
+            <td><code>ast.parse()</code> succeeds on <code>agent/tools.py</code></td>
+            <td><span class="badge badge-pass" id="chk-7">PASS</span></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Syntax: agent.py</td>
+            <td><code>ast.parse()</code> succeeds on <code>agent/agent.py</code></td>
+            <td><span class="badge badge-pass" id="chk-8">PASS</span></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>Tool signatures</td>
+            <td>All 3 functions present with correct parameter names</td>
+            <td><span class="badge badge-pass" id="chk-9">PASS</span></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>System instruction</td>
+            <td><code>agent.py</code> contains system instruction with reconciliation rules</td>
+            <td><span class="badge badge-pass" id="chk-10">PASS</span></td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>Model config</td>
+            <td><code>agent.py</code> references <code>gemini-3.5-flash</code></td>
+            <td><span class="badge badge-pass" id="chk-11">PASS</span></td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>Dependencies</td>
+            <td><code>pyproject.toml</code> includes <code>google-adk</code></td>
+            <td><span class="badge badge-pass" id="chk-12">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Result: 12/12 PASS</div>
+        All validation checks passed. The agent context snippets are sufficient for a coding agent to produce a structurally complete, syntactically valid ADK agent.
+      </div>
+
+      <h2 style="margin-top:1.5rem">Assumptions &amp; Gaps Log</h2>
+      <p>The subagent flagged 8 areas where the context blocks were ambiguous or insufficient. Each is a potential improvement to the workshop materials.</p>
+
+      <table class="test-matrix">
+        <thead><tr><th>#</th><th>Gap</th><th>What the subagent assumed</th><th>Source block</th><th>Severity</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Model name validity</td>
+            <td><code>gemini-3.5-flash</code> used as instructed, but may not be a valid model ID at runtime depending on workshop timing</td>
+            <td>intro ctx-combined</td>
+            <td><span class="badge badge-info">NOTE</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>GTFS data generation</td>
+            <td>Invented all timetables, coordinates, and route structures. Context gave station/route names but no actual schedules</td>
+            <td>m0 ctx-combined</td>
+            <td><span class="badge badge-info">NOTE</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><code>compute_reroute</code> metric</td>
+            <td>Instructions said "BFS/shortest-path" but didn't specify what metric. Used earliest-arrival BFS</td>
+            <td>m1 ctx-combined</td>
+            <td><span class="badge badge-pending">LOW</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>"Remove disrupted" scope</td>
+            <td>Instructions didn't clarify if "remove disrupted" means cancelled only or also delayed. Removed only cancelled trips</td>
+            <td>m1 ctx-combined</td>
+            <td><span class="badge badge-pending">LOW</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><code>agents-cli scaffold</code> vs manual</td>
+            <td>Instructions mention <code>agents-cli scaffold</code> but agent can't run CLI tools. Created structure manually following ADK conventions</td>
+            <td>m1 ctx-prompts</td>
+            <td><span class="badge badge-info">NOTE</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>ADK agent export convention</td>
+            <td>Context blocks don't specify how ADK discovers the agent. Used <code>root_agent</code> variable in <code>__init__.py</code> (ADK convention)</td>
+            <td>m1 ctx-combined</td>
+            <td><span class="badge badge-pending">LOW</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Tool wiring: FunctionTool vs plain</td>
+            <td>Instructions say "tools" but don't specify wrapper. Used plain functions (auto-wrapped by ADK)</td>
+            <td>m1 ctx-combined</td>
+            <td><span class="badge badge-info">NOTE</span></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><code>time_window_end</code> optionality</td>
+            <td>Signature shows 3 params but <code>?</code> notation is inconsistent. Made <code>time_end</code> optional with default "23:59"</td>
+            <td>m1 ctx-combined</td>
+            <td><span class="badge badge-info">NOTE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 5: Results -->
+    <div id="results" class="tab-panel">
+      <div class="callout callout-success">
+        <div class="callout-title">12/12 Checks Passed &mdash; Context Blocks Are Sufficient</div>
+        The subagent successfully built a complete ADK agent project from the context snippets alone. All files exist, all foreign keys are consistent, all code is syntactically valid, and all 3 tool signatures match the spec.
+      </div>
+
+      <div class="card">
+        <h3>Generated Files Summary</h3>
+        <table class="test-matrix">
+          <thead><tr><th>File</th><th>Content</th><th>Quality</th></tr></thead>
+          <tbody>
+            <tr><td><code>data/gtfs/stops.txt</code></td><td>17 stations across UK/FR/BE/NL/DE with coordinates</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>data/gtfs/routes.txt</code></td><td>5 routes: Eurostar, Thalys, ICE International, InterCity Direct, InterCity Brussels-Liege</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>data/gtfs/trips.txt</code></td><td>20 trips (7 Eurostar, 4 Thalys, 3 ICE, 3 ICD, 3 ICB)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>data/gtfs/stop_times.txt</code></td><td>111 stop-time entries with realistic journey durations</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>data/gtfs/calendar.txt</code></td><td>3 service patterns (WEEKDAY, WEEKEND, DAILY)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>data/disruptions.json</code></td><td>Signal failure at St Pancras, 4 affected trips (1 cancelled, 3 delayed)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>agent/agent.py</code></td><td>Agent with model, system instruction (6 rules), 3 tools registered</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>agent/tools.py</code></td><td>325 lines, 3 tools with type hints, docstrings, BFS reroute</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>agent/__init__.py</code></td><td>Exports <code>root_agent</code> (ADK convention)</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+            <tr><td><code>pyproject.toml</code></td><td><code>google-adk&gt;=1.0.0</code>, Python &gt;=3.11, hatchling build</td><td><span class="badge badge-pass">GOOD</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Smoke Test Results</h3>
+        <p>The subagent ran functional smoke tests on the generated tools with the synthetic data:</p>
+        <ul>
+          <li><code>get_scheduled_departures("St Pancras", "13:00", "17:00")</code> &rarr; returned ES9012, ES9005, ES9007</li>
+          <li><code>check_disruptions(station_name="St Pancras")</code> &rarr; returned all 4 disrupted trips</li>
+          <li><code>compute_reroute("St Pancras", "Paris Gare du Nord", "13:00")</code> &rarr; correctly skipped cancelled ES9005, returned ES9007 (16:31 departure, arriving 18:55, 0 changes)</li>
+        </ul>
+        <p>The test query "My 13:31 St Pancras to Paris service is affected" would match trip ES9005 (13:31 departure, cancelled), and the reroute correctly finds the next available Eurostar.</p>
+      </div>
+
+      <div class="card">
+        <h3>Recommendations for Workshop Materials</h3>
+        <p>Based on the 8 assumptions the subagent had to make, consider these improvements:</p>
+        <ol>
+          <li><strong>Add ADK export convention</strong> to m1 context: mention that <code>__init__.py</code> should export <code>root_agent</code></li>
+          <li><strong>Clarify "remove disrupted"</strong> in <code>compute_reroute</code> spec: specify whether to exclude only cancelled trips or also delayed ones</li>
+          <li><strong>Specify BFS metric</strong>: "earliest arrival" vs "fewest changes" vs "shortest distance"</li>
+          <li><strong>Clarify <code>time_window_end</code> optionality</strong>: the <code>?</code> suffix notation in m1 is inconsistent with the 3-param signature in intro</li>
+        </ol>
+        <p>Items 1-4 are low severity &mdash; the subagent made reasonable choices in all cases. The context blocks are already strong enough for a successful build.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+
+  // Copy button
+  function copyBlock(id) {
+    const el = document.getElementById(id);
+    const text = el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.parentElement.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
