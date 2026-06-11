@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M4 — Optimize | Rush Hour Workshop</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --accent: #1a73e8;
+    --accent-light: #e8f0fe;
+    --danger: #dc3545;
+    --danger-light: #fde8ea;
+    --success: #198754;
+    --success-light: #d1e7dd;
+    --warning: #fd7e14;
+    --warning-light: #fff3e0;
+    --govern: #7c3aed;
+    --govern-light: #ede9fe;
+    --optimize: #0891b2;
+    --optimize-light: #e0f7fa;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.6; padding: 0; }
+
+  /* Sidebar nav */
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+    background: #1a1f2e; color: #c5cdd8; overflow-y: auto; z-index: 100;
+    display: flex; flex-direction: column; padding: 0;
+  }
+  .sidebar-header { padding: 1.25rem 1rem .75rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-header .title { font-size: .85rem; font-weight: 800; color: #fff; letter-spacing: .5px; line-height: 1.3; }
+  .sidebar-header .subtitle { font-size: .7rem; color: #6b7a8d; margin-top: .2rem; }
+  .sidebar nav { flex: 1; padding: .5rem 0; }
+  .sidebar a {
+    display: flex; align-items: center; gap: .6rem; padding: .6rem 1rem;
+    color: #8b97a8; text-decoration: none; font-size: .82rem; font-weight: 500;
+    border-left: 3px solid transparent; transition: background .12s, color .12s, border-color .12s;
+  }
+  .sidebar a:hover { background: rgba(255,255,255,.05); color: #d0d8e3; }
+  .sidebar a.active { background: rgba(26,115,232,.12); color: #8ab4f8; border-left-color: #8ab4f8; font-weight: 700; }
+  .sidebar a .nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sidebar a .nav-label { line-height: 1.3; }
+  .sidebar a .nav-sub { display: block; font-size: .7rem; font-weight: 400; color: #5e6b7a; }
+  .sidebar a.active .nav-sub { color: #6a9bd8; }
+  .sidebar-footer { padding: .75rem 1rem; border-top: 1px solid rgba(255,255,255,.08); font-size: .68rem; color: #4a5568; }
+
+  .main-content { margin-left: 220px; }
+  @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #065666 0%, #0891b2 50%, #22d3ee 100%);
+    color: #fff; padding: 2.5rem 2rem 2rem; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--optimize); }
+  .hero-track { font-size: .8rem; letter-spacing: 2px; text-transform: uppercase; opacity: .7; margin-bottom: .25rem; }
+  .hero-module { font-size: 1rem; opacity: .85; margin-bottom: .3rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .4rem; }
+  .hero-sub { font-size: 1.05rem; opacity: .85; max-width: 680px; margin: 0 auto; }
+  .hero-time { display: inline-block; margin-top: .75rem; background: rgba(255,255,255,.15); padding: .3rem 1rem; border-radius: 20px; font-size: .85rem; font-weight: 600; }
+  .hero-pills { display: flex; justify-content: center; gap: .5rem; margin-top: .75rem; flex-wrap: wrap; }
+  .hero-pill { background: rgba(255,255,255,.12); padding: .2rem .7rem; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+  .tab-btn {
+    padding: .75rem 1.25rem; border: none; background: none;
+    font-family: var(--font); font-size: .95rem; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    white-space: nowrap; transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--optimize); border-bottom-color: var(--optimize); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow);
+  }
+  .card h3 { font-size: 1.1rem; margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem; }
+
+  .callout { border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; border-left: 4px solid; }
+  .callout-danger { background: var(--danger-light); border-color: var(--danger); }
+  .callout-info { background: var(--accent-light); border-color: var(--accent); }
+  .callout-success { background: var(--success-light); border-color: var(--success); }
+  .callout-warning { background: var(--warning-light); border-color: var(--warning); }
+  .callout-optimize { background: var(--optimize-light); border-color: var(--optimize); }
+  .callout-title { font-weight: 700; margin-bottom: .35rem; }
+
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem;
+    box-shadow: var(--shadow); position: relative; padding-left: 4.5rem;
+  }
+  .step-num {
+    position: absolute; left: 1.25rem; top: 1.4rem;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--optimize); color: #fff; font-weight: 800; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h3 { font-size: 1.05rem; margin-bottom: .5rem; }
+  .step p { margin-bottom: .5rem; }
+  .step-time {
+    display: inline-block; background: var(--optimize-light); color: var(--optimize);
+    font-size: .75rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-bottom: .5rem;
+  }
+
+  .beat-badge { display: inline-block; font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-left: .5rem; vertical-align: middle; }
+  .beat-1 { background: #e8f0fe; color: #1a73e8; }
+  .beat-2 { background: #fff3e0; color: #b45309; }
+  .beat-3 { background: #d1e7dd; color: #198754; }
+  .beat-4 { background: #ede9fe; color: #7c3aed; }
+
+  .prompt-block {
+    background: #1e1e1e; color: #d4d4d4; padding: 1rem 1.25rem;
+    border-radius: var(--radius); font-family: var(--mono); font-size: .85rem;
+    line-height: 1.55; margin: .75rem 0; position: relative;
+    overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .prompt-label { position: absolute; top: .4rem; right: .6rem; font-size: .65rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .prompt-antigravity { background: linear-gradient(135deg, #1a1f2e, #252b3b); border: 1px solid #3a4255; }
+
+  code { background: #eef1f5; padding: .15rem .4rem; border-radius: 4px; font-family: var(--mono); font-size: .88em; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: .88rem; margin: .75rem 0; }
+  table.data th, table.data td { padding: .55rem .75rem; border: 1px solid var(--border); text-align: left; }
+  table.data th { background: #f1f3f5; font-weight: 700; }
+  table.data tr:hover td { background: #f8f9fa; }
+
+  .agent-ctx {
+    background: #1b2838; color: #c5e1f5; border: 2px solid #2d4a6f;
+    border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0;
+    font-family: var(--mono); font-size: .82rem; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .agent-ctx-label {
+    display: inline-block; background: #2d4a6f; color: #e0f0ff;
+    font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: .2rem .6rem; border-radius: 4px; margin-bottom: .75rem;
+  }
+  .agent-section { position: relative; }
+  .copy-btn {
+    position: absolute; top: .4rem; right: .5rem;
+    background: #333; color: #aaa; border: 1px solid #555; border-radius: 4px;
+    padding: .2rem .5rem; font-size: .7rem; cursor: pointer; font-family: var(--font);
+  }
+  .copy-btn:hover { background: #444; color: #ddd; }
+
+  .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
+  .map-wrap svg { max-width: 100%; height: auto; }
+
+  .done-when {
+    background: var(--success-light); border: 2px solid var(--success);
+    border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-top: 1.5rem;
+  }
+  .done-when h3 { color: var(--success); font-size: 1rem; margin-bottom: .6rem; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: .55rem 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: .6rem; font-size: .93rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon {
+    width: 22px; height: 22px; flex-shrink: 0;
+    border: 2px solid var(--optimize); border-radius: 4px; margin-top: 2px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s;
+  }
+  .check-icon.checked { background: var(--optimize); }
+  .check-icon.checked::after { content: "\2713"; color: #fff; font-size: .75rem; font-weight: 800; }
+
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 1.5rem; }
+    .step { padding-left: 1.25rem; padding-top: 3.5rem; }
+    .step-num { top: 1rem; left: 1.25rem; }
+    .container { padding: 1rem .75rem; }
+  }
+
+  h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: .5rem; }
+  p { margin-bottom: .75rem; }
+  strong { font-weight: 700; }
+  ul, ol { margin-left: 1.25rem; margin-bottom: .75rem; }
+  li { margin-bottom: .25rem; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR NAV -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="title">"Rush Hour"</div>
+    <div class="subtitle">Track 2 &middot; Platform Builders</div>
+  </div>
+  <nav>
+    <a href="intro.html"><span class="nav-dot" style="background:#fd7e14;"></span><span class="nav-label">Introduction<span class="nav-sub">Workshop overview</span></span></a>
+    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Setup<span class="nav-sub">10 min &middot; Cockpit &amp; data</span></span></a>
+    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span></a>
+    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span></a>
+    <a href="m3.html"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern<span class="nav-sub">25 min &middot; Security</span></span></a>
+    <a href="m4.html" class="active"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize<span class="nav-sub">20 min &middot; Quality flywheel</span></span></a>
+    <a href="m5.html"><span class="nav-dot" style="background:#b45309;"></span><span class="nav-label">M5 &middot; Engage<span class="nav-sub">10 min &middot; Publish</span></span></a>
+  </nav>
+  <div class="sidebar-footer">Build with Gemini World Tour</div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-track">Build with Gemini World Tour &middot; Track 2</div>
+  <div class="hero-module">Module 4</div>
+  <h1>OPTIMIZE</h1>
+  <p class="hero-sub">Move from "looks right" to measured quality with the Quality Flywheel &mdash;<br>simulate, score, cluster failures, optimize automatically.</p>
+  <div class="hero-time">20 minutes &middot; 1:30 &ndash; 1:50 &middot; Hands-on</div>
+  <div class="hero-pills">
+    <span class="hero-pill">Quality Flywheel</span>
+    <span class="hero-pill">User Simulation</span>
+    <span class="hero-pill">AutoRaters</span>
+    <span class="hero-pill">Prompt Optimization</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="callout callout-optimize">
+    <div class="callout-title">Objective</div>
+    <p>Run the <strong>Quality Flywheel</strong>: simulate the crisis at scale, score your agent with autoraters,
+    find failure clusters, and <strong>automatically optimize</strong> the system instruction. This is the difference
+    between a demo and a production agent.</p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
+    <button class="tab-btn" data-tab="flywheel" role="tab">The Flywheel</button>
+    <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
+    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
+  </div>
+
+  <!-- TAB 1: STEP-BY-STEP -->
+  <div id="tab-steps" class="tab-panel active">
+    <h2>Optimize in 4 Steps</h2>
+
+    <!-- Step 1: Concept -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <span class="step-time">2 min</span>
+      <h3>The Quality Flywheel Concept</h3>
+      <p>Quality improvement for agents is a loop, not a one-time check:</p>
+      <ol>
+        <li><strong>Evaluate</strong> &mdash; run the agent against many scenarios and score it</li>
+        <li><strong>Analyze</strong> &mdash; find <strong>loss clusters</strong> (groups of failures with a common cause)</li>
+        <li><strong>Optimize</strong> &mdash; fix the biggest cluster (often by refining the system instruction)</li>
+        <li><strong>Repeat</strong> &mdash; each turn raises quality empirically</li>
+      </ol>
+      <p>This is how you go from "it works on my one test query" to "it works on every query."</p>
+    </div>
+
+    <!-- Step 2: Simulate -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <span class="step-time">7 min</span>
+      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
+      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
+      <h3>Simulate the Crisis at Scale</h3>
+      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Generate 100 commuter scenarios during a St Pancras signal failure and run them against my agent, including a case where the disruption feed is unavailable."</div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3>User Simulation</h3>
+        <p>Auto-generate many synthetic commuters asking disruption questions in different ways:</p>
+        <ul>
+          <li>"Is my 13:31 to Paris running?" (direct)</li>
+          <li>"I need to get to Brussels by 5pm, what are my options?" (intent-based)</li>
+          <li>"All the boards say delayed &mdash; what's actually happening?" (vague)</li>
+          <li>"I'm at St Pancras with two kids and heavy luggage &mdash; help!" (emotional)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Environment Simulation</h3>
+        <p>Intercept the disruption tool to inject edge cases without touching real backends:</p>
+        <ul>
+          <li><strong>Normal signal failure</strong> &mdash; the base crisis scenario</li>
+          <li><strong>Feed unavailable</strong> &mdash; disruption API returns 503</li>
+          <li><strong>No data</strong> &mdash; empty response for an unknown station</li>
+          <li><strong>Multiple disruptions</strong> &mdash; cascading failures across routes</li>
+        </ul>
+      </div>
+
+      <p><strong>Under the Hood:</strong> The <code>agents-cli</code> <strong>eval</strong> skill orchestrates the simulation,
+      runs each scenario against the deployed agent, and collects traces.</p>
+    </div>
+
+    <!-- Step 3: Score -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <span class="step-time">5 min</span>
+      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
+      <h3>Score It &mdash; Multi-turn AutoRaters</h3>
+      <p>Track the metrics that actually matter:</p>
+      <table class="data">
+        <thead><tr><th>Metric</th><th>What it measures</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Task Success</strong></td><td>Did the commuter get a valid reroute?</td><td>AutoRater checks if the response contains a concrete alternative with times and stations</td></tr>
+          <tr><td><strong>Tool-use Quality</strong></td><td>Did the agent reconcile correctly?</td><td>AutoRater checks that Tool 1 + Tool 2 were called before answering</td></tr>
+          <tr><td><strong>Factual Accuracy</strong></td><td>Are all referenced trains real?</td><td>Cross-check trip_ids in the response against GTFS data</td></tr>
+          <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear action?</td><td>AutoRater checks for a specific recommendation at the end</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Platform Reveal:</strong> Open the <strong>evaluation dashboard</strong> &mdash; see scores across all 100 scenarios.
+      Click a failed run to see its <strong>reasoning trace</strong> and understand why it failed.</p>
+    </div>
+
+    <!-- Step 4: Fix -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <span class="step-time">6 min</span>
+      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
+      <span class="beat-badge beat-4">Beat 4 &middot; So-What</span>
+      <h3>Find the Weak Spots &amp; Fix Them</h3>
+
+      <div class="card" style="margin-top:.5rem;">
+        <h3>Loss Clusters</h3>
+        <p>The system groups failures by common cause. Example clusters:</p>
+        <ul>
+          <li>"Fails when origin IS the disrupted station" (e.g., asking from St Pancras itself)</li>
+          <li>"Fails when the commuter asks a vague question without a specific train"</li>
+          <li>"Fails when the disruption feed returns an error"</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Prompt Optimization</div>
+        <p>Automatically refine the system instruction to fix the biggest failure cluster:</p>
+      </div>
+      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</div>
+      <p><strong>Under the Hood:</strong> ADK's <code>adk optimize</code> / the Optimizer service:</p>
+      <ol>
+        <li>Identifies the largest loss cluster</li>
+        <li>Generates a refined system instruction targeting that failure mode</li>
+        <li>Re-runs the failed scenarios to verify improvement</li>
+        <li>Shows you the before/after scores</li>
+      </ol>
+      <p><strong>So-What:</strong> Quality improvement is <strong>empirical and automatable</strong>, not guesswork.
+      This is the difference between a demo and a production agent.</p>
+    </div>
+
+    <!-- Done-when -->
+    <div class="done-when">
+      <h3>Mentor Checkpoint &mdash; Done When:</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>100 simulated scenarios have been run against your agent</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Evaluation dashboard shows scores for all metrics</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You've identified at least one loss cluster</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>System instruction has been optimized with a before/after score improvement</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 2: THE FLYWHEEL -->
+  <div id="tab-flywheel" class="tab-panel">
+    <h2>The Quality Flywheel</h2>
+
+    <p>The Quality Flywheel is the official loop for agent quality improvement.
+    Each revolution raises quality empirically.</p>
+
+    <div class="map-wrap">
+      <svg viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+        <defs>
+          <marker id="at" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="#0891b2"/>
+          </marker>
+        </defs>
+
+        <!-- Evaluate -->
+        <rect x="210" y="10" width="180" height="70" rx="12" fill="#e0f7fa" stroke="#0891b2" stroke-width="2.5"/>
+        <text x="300" y="36" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#0891b2">1. EVALUATE</text>
+        <text x="300" y="55" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Run 100 scenarios</text>
+        <text x="300" y="70" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">User + Environment simulation</text>
+
+        <!-- Arrow down-right -->
+        <path d="M 395 60 Q 480 60 480 130" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
+
+        <!-- Analyze -->
+        <rect x="390" y="140" width="180" height="70" rx="12" fill="#fde8ea" stroke="#dc3545" stroke-width="2"/>
+        <text x="480" y="166" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#dc3545">2. ANALYZE</text>
+        <text x="480" y="185" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Find loss clusters</text>
+        <text x="480" y="200" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Group failures by cause</text>
+
+        <!-- Arrow down-left -->
+        <path d="M 480 215 Q 480 280 395 280" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
+
+        <!-- Optimize -->
+        <rect x="210" y="250" width="180" height="70" rx="12" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+        <text x="300" y="276" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#198754">3. OPTIMIZE</text>
+        <text x="300" y="295" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Refine system instruction</text>
+        <text x="300" y="310" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">adk optimize</text>
+
+        <!-- Arrow up-left -->
+        <path d="M 210 280 Q 120 280 120 175" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
+
+        <!-- Repeat -->
+        <rect x="30" y="140" width="180" height="70" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="120" y="166" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#7c3aed">4. REPEAT</text>
+        <text x="120" y="185" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Each turn raises quality</text>
+        <text x="120" y="200" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Empirical, not guesswork</text>
+
+        <!-- Arrow up-right -->
+        <path d="M 120 135 Q 120 60 205 60" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
+
+        <!-- Center label -->
+        <text x="300" y="185" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#0891b2">Quality</text>
+        <text x="300" y="200" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#0891b2">Flywheel</text>
+
+        <!-- Metrics -->
+        <rect x="140" y="350" width="320" height="55" rx="10" fill="#f1f3f5" stroke="#dee2e6" stroke-width="1.5"/>
+        <text x="300" y="370" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#333">Metrics That Matter</text>
+        <text x="300" y="390" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Task Success &middot; Tool-use Quality &middot; Factual Accuracy &middot; Action Clarity</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <h3>Why This Works</h3>
+      <ul>
+        <li><strong>Simulation creates coverage</strong> &mdash; 100 scenarios catch failures your one test query never will</li>
+        <li><strong>AutoRaters remove subjectivity</strong> &mdash; metrics are defined, measured, compared</li>
+        <li><strong>Loss clusters reveal patterns</strong> &mdash; not random failures, but systematic weaknesses</li>
+        <li><strong>Automatic optimization closes the loop</strong> &mdash; the system proposes and tests a fix, not you</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Example: Before vs. After</h3>
+      <table class="data">
+        <thead><tr><th>Metric</th><th>Before Optimization</th><th>After Optimization</th></tr></thead>
+        <tbody>
+          <tr><td>Task Success</td><td>72%</td><td>91%</td></tr>
+          <tr><td>Tool-use Quality</td><td>85%</td><td>97%</td></tr>
+          <tr><td>Factual Accuracy</td><td>88%</td><td>95%</td></tr>
+          <tr><td>Action Clarity</td><td>78%</td><td>94%</td></tr>
+        </tbody>
+      </table>
+      <p>The biggest jump comes from fixing the top loss cluster. One refined instruction,
+      empirically validated, raises quality across the board.</p>
+    </div>
+  </div>
+
+  <!-- TAB 3: 4-BEAT RHYTHM -->
+  <div id="tab-beats" class="tab-panel">
+    <h2>The 4-Beat Rhythm &mdash; Module 4</h2>
+
+    <div class="card">
+      <h3><span class="beat-badge beat-1" style="margin-left:0;">Beat 1</span> The Prompt</h3>
+      <table class="data">
+        <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
+        <tbody>
+          <tr><td>4.2 Simulate</td><td>"Generate 100 commuter scenarios during a St Pancras signal failure and run them against my agent, including a case where the disruption feed is unavailable."</td></tr>
+          <tr><td>4.4 Optimize</td><td>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="beat-badge beat-2" style="margin-left:0;">Beat 2</span> Under the Hood</h3>
+      <table class="data">
+        <thead><tr><th>Step</th><th>What ran</th></tr></thead>
+        <tbody>
+          <tr><td>4.2</td><td><code>agents-cli eval</code> &mdash; User + Environment simulation, trace collection for 100 scenarios</td></tr>
+          <tr><td>4.3</td><td>Multi-turn AutoRaters scored task success, tool-use quality, factual accuracy, action clarity</td></tr>
+          <tr><td>4.4</td><td><code>adk optimize</code> / Optimizer service &mdash; identified loss cluster, refined instruction, re-tested</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> The Platform Reveal</h3>
+      <ul>
+        <li><strong>Evaluation dashboard</strong> &mdash; scores across all 100 scenarios with pass/fail breakdown</li>
+        <li><strong>Trace viewer</strong> &mdash; drill into a failed run and see exactly where the agent went wrong</li>
+        <li><strong>Before/after scores</strong> &mdash; concrete evidence that the optimization worked</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> So-What</h3>
+      <ul>
+        <li><strong>Empirical quality</strong> &mdash; measured, not guessed</li>
+        <li><strong>Automatable improvement</strong> &mdash; the system finds and fixes weaknesses</li>
+        <li><strong>Production readiness</strong> &mdash; you know your agent works because you've tested it at scale</li>
+        <li><strong>Continuous improvement</strong> &mdash; the flywheel keeps turning as you add scenarios and edge cases</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 4: AGENT CONTEXT -->
+  <div id="tab-agent" class="tab-panel">
+    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">What is this tab?</div>
+      <p>Structured context blocks for your coding agent. Copy a block and paste it into
+      Antigravity's context.</p>
+    </div>
+
+    <div class="card agent-section">
+      <h3>Antigravity Prompts (Copy &amp; Paste)</h3>
+      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
+      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; M4 Prompts</span>
+## Antigravity prompts for Module 4
+
+### Prompt 1 &mdash; Simulate (7 min)
+"Generate 100 commuter scenarios during a St Pancras signal failure
+and run them against my agent, including a case where the disruption
+feed is unavailable."
+
+### Prompt 2 &mdash; Optimize (6 min)
+"Analyze the failures and optimize my system instruction to fix
+the biggest cluster."</div>
+    </div>
+
+    <div class="card agent-section">
+      <h3>Combined Context (All-in-One for M4)</h3>
+      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M4 Combined</span>
+# Module 4: OPTIMIZE &mdash; Full Agent Context
+
+## Goal
+Run the Quality Flywheel: simulate, score, cluster failures, optimize.
+Move from "looks right" to measured, empirical quality.
+
+## The Quality Flywheel
+1. Evaluate &mdash; run 100 simulated scenarios against the agent
+2. Analyze &mdash; find loss clusters (groups of failures with common cause)
+3. Optimize &mdash; refine system instruction to fix the biggest cluster
+4. Repeat &mdash; each turn raises quality
+
+## Step 1: Simulate at scale
+- User Simulation: 100 synthetic commuters asking different questions
+- Environment Simulation: inject edge cases (feed unavailable, 503,
+  empty data, multiple disruptions)
+- Use agents-cli eval skill to orchestrate
+
+## Step 2: Score with AutoRaters
+- Task Success: did the commuter get a valid reroute?
+- Tool-use Quality: did the agent call Tool 1 + Tool 2 before answering?
+- Factual Accuracy: are all referenced trains real (trip_ids in GTFS)?
+- Action Clarity: does the response end with one clear recommendation?
+
+## Step 3: Find loss clusters
+- System groups failures by common cause
+- Example: "fails when origin IS the disrupted station"
+- Example: "fails when commuter asks a vague question"
+
+## Step 4: Optimize
+- Use adk optimize / Optimizer service
+- Refine system instruction targeting the biggest cluster
+- Re-run failed scenarios to verify improvement
+- Compare before/after scores
+
+## Success = before/after score + one optimization applied from
+a real failure cluster</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  function copyBlock(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.parentElement.querySelector('.copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    });
+  }
+</script>
+
+</div><!-- /main-content -->
+</body>
+</html>

@@ -18,6 +18,10 @@ Workshop catalog and event history for the Google Cloud "Era of Agents" hands-on
 - **[Introduction](https://kazunori279.github.io/gcp-eoa/BwG-track2/intro.html)** — Mission, stack, data, and agent context
 - **[M0 · Setup](https://kazunori279.github.io/gcp-eoa/BwG-track2/m0.html)** — Environment setup and data orientation
 - **[M1 · Build](https://kazunori279.github.io/gcp-eoa/BwG-track2/m1.html)** — Core agent with 3 tools
+- **[M2 · Scale](https://kazunori279.github.io/gcp-eoa/BwG-track2/m2.html)** — Deploy to Agent Runtime, Sessions, Memory Bank
+- **[M3 · Govern](https://kazunori279.github.io/gcp-eoa/BwG-track2/m3.html)** — Registry, Identity, Gateway, Model Armor
+- **[M4 · Optimize](https://kazunori279.github.io/gcp-eoa/BwG-track2/m4.html)** — Quality Flywheel, simulation, AutoRaters
+- **[M5 · Engage](https://kazunori279.github.io/gcp-eoa/BwG-track2/m5.html)** — Publish to Gemini Enterprise
 - **[Test Plan](https://kazunori279.github.io/gcp-eoa/BwG-track2/test_plan.html)** — Agent context validation (12/12 PASS)
 
 Open the HTML files in any browser — no dependencies or build step required.

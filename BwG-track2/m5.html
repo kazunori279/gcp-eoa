@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M5 — Engage | Rush Hour Workshop</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --accent: #1a73e8;
+    --accent-light: #e8f0fe;
+    --danger: #dc3545;
+    --danger-light: #fde8ea;
+    --success: #198754;
+    --success-light: #d1e7dd;
+    --warning: #fd7e14;
+    --warning-light: #fff3e0;
+    --govern: #7c3aed;
+    --govern-light: #ede9fe;
+    --optimize: #0891b2;
+    --optimize-light: #e0f7fa;
+    --engage: #b45309;
+    --engage-light: #fef3c7;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.6; padding: 0; }
+
+  /* Sidebar nav */
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+    background: #1a1f2e; color: #c5cdd8; overflow-y: auto; z-index: 100;
+    display: flex; flex-direction: column; padding: 0;
+  }
+  .sidebar-header { padding: 1.25rem 1rem .75rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-header .title { font-size: .85rem; font-weight: 800; color: #fff; letter-spacing: .5px; line-height: 1.3; }
+  .sidebar-header .subtitle { font-size: .7rem; color: #6b7a8d; margin-top: .2rem; }
+  .sidebar nav { flex: 1; padding: .5rem 0; }
+  .sidebar a {
+    display: flex; align-items: center; gap: .6rem; padding: .6rem 1rem;
+    color: #8b97a8; text-decoration: none; font-size: .82rem; font-weight: 500;
+    border-left: 3px solid transparent; transition: background .12s, color .12s, border-color .12s;
+  }
+  .sidebar a:hover { background: rgba(255,255,255,.05); color: #d0d8e3; }
+  .sidebar a.active { background: rgba(26,115,232,.12); color: #8ab4f8; border-left-color: #8ab4f8; font-weight: 700; }
+  .sidebar a .nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sidebar a .nav-label { line-height: 1.3; }
+  .sidebar a .nav-sub { display: block; font-size: .7rem; font-weight: 400; color: #5e6b7a; }
+  .sidebar a.active .nav-sub { color: #6a9bd8; }
+  .sidebar-footer { padding: .75rem 1rem; border-top: 1px solid rgba(255,255,255,.08); font-size: .68rem; color: #4a5568; }
+
+  .main-content { margin-left: 220px; }
+  @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #7c2d12 0%, #b45309 40%, #f59e0b 100%);
+    color: #fff; padding: 2.5rem 2rem 2rem; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--engage); }
+  .hero-track { font-size: .8rem; letter-spacing: 2px; text-transform: uppercase; opacity: .7; margin-bottom: .25rem; }
+  .hero-module { font-size: 1rem; opacity: .85; margin-bottom: .3rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .4rem; }
+  .hero-sub { font-size: 1.05rem; opacity: .85; max-width: 680px; margin: 0 auto; }
+  .hero-time { display: inline-block; margin-top: .75rem; background: rgba(255,255,255,.15); padding: .3rem 1rem; border-radius: 20px; font-size: .85rem; font-weight: 600; }
+  .hero-pills { display: flex; justify-content: center; gap: .5rem; margin-top: .75rem; flex-wrap: wrap; }
+  .hero-pill { background: rgba(255,255,255,.12); padding: .2rem .7rem; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+  .tab-btn {
+    padding: .75rem 1.25rem; border: none; background: none;
+    font-family: var(--font); font-size: .95rem; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    white-space: nowrap; transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--engage); border-bottom-color: var(--engage); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow);
+  }
+  .card h3 { font-size: 1.1rem; margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem; }
+
+  .callout { border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; border-left: 4px solid; }
+  .callout-danger { background: var(--danger-light); border-color: var(--danger); }
+  .callout-info { background: var(--accent-light); border-color: var(--accent); }
+  .callout-success { background: var(--success-light); border-color: var(--success); }
+  .callout-warning { background: var(--warning-light); border-color: var(--warning); }
+  .callout-engage { background: var(--engage-light); border-color: var(--engage); }
+  .callout-title { font-weight: 700; margin-bottom: .35rem; }
+
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem;
+    box-shadow: var(--shadow); position: relative; padding-left: 4.5rem;
+  }
+  .step-num {
+    position: absolute; left: 1.25rem; top: 1.4rem;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--engage); color: #fff; font-weight: 800; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h3 { font-size: 1.05rem; margin-bottom: .5rem; }
+  .step p { margin-bottom: .5rem; }
+  .step-time {
+    display: inline-block; background: var(--engage-light); color: var(--engage);
+    font-size: .75rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-bottom: .5rem;
+  }
+
+  .beat-badge { display: inline-block; font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-left: .5rem; vertical-align: middle; }
+  .beat-1 { background: #e8f0fe; color: #1a73e8; }
+  .beat-2 { background: #fff3e0; color: #b45309; }
+  .beat-3 { background: #d1e7dd; color: #198754; }
+  .beat-4 { background: #ede9fe; color: #7c3aed; }
+
+  .prompt-block {
+    background: #1e1e1e; color: #d4d4d4; padding: 1rem 1.25rem;
+    border-radius: var(--radius); font-family: var(--mono); font-size: .85rem;
+    line-height: 1.55; margin: .75rem 0; position: relative;
+    overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .prompt-label { position: absolute; top: .4rem; right: .6rem; font-size: .65rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .prompt-antigravity { background: linear-gradient(135deg, #1a1f2e, #252b3b); border: 1px solid #3a4255; }
+
+  code { background: #eef1f5; padding: .15rem .4rem; border-radius: 4px; font-family: var(--mono); font-size: .88em; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: .88rem; margin: .75rem 0; }
+  table.data th, table.data td { padding: .55rem .75rem; border: 1px solid var(--border); text-align: left; }
+  table.data th { background: #f1f3f5; font-weight: 700; }
+  table.data tr:hover td { background: #f8f9fa; }
+
+  .agent-ctx {
+    background: #1b2838; color: #c5e1f5; border: 2px solid #2d4a6f;
+    border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0;
+    font-family: var(--mono); font-size: .82rem; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .agent-ctx-label {
+    display: inline-block; background: #2d4a6f; color: #e0f0ff;
+    font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: .2rem .6rem; border-radius: 4px; margin-bottom: .75rem;
+  }
+  .agent-section { position: relative; }
+  .copy-btn {
+    position: absolute; top: .4rem; right: .5rem;
+    background: #333; color: #aaa; border: 1px solid #555; border-radius: 4px;
+    padding: .2rem .5rem; font-size: .7rem; cursor: pointer; font-family: var(--font);
+  }
+  .copy-btn:hover { background: #444; color: #ddd; }
+
+  .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
+  .map-wrap svg { max-width: 100%; height: auto; }
+
+  .done-when {
+    background: var(--success-light); border: 2px solid var(--success);
+    border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-top: 1.5rem;
+  }
+  .done-when h3 { color: var(--success); font-size: 1rem; margin-bottom: .6rem; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: .55rem 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: .6rem; font-size: .93rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon {
+    width: 22px; height: 22px; flex-shrink: 0;
+    border: 2px solid var(--engage); border-radius: 4px; margin-top: 2px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s;
+  }
+  .check-icon.checked { background: var(--engage); }
+  .check-icon.checked::after { content: "\2713"; color: #fff; font-size: .75rem; font-weight: 800; }
+
+  /* BSGO arc cards */
+  .arc-card {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 1rem 1.25rem; margin-bottom: .75rem;
+    display: flex; align-items: center; gap: 1rem;
+    border-left: 5px solid;
+  }
+  .arc-card .arc-module {
+    font-size: .85rem; font-weight: 800;
+    min-width: 100px;
+  }
+  .arc-card .arc-detail { font-size: .9rem; }
+  .arc-card .arc-artifacts {
+    font-size: .8rem; color: var(--text-muted); margin-top: .2rem;
+  }
+
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 1.5rem; }
+    .step { padding-left: 1.25rem; padding-top: 3.5rem; }
+    .step-num { top: 1rem; left: 1.25rem; }
+    .container { padding: 1rem .75rem; }
+    .arc-card { flex-direction: column; align-items: flex-start; gap: .3rem; }
+  }
+
+  h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: .5rem; }
+  p { margin-bottom: .75rem; }
+  strong { font-weight: 700; }
+  ul, ol { margin-left: 1.25rem; margin-bottom: .75rem; }
+  li { margin-bottom: .25rem; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR NAV -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="title">"Rush Hour"</div>
+    <div class="subtitle">Track 2 &middot; Platform Builders</div>
+  </div>
+  <nav>
+    <a href="intro.html"><span class="nav-dot" style="background:#fd7e14;"></span><span class="nav-label">Introduction<span class="nav-sub">Workshop overview</span></span></a>
+    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Setup<span class="nav-sub">10 min &middot; Cockpit &amp; data</span></span></a>
+    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span></a>
+    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span></a>
+    <a href="m3.html"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern<span class="nav-sub">25 min &middot; Security</span></span></a>
+    <a href="m4.html"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize<span class="nav-sub">20 min &middot; Quality flywheel</span></span></a>
+    <a href="m5.html" class="active"><span class="nav-dot" style="background:#b45309;"></span><span class="nav-label">M5 &middot; Engage<span class="nav-sub">10 min &middot; Publish</span></span></a>
+  </nav>
+  <div class="sidebar-footer">Build with Gemini World Tour</div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-track">Build with Gemini World Tour &middot; Track 2</div>
+  <div class="hero-module">Module 5</div>
+  <h1>ENGAGE</h1>
+  <p class="hero-sub">Publish your agent to Gemini Enterprise &mdash; the pro-code thing you vibe-built<br>is now a chat anyone in the organization can use.</p>
+  <div class="hero-time">10 minutes &middot; 1:50 &ndash; 2:00 &middot; Guided</div>
+  <div class="hero-pills">
+    <span class="hero-pill">Gemini Enterprise</span>
+    <span class="hero-pill">agents-cli publish</span>
+    <span class="hero-pill">Federation</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="callout callout-engage">
+    <div class="callout-title">The Payoff</div>
+    <p>Two hours ago, the Agent Platform console was empty and Gemini Enterprise had no agents.
+    Now you'll publish the agent you built, scaled, governed, and optimized &mdash; and talk to it
+    as a non-technical ops manager would. <strong>This is the "after" picture.</strong></p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
+    <button class="tab-btn" data-tab="arc" role="tab">The Full Arc</button>
+    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
+  </div>
+
+  <!-- TAB 1: STEP-BY-STEP -->
+  <div id="tab-steps" class="tab-panel active">
+    <h2>Engage in 2 Steps</h2>
+
+    <!-- Step 1: Publish -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <span class="step-time">5 min</span>
+      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
+      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
+      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
+      <h3>Publish to Gemini Enterprise</h3>
+      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Publish my agent to our Gemini Enterprise app so business users can use it."</div>
+      <p><strong>Under the Hood:</strong> <code>agents-cli publish</code>:</p>
+      <ul>
+        <li>Registers the Agent Runtime agent with the Gemini Enterprise app</li>
+        <li>VPC-SC compliant &mdash; data stays within your security boundary</li>
+        <li>Supports cross-project publishing</li>
+        <li>Passes the end-user's identity for personalization (Memory Bank integration)</li>
+      </ul>
+
+      <div class="callout callout-success" style="margin-top:.75rem;">
+        <div class="callout-title">Platform Reveal &mdash; The Payoff</div>
+        <p>Switch to the <strong>Gemini Enterprise web app</strong>. As a <strong>non-technical ops manager</strong>,
+        simply chat:</p>
+      </div>
+      <div class="prompt-block prompt-antigravity"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
+      <p>The pro-code thing you vibe-built is now a chat <strong>anyone in the organization</strong> can use.
+      No IDE, no code, no API calls &mdash; just a conversation.</p>
+    </div>
+
+    <!-- Step 2: Wrap -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <span class="step-time">3 min</span>
+      <span class="beat-badge beat-4">Beat 4 &middot; So-What</span>
+      <h3>The Unified Finish Line</h3>
+      <p>Recap the <strong>BSGO journey</strong> and the artifacts now living in the platform:</p>
+      <table class="data">
+        <thead><tr><th>Phase</th><th>What you did</th><th>Platform artifact</th></tr></thead>
+        <tbody>
+          <tr><td><strong>M1 &middot; Build</strong></td><td>Vibe-built agent + 3 tools by prompting</td><td>ADK project, reasoning trace</td></tr>
+          <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td>Agent Runtime, Sessions, Memory Bank, Sandbox</td></tr>
+          <tr><td><strong>M3 &middot; Govern</strong></td><td>Registered, identity-bound, policy-enforced</td><td>Registry, Identity, Gateway, Model Armor</td></tr>
+          <tr><td><strong>M4 &middot; Optimize</strong></td><td>100 scenarios, loss clusters, auto-optimized</td><td>Evaluation scores, optimized instruction</td></tr>
+          <tr><td><strong>M5 &middot; Engage</strong></td><td>Published for business users</td><td>Gemini Enterprise agent</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info" style="margin-top:1rem;">
+        <div class="callout-title">The Unified-Stack Message</div>
+        <p>Track-1 business users can now <strong>consume</strong> what Track-2 platform builders <strong>produced</strong>.
+        The same platform spans both audiences &mdash; from ADK code to Gemini chat.</p>
+      </div>
+    </div>
+
+    <!-- Done-when -->
+    <div class="done-when">
+      <h3>Final Checkpoint &mdash; Workshop Complete When:</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is published to Gemini Enterprise</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You can chat with it as a non-technical user in Gemini Enterprise</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The agent answers the crisis question with a concrete reroute</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Compare the "before" (empty console) to the "after" (full platform)</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 2: THE FULL ARC -->
+  <div id="tab-arc" class="tab-panel">
+    <h2>The Full BSGO Arc</h2>
+
+    <p>Here's everything you built in 2 hours, from empty console to governed, optimized, federated agent:</p>
+
+    <div class="map-wrap">
+      <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
+        <defs>
+          <marker id="af" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="#333"/>
+          </marker>
+        </defs>
+
+        <!-- M0 -->
+        <rect x="10" y="90" width="100" height="60" rx="8" fill="#f1f3f5" stroke="#6c757d" stroke-width="1.5"/>
+        <text x="60" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="#6c757d">M0 &middot; Setup</text>
+        <text x="60" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#666">Cockpit + data</text>
+        <text x="60" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">10 min</text>
+
+        <line x1="115" y1="120" x2="140" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+        <!-- M1 Build -->
+        <rect x="145" y="90" width="115" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+        <text x="202" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#1a73e8">M1 &middot; BUILD</text>
+        <text x="202" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Agent + 3 tools</text>
+        <text x="202" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">30 min</text>
+
+        <line x1="265" y1="120" x2="290" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+        <!-- M2 Scale -->
+        <rect x="295" y="90" width="115" height="60" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+        <text x="352" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#198754">M2 &middot; SCALE</text>
+        <text x="352" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Deploy + state</text>
+        <text x="352" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">25 min</text>
+
+        <line x1="415" y1="120" x2="440" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+        <!-- M3 Govern -->
+        <rect x="445" y="90" width="115" height="60" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="502" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#7c3aed">M3 &middot; GOVERN</text>
+        <text x="502" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Security layers</text>
+        <text x="502" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">25 min</text>
+
+        <line x1="565" y1="120" x2="590" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+        <!-- M4 Optimize -->
+        <rect x="595" y="90" width="115" height="60" rx="8" fill="#e0f7fa" stroke="#0891b2" stroke-width="2"/>
+        <text x="652" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#0891b2">M4 &middot; OPTIMIZE</text>
+        <text x="652" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Quality flywheel</text>
+        <text x="652" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">20 min</text>
+
+        <!-- Arrow down to M5 -->
+        <line x1="652" y1="155" x2="652" y2="175" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+        <!-- M5 Engage -->
+        <rect x="545" y="180" width="215" height="50" rx="8" fill="#fef3c7" stroke="#b45309" stroke-width="2.5"/>
+        <text x="652" y="200" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="800" fill="#b45309">M5 &middot; ENGAGE</text>
+        <text x="652" y="218" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Published to Gemini Enterprise</text>
+
+        <!-- Labels -->
+        <text x="400" y="30" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#333">Build &rarr; Scale &rarr; Govern &rarr; Optimize &rarr; Engage</text>
+        <text x="400" y="50" text-anchor="middle" font-family="system-ui" font-size="10" fill="#666">2 hours from empty console to governed, federated enterprise agent</text>
+
+        <!-- Before/after labels -->
+        <text x="60" y="78" text-anchor="middle" font-family="system-ui" font-size="8" font-weight="700" fill="#dc3545">BEFORE: empty</text>
+        <text x="652" y="235" text-anchor="middle" font-family="system-ui" font-size="8" font-weight="700" fill="#198754">AFTER: production-ready</text>
+      </svg>
+    </div>
+
+    <h2 style="margin-top:1.5rem;">Artifacts by Module</h2>
+
+    <div class="arc-card" style="border-color:#6c757d; background:#f8f9fa;">
+      <div class="arc-module" style="color:#6c757d;">M0 &middot; Setup</div>
+      <div>
+        <div class="arc-detail">Cockpit ready, data downloaded, "before" screenshot captured</div>
+        <div class="arc-artifacts">Antigravity + agents-cli + GTFS data + empty console</div>
+      </div>
+    </div>
+
+    <div class="arc-card" style="border-color:#1a73e8;">
+      <div class="arc-module" style="color:#1a73e8;">M1 &middot; Build</div>
+      <div>
+        <div class="arc-detail">Multi-tool transit agent running locally in ADK playground</div>
+        <div class="arc-artifacts">ADK project &middot; 3 tools &middot; system instruction &middot; reasoning trace</div>
+      </div>
+    </div>
+
+    <div class="arc-card" style="border-color:#198754;">
+      <div class="arc-module" style="color:#198754;">M2 &middot; Scale</div>
+      <div>
+        <div class="arc-detail">Deployed to Agent Runtime with stateful, personalized, sandboxed compute</div>
+        <div class="arc-artifacts">Runtime instance &middot; Sessions &middot; Memory Bank &middot; Code Execution sandbox</div>
+      </div>
+    </div>
+
+    <div class="arc-card" style="border-color:#7c3aed;">
+      <div class="arc-module" style="color:#7c3aed;">M3 &middot; Govern</div>
+      <div>
+        <div class="arc-detail">Registered, identity-bound, policy-enforced corporate asset</div>
+        <div class="arc-artifacts">Agent Registry &middot; IAM Identity &middot; Agent Gateway &middot; Model Armor</div>
+      </div>
+    </div>
+
+    <div class="arc-card" style="border-color:#0891b2;">
+      <div class="arc-module" style="color:#0891b2;">M4 &middot; Optimize</div>
+      <div>
+        <div class="arc-detail">Empirically measured and automatically optimized</div>
+        <div class="arc-artifacts">100 scenarios &middot; AutoRater scores &middot; loss clusters &middot; optimized instruction</div>
+      </div>
+    </div>
+
+    <div class="arc-card" style="border-color:#b45309; background:#fffbeb;">
+      <div class="arc-module" style="color:#b45309;">M5 &middot; Engage</div>
+      <div>
+        <div class="arc-detail">Published to Gemini Enterprise &mdash; anyone can chat with your agent</div>
+        <div class="arc-artifacts">Gemini Enterprise agent &middot; VPC-SC compliant &middot; cross-project &middot; personalized</div>
+      </div>
+    </div>
+
+    <div class="callout callout-success" style="margin-top:1rem;">
+      <div class="callout-title">The Thesis &mdash; Confirmed</div>
+      <p>You traversed the entire Build &rarr; Scale &rarr; Govern &rarr; Optimize lifecycle almost entirely by
+      <strong>prompting</strong> inside Antigravity &mdash; and at every stage you left the IDE to see the
+      <strong>real enterprise artifact</strong> the platform created for you.</p>
+    </div>
+  </div>
+
+  <!-- TAB 3: AGENT CONTEXT -->
+  <div id="tab-agent" class="tab-panel">
+    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">What is this tab?</div>
+      <p>Structured context blocks for your coding agent. M5 has one prompt &mdash; the publish step.</p>
+    </div>
+
+    <div class="card agent-section">
+      <h3>Antigravity Prompt</h3>
+      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
+      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; M5 Prompt</span>
+## Antigravity prompt for Module 5
+
+### Prompt 1 &mdash; Publish (5 min)
+"Publish my agent to our Gemini Enterprise app so business users
+can use it. Ensure VPC-SC compliance and pass end-user identity
+for personalization."</div>
+    </div>
+
+    <div class="card agent-section">
+      <h3>Combined Context (All-in-One for M5)</h3>
+      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M5 Combined</span>
+# Module 5: ENGAGE &mdash; Full Agent Context
+
+## Goal
+Publish the governed, optimized agent to Gemini Enterprise so
+non-technical business users can chat with it.
+
+## Publish command
+Use agents-cli publish skill. This:
+- Registers the Agent Runtime agent with Gemini Enterprise
+- Ensures VPC-SC compliance (data stays in security boundary)
+- Supports cross-project publishing
+- Passes end-user identity for Memory Bank personalization
+
+## Test as a business user
+Switch to the Gemini Enterprise web app and chat:
+"Trains out of St Pancras are disrupted &mdash; what do I tell
+travelers heading to Paris?"
+
+The agent should answer with the same quality as in M4 &mdash;
+concrete reroute, specific times, one clear recommendation.
+
+## The full BSGO arc is complete:
+Build (ADK) &rarr; Scale (Runtime/Sessions/Memory/Sandbox) &rarr;
+Govern (Registry/Identity/Gateway/Model Armor) &rarr;
+Optimize (Quality Flywheel) &rarr; Engage (Gemini Enterprise)
+
+## Success = business user can chat with your agent in
+Gemini Enterprise and get a concrete, accurate answer</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  function copyBlock(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.parentElement.querySelector('.copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    });
+  }
+</script>
+
+</div><!-- /main-content -->
+</body>
+</html>
