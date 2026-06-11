@@ -1184,17 +1184,13 @@ stop_times.trip_id → trips.trip_id → routes.route_id
 trips.service_id → calendar.service_id
 disruptions.affected_trips[].trip_id → trips.trip_id
 
-## What to build next (M1)
-1. Scaffold ADK project: `agents-cli scaffold`
-2. Implement 3 tools:
-   - get_scheduled_departures(station, time_start, time_end) → GTFS query
-   - check_disruptions(station?, trip_id?) → disruptions.json lookup
-   - compute_reroute(origin, dest, depart_after) → alternative path
-3. Write system instruction (reconcile before answering, never invent,
-   suggest reroutes, end with one clear action)
-4. Test in ADK local playground with:
-   "My 13:31 St Pancras to Paris service is affected — how do I still
-   get to Paris?"</div>
+## Preview of Module 1 (BUILD)
+In the next module you will scaffold an ADK agent, implement 3 tools
+(get_scheduled_departures, check_disruptions, compute_reroute), write
+a system instruction, and test locally.
+
+Do NOT start building yet — this context is a workspace summary only.
+Wait for the Module 1 instructions.</div>
     </div>
   </div>
 
