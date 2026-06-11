@@ -799,11 +799,12 @@
   <div id="tab-agent" class="tab-panel">
     <h2>Agent Context — Feed This to Your Coding Agent</h2>
 
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>This tab contains structured context blocks you can feed to your coding agent (in Antigravity
-      or any LLM-powered IDE). Copy a block and paste it into the agent's context, or point the agent
-      at this file. Each block is self-contained and designed for machine consumption.</p>
+    <div class="callout callout-warning">
+      <div class="callout-title">Scenario background only &mdash; do not build yet</div>
+      <p>These blocks orient your coding agent on <strong>what</strong> we're building and <strong>why</strong>.
+      They do <em>not</em> contain file paths, project setup, or build instructions &mdash; those come in
+      <strong>M0</strong> (workspace setup) and <strong>M1</strong> (build). Paste the Combined Context below
+      to give your agent the mission briefing, then move to M0.</p>
     </div>
 
     <!-- BLOCK 1: Project context -->
@@ -994,56 +995,53 @@ workshop-project/
 
     <!-- BLOCK 6: Full combined context -->
     <div class="card agent-section">
-      <h3><span class="icon">&#x1F4E6;</span> Combined Context (All-in-One)</h3>
-      <p>A single block combining all the above — paste this once to fully onboard your coding agent.</p>
+      <h3><span class="icon">&#x1F4E6;</span> Combined Context (Scenario Background)</h3>
+      <p>Paste this once to give your coding agent the mission briefing. It describes the scenario
+      and what the agent will do &mdash; but does not trigger any file operations or building.</p>
       <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
       <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; Combined</span>
-# Rush Hour: Transit-Crisis Agent — Full Context
+# Rush Hour: Transit-Crisis Agent — Scenario Background
 
-## Mission
-Build an ADK agent that answers commuter questions during a signal
-failure at London St Pancras. It reconciles a static GTFS schedule
-against a simulated disruption feed and returns verified delays and
-concrete reroutes across the 17-station cross-border rail network
-(UK/FR/BE/NL/DE).
+## What we're building
+A transit-crisis assistant for cross-border high-speed rail. A signal
+failure has disrupted peak-hour departures from London St Pancras.
+Hundreds of travelers need real-time answers: "Is my train running?
+How do I still get to Paris?"
 
-## Stack
-- Framework: Google ADK (Agent Development Kit)
-- Model: gemini-3.5-flash
-- Language: Python 3.11+ with uv
-- CLI: agents-cli (scaffold/deploy/eval/optimize/publish skills)
-- Data: local static files only, no live APIs
+## Why an agent, not a chatbot
+A plain LLM knows timetables but not what's happening right now.
+Our agent must RECONCILE two data sources:
+- The published schedule ("what SHOULD happen") — static GTFS data
+- A disruption feed ("what IS happening") — which services are
+  cancelled or delayed, and why
 
-## Data
-- data/gtfs/ — stops.txt, stop_times.txt, trips.txt, routes.txt,
-  calendar.txt — 17 stations, ~10-month intercity schedule
-- data/disruptions.json — simulated signal failure: affected trip_ids,
-  delays, impacted stops, cause, time window
+The join of schedule × disruption on trip_id/stop_id is the core
+pattern. Without it, the agent is guessing.
 
-## Tools (3 required)
-1. get_scheduled_departures(station_name, time_window_start, time_window_end)
-   → list of scheduled departures from GTFS
-2. check_disruptions(station_name?, trip_id?)
-   → list of disruptions from disruptions.json
-3. compute_reroute(origin, destination, departure_after)
-   → alternative route avoiding disrupted services
+## The network
+17 stations across UK, France, Belgium, Netherlands, and Germany.
+Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
+Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
 
-## Core pattern: Reconciliation
-The agent MUST call get_scheduled_departures + check_disruptions
-before answering. The join of schedule × disruption on trip_id/stop_id
-is what makes this an agent, not a chatbot.
+## What the agent must do
+1. Look up scheduled departures for a station and time window
+2. Check which of those services are disrupted (delayed/cancelled)
+3. Compute a concrete reroute avoiding disrupted services
+4. Present the answer calmly with specific times, stations, and
+   number of changes
+5. End with one clear recommended action
 
-## System instruction rules
-1. Always reconcile schedule vs disruptions before answering
-2. Never invent a train — only reference trips in the GTFS data
-3. Proactively compute reroutes when services are disrupted
-4. Stay calm and factual; end with one clear recommended action
-5. If disruption feed is unavailable, say so and recommend boards
+## The crisis scenario
+A signal failure at the St Pancras throat during peak hours.
+Multiple Eurostar and cross-border services are affected — some
+cancelled outright, others delayed 15–45 minutes. Travelers need
+to know: which trains are still running, and what's the best
+alternative route to their destination?
 
-## Test query
-"My 13:31 St Pancras to Paris service is affected — how do I still
-get to Paris?"
-Expected: agent calls all 3 tools, returns a concrete reroute.</div>
+## What's next
+In the following modules you will set up your workspace (M0), then
+build the agent with 3 tools by prompting in Antigravity (M1).
+Do NOT start building yet — this context is background only.</div>
     </div>
   </div>
 
