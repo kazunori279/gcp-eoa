@@ -771,31 +771,59 @@ disrupted, and end every response with one clear recommended action.</div>
       <div class="step-num">4</div>
       <span class="step-time">5 min</span>
       <h3>Run It Locally &mdash; The Playground</h3>
-      <p>Time to see the agent in action. Launch the ADK local web playground and
-      send the crisis question. Watch the reasoning trace to see <em>why</em> the agent
-      does what it does.</p>
+      <p>Time to see the agent in action. Launch the ADK local web playground, grab the
+      link, and try several crisis questions yourself. Watch the reasoning trace to see
+      <em>why</em> the agent does what it does &mdash; and have the coding agent keep an eye
+      on the running server, catching and fixing any errors as you test.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
         <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Run the agent in the ADK local playground (adk web). Test with:
-"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still
-get to Paris?"
-Verify the reasoning trace shows all 3 tools being called.</div>
+Can you now run the agent locally with adk web using playground and
+share the link for me to test. Also share multiple queries I can test
+to make sure the whole system works as intended. Keep checking the
+server that's running in the background and catch errors and fix them.</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>The reasoning trace shows the agent calling all 3 tools:</p>
+        <p>AGY starts the playground in the background and hands you a link to test:</p>
+        <ul>
+          <li>Runs <code>agents-cli playground</code> (the <code>adk web</code> Dev UI) and shares the local URL &mdash; typically <code>http://localhost:8000</code></li>
+          <li>Keeps the server running in the background and tails its logs, catching and fixing any runtime errors (wrong data paths, import errors, tool exceptions) as they surface</li>
+          <li>Suggests test queries so you can exercise the whole system &mdash; work through the three scenarios below</li>
+        </ul>
+
+        <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Reconciliation &amp; Proactive Reroute (cancelled service)</strong></p>
+        <p>The headline flow: reconcile the static schedule against the live disruption feed, then proactively compute an alternative.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt</span>I'm booked on the 16:31 St Pancras to Paris service today. Is it still running, and if not, how do I still get to Paris?</div>
+        <p><em>What to watch for:</em></p>
         <ol>
-          <li><code>get_scheduled_departures(station_query="St Pancras", start_time="13:00", end_time="14:00")</code> &mdash; finds trip <code>9024-0715</code> departing 13:31</li>
-          <li><code>check_disruptions(station_query="St Pancras")</code> &mdash; retrieves the signal failure window (15:00&ndash;19:30)</li>
-          <li><code>check_disruptions(trip_id="9024-0715")</code> &mdash; confirms this specific trip is <em>not</em> in the affected list (it departs before the disruption)</li>
-          <li><code>compute_reroute(origin="St Pancras", destination="Paris", departure_after="13:31")</code> &mdash; proactively finds the next alternative (<code>9040-0715</code>, delayed to 18:16)</li>
+          <li>Calls <code>get_scheduled_departures(station_name='St Pancras', start_time='16:00', end_time='17:00', date_str='2026-07-15')</code> to resolve the 16:31 Paris departure.</li>
+          <li>Calls <code>check_disruptions</code> and joins on <code>trip_id</code> &mdash; the 16:31 service is <strong>cancelled</strong> by the St Pancras throat signal failure.</li>
+          <li>Proactively calls <code>compute_reroute(origin='St Pancras', destination='Paris Gare du Nord', departure_after='16:31', date_str='2026-07-15')</code> for the earliest alternative (e.g., transferring at Brussels Midi).</li>
+          <li>Closes with exactly one prominent recommended action.</li>
         </ol>
-        <p>The agent correctly identifies the 13:31 service is <strong>not disrupted</strong> (departs before the 15:00 window),
-        provides disruption context, and proactively offers the next available alternative with the delay factored in.</p>
-        <p>The response ends with: <em>"Proceed to London St Pancras International as planned to board your scheduled 13:31 departure."</em></p>
+
+        <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Status of a Delayed Service</strong></p>
+        <p>Checks that the agent reports a precise delay rather than a blanket "cancelled".</p>
+        <div class="prompt-block"><span class="prompt-label">prompt</span>What's the status of the 18:04 Eurostar from St Pancras to Brussels?</div>
+        <p><em>What to watch for:</em></p>
+        <ol>
+          <li>Calls <code>get_scheduled_departures</code> around 18:00 to find the Brussels service.</li>
+          <li>Calls <code>check_disruptions</code> and reconciles the service as <strong>delayed (+30 min)</strong>, with a new estimated departure &mdash; not cancelled.</li>
+          <li>Reports the exact delay and still ends with one recommended action.</li>
+        </ol>
+
+        <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; A Service That Is <em>Not</em> Affected (no false positives)</strong></p>
+        <p>Confirms the agent doesn't invent a disruption for a train outside the affected window.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt</span>Will my 13:31 St Pancras to Paris train run today?</div>
+        <p><em>What to watch for:</em></p>
+        <ol>
+          <li>Calls <code>get_scheduled_departures</code> and finds the 13:31 departure.</li>
+          <li>Calls <code>check_disruptions</code> &mdash; the trip is <em>not</em> in the affected list (it departs before the 15:00&ndash;19:30 disruption window).</li>
+          <li>Confirms the service is operating normally &mdash; no hallucinated disruption &mdash; and still ends with one recommended action.</li>
+        </ol>
         <p><strong>What just happened:</strong> The reasoning trace proves the agent is reconciling
         data, not guessing. This traceability is the foundation for governance (M3) and
         optimization (M4).</p>
@@ -815,17 +843,17 @@ Verify the reasoning trace shows all 3 tools being called.</div>
           <tr>
             <td>1</td>
             <td><code>get_scheduled_departures</code></td>
-            <td>Queries St Pancras departures around 13:31 &mdash; finds the Paris service</td>
+            <td>Queries St Pancras departures around 16:31 &mdash; finds the Paris service</td>
           </tr>
           <tr>
             <td>2</td>
             <td><code>check_disruptions</code></td>
-            <td>Checks the 13:31 trip &mdash; finds it's cancelled/delayed due to signal failure</td>
+            <td>Checks the 16:31 trip &mdash; finds it's cancelled due to the signal failure</td>
           </tr>
           <tr>
             <td>3</td>
             <td><code>compute_reroute</code></td>
-            <td>Finds alternative: e.g., via Lille or Brussels, with a later departure</td>
+            <td>Finds an alternative via Brussels Midi, with a later departure</td>
           </tr>
         </tbody>
       </table>
@@ -835,18 +863,18 @@ Verify the reasoning trace shows all 3 tools being called.</div>
       <h3>What a Good Answer Looks Like</h3>
       <p>The agent should:</p>
       <ul>
-        <li>Confirm the 13:31 service is affected (with specific status: cancelled/delayed)</li>
-        <li>Explain <em>why</em> (signal failure at St Pancras)</li>
-        <li>Offer a <strong>concrete reroute</strong> with specific times and stations</li>
-        <li>End with <strong>one clear recommended action</strong></li>
-      </ul>
-      <div class="callout callout-success" style="margin-top:.75rem;">
-        <div class="callout-title">Example good answer</div>
-        <p>"Your 13:31 St Pancras&ndash;Paris Eurostar is cancelled due to the signal failure.
-        The next available route is the <strong>14:05 via Brussels Midi</strong>, changing in Brussels
-        with arrival at Paris Gare du Nord at <strong>17:32</strong> (1 change, ~3h27m total).
-        <strong>Recommended: head to Platform 5 for the 14:05 Brussels service.</strong>"</p>
-      </div>
+          <li>Confirm whether the requested service is affected (with specific status: cancelled/delayed)</li>
+          <li>Explain <em>why</em> (signal failure at St Pancras)</li>
+          <li>Offer a <strong>concrete reroute</strong> with specific times and stations</li>
+          <li>End with <strong>one clear recommended action</strong></li>
+        </ul>
+        <div class="callout callout-success" style="margin-top:.75rem;">
+          <div class="callout-title">Example good answer</div>
+          <p>"Your 16:31 St Pancras&ndash;Paris Eurostar is cancelled due to the signal failure.
+          The earliest alternative routes <strong>via Brussels Midi</strong> &mdash; change at Brussels for an
+          onward service to Paris Gare du Nord (1 change).
+          <strong>Recommended: rebook onto the next Brussels Midi departure and change there for Paris.</strong>"</p>
+        </div>
     </div>
 
     <div class="card">
@@ -898,17 +926,18 @@ Verify the reasoning trace shows all 3 tools being called.</div>
 
     <div class="card">
       <h3><span class="beat-badge beat-1" style="margin-left:0;">Beat 1</span> What You Typed</h3>
-      <p>What you type into Antigravity. In this module, you'll issue 3 prompts:</p>
+      <p>What you type into Antigravity. In this module, you'll issue 4 prompts:</p>
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
           <tr><td>1.1 Scaffold</td><td>"Scaffold a new ADK agent project for a transit assistant&hellip;"</td></tr>
           <tr><td>1.2 Tools</td><td>"Add three tools: schedule lookup, disruption check, reroute compute&hellip;"</td></tr>
           <tr><td>1.3 Instruction</td><td>"Write the system instruction: stay calm, reconcile, never invent&hellip;"</td></tr>
+          <tr><td>1.4 Run &amp; Test</td><td>"Run it locally with adk web, share the link, and give me queries to test&hellip;"</td></tr>
         </tbody>
       </table>
-      <p><strong>Why it matters:</strong> Proves the "do it with a prompt" promise. You described 3 capabilities
-      in natural language and got working code.</p>
+      <p><strong>Why it matters:</strong> Proves the "do it with a prompt" promise. You described 4 capabilities
+      in natural language and got a working, testable agent.</p>
     </div>
 
     <div class="card">
@@ -920,6 +949,7 @@ Verify the reasoning trace shows all 3 tools being called.</div>
           <tr><td>1.1</td><td><code>agents-cli scaffold</code> &mdash; created project structure, agent def, tools module, env config</td></tr>
           <tr><td>1.2</td><td>Code generation with ADK <code>FunctionTool</code> pattern &mdash; docstrings become the model's tool descriptions</td></tr>
           <tr><td>1.3</td><td>System instruction injected into the agent's <code>instruction</code> field</td></tr>
+          <tr><td>1.4</td><td><code>adk web</code> / <code>agents-cli playground</code> &mdash; local Dev UI for interactive testing and the reasoning trace</td></tr>
         </tbody>
       </table>
       <p><strong>Why it matters:</strong> Demystifies the automation. You know exactly what happened.</p>
