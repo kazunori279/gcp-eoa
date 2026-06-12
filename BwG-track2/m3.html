@@ -270,13 +270,6 @@
 
 <div class="container">
 
-  <div class="callout callout-govern">
-    <div class="callout-title">The Track-2 Differentiator</div>
-    <p>This is the module that sets Track 2 apart. While Track 1 users <em>consume</em> agents,
-    you understand how they're <strong>governed</strong>. Unmanaged agents are autonomous code executing tools
-    with unverified permissions &mdash; governance is not paperwork, it's <strong>attack-surface control</strong>.</p>
-  </div>
-
   <div class="callout callout-warning">
     <div class="callout-title">Format: Guided Demo + One Hands-on Step</div>
     <p>Agent Gateway, Identity, and Model Armor are <strong>Preview / Private Preview</strong>.
@@ -387,16 +380,15 @@ with schemas.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY registers the agent with A2A-style metadata:</p>
+        <p>AGY discovers the Gemini Enterprise App ID (<code>explore-ai</code>), reads the tool schemas from <code>agent.py</code>,
+        and runs <code>agents-cli publish gemini-enterprise</code> to register the agent. It creates a <code>registration_results.md</code> artifact.</p>
         <ul>
-          <li>Agent listed in the <strong>Registry catalog</strong> with name, version, and status</li>
-          <li>All 3 tools cataloged with schemas, parameters, and descriptions</li>
-          <li>Other teams can discover and reuse your agent through the catalog</li>
+          <li>Agent published as <strong>v0.1.0</strong> with name, description, and tool catalog</li>
+          <li>All 5 tools cataloged with auto-extracted parameter schemas: <code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>, <code>set_home_station</code>, <code>get_home_station</code></li>
+          <li>Linked to the deployed Vertex AI Reasoning Engine endpoint</li>
         </ul>
-        <p><strong>What just happened:</strong> Your agent is now a discoverable corporate asset.
-        <strong>Tool versioning</strong> means if the GTFS source schema changes, you update the
-        tool centrally without breaking downstream consumers. Browse the Registry in the
-        <strong>Agent Platform console</strong> to see it.</p>
+        <p><strong>What just happened:</strong> Your agent is now a discoverable corporate asset in the Gemini Enterprise console.
+        Other teams can find it, see its tools, and reuse it through the catalog.</p>
       </div>
     </div>
 
