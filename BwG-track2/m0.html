@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M0 — Setup &amp; The Mission | Rush Hour Workshop</title>
+<title>M0 — The Mission &amp; Setup | Rush Hour Workshop</title>
 <style>
   :root {
     --bg: #f8f9fa;
@@ -152,6 +152,27 @@
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
 
   .section-divider { border-top: 2px solid var(--border); margin-top: 2rem; padding-top: .5rem; }
+
+  /* Phase bar */
+  .phase-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .phase-chip {
+    text-align: center;
+    padding: .65rem .4rem;
+    border-radius: var(--radius);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+  }
+  .phase-build { background: var(--accent-light); color: var(--accent); }
+  .phase-scale { background: var(--success-light); color: var(--success); }
+  .phase-govern { background: var(--govern-light); color: var(--govern); }
+  .phase-optimize { background: var(--optimize-light); color: var(--optimize); }
+  .phase-engage { background: var(--warning-light); color: #b45309; }
 
   /* Cards */
   .card {
@@ -403,6 +424,7 @@
   @media (max-width: 700px) {
     .hero h1 { font-size: 1.5rem; }
     .before-after { grid-template-columns: 1fr; }
+    .phase-bar { grid-template-columns: repeat(3, 1fr); }
     .step { padding-left: 1.25rem; padding-top: 3.5rem; }
     .step-num { top: 1rem; left: 1.25rem; }
     .container { padding: 1rem .75rem; }
@@ -426,13 +448,9 @@
     <div class="subtitle">Track 2 &middot; Platform Builders</div>
   </div>
   <nav>
-    <a href="intro.html">
-      <span class="nav-dot" style="background:#fd7e14;"></span>
-      <span class="nav-label">Introduction<span class="nav-sub">Workshop overview</span></span>
-    </a>
     <a href="m0.html" class="active">
       <span class="nav-dot" style="background:#6c757d;"></span>
-      <span class="nav-label">M0 &middot; Setup<span class="nav-sub">10 min &middot; Cockpit &amp; data</span></span>
+      <span class="nav-label">M0 &middot; Start Here<span class="nav-sub">10 min &middot; Mission &amp; setup</span></span>
     </a>
     <a href="m1.html">
       <span class="nav-dot" style="background:#1a73e8;"></span>
@@ -467,10 +485,10 @@
      HERO
      ═══════════════════════════════════════════════════════════════ -->
 <div class="hero">
-  <div class="hero-track">Build with Gemini World Tour &middot; Track 2</div>
+  <div class="hero-track">Build with Gemini World Tour &middot; Track 2 &middot; Platform Builders</div>
   <div class="hero-module">Module 0</div>
-  <h1>Setup &amp; The Mission</h1>
-  <p class="hero-sub">Get your cockpit running, download the data, understand the crisis,<br>
+  <h1>The Mission &amp; Setup</h1>
+  <p class="hero-sub">Understand the crisis, meet your tools, download the data,<br>
   and see the empty platform you'll fill by the end of the workshop.</p>
   <div class="hero-time">10 minutes &middot; 0:00 &ndash; 0:10</div>
 </div>
@@ -480,6 +498,14 @@
      ═══════════════════════════════════════════════════════════════ -->
 <div class="container">
 
+  <div class="phase-bar">
+    <div class="phase-chip phase-build">M1 &middot; BUILD</div>
+    <div class="phase-chip phase-scale">M2 &middot; SCALE</div>
+    <div class="phase-chip phase-govern">M3 &middot; GOVERN</div>
+    <div class="phase-chip phase-optimize">M4 &middot; OPTIMIZE</div>
+    <div class="phase-chip phase-engage">M5 &middot; ENGAGE</div>
+  </div>
+
   <div class="callout callout-info">
     <div class="callout-title">Objective</div>
     <p>Everyone is in Antigravity with a working cockpit, has the data, understands the crisis,
@@ -487,7 +513,7 @@
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────
-       CRISIS BRIEFING (intro context)
+       THE CRISIS BRIEFING
        ───────────────────────────────────────────────────────────── -->
     <h2>The Crisis Briefing</h2>
 
@@ -582,27 +608,206 @@
       The agent you build in M1 will be deployed (M2), governed (M3), optimized (M4), and published (M5) to make this work.</p>
     </div>
 
+    <div class="card">
+      <h3><span class="icon">&#x1F310;</span> The Network</h3>
+      <p>The dataset covers <strong>17 stations</strong> across 5 countries (UK, France, Belgium, Netherlands, Germany)
+      on the Eurostar / cross-border rail network.</p>
+
+      <div class="map-wrap">
+        <svg viewBox="0 0 600 290" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;">
+          <rect x="0" y="0" width="600" height="290" rx="12" fill="#f0f4f8"/>
+          <!-- UK -->
+          <rect x="20" y="20" width="160" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="100" y="38" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">UNITED KINGDOM</text>
+          <circle cx="60" cy="58" r="5" fill="#dc3545"/>
+          <text x="72" y="62" font-family="system-ui" font-size="10" fill="#333" font-weight="700">St Pancras</text>
+          <text x="60" y="58" text-anchor="middle" font-family="system-ui" font-size="5" fill="#fff" font-weight="800">!</text>
+          <rect x="38" y="45" width="44" height="16" rx="3" fill="#dc3545" opacity=".12"/>
+          <!-- France -->
+          <rect x="20" y="110" width="280" height="80" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="160" y="128" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">FRANCE</text>
+          <circle cx="70" cy="155" r="4" fill="#1a73e8"/>
+          <text x="80" y="159" font-family="system-ui" font-size="10" fill="#333">Lille Europe</text>
+          <circle cx="70" cy="175" r="4" fill="#1a73e8"/>
+          <text x="80" y="179" font-family="system-ui" font-size="10" fill="#333">Paris Gare du Nord</text>
+          <circle cx="200" cy="155" r="4" fill="#1a73e8"/>
+          <text x="210" y="159" font-family="system-ui" font-size="10" fill="#333">Calais</text>
+          <!-- Belgium -->
+          <rect x="320" y="110" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="128" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">BELGIUM</text>
+          <circle cx="370" cy="150" r="4" fill="#1a73e8"/>
+          <text x="380" y="154" font-family="system-ui" font-size="10" fill="#333">Brussels Midi</text>
+          <!-- Netherlands -->
+          <rect x="320" y="20" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="38" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">NETHERLANDS</text>
+          <circle cx="370" cy="58" r="4" fill="#1a73e8"/>
+          <text x="380" y="62" font-family="system-ui" font-size="10" fill="#333">Amsterdam / Rotterdam</text>
+          <!-- Germany -->
+          <rect x="320" y="200" width="260" height="60" rx="8" fill="#fff" stroke="#ddd"/>
+          <text x="450" y="218" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888" font-weight="600">GERMANY</text>
+          <circle cx="370" cy="240" r="4" fill="#1a73e8"/>
+          <text x="380" y="244" font-family="system-ui" font-size="10" fill="#333">Cologne / Frankfurt</text>
+          <!-- Connections -->
+          <line x1="60" y1="63" x2="70" y2="151" stroke="#dc3545" stroke-width="2" stroke-dasharray="6,3"/>
+          <line x1="70" y1="159" x2="70" y2="171" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="70" y1="155" x2="196" y2="155" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="200" y1="155" x2="366" y2="150" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="370" y1="146" x2="370" y2="62" stroke="#1a73e8" stroke-width="1.5"/>
+          <line x1="370" y1="154" x2="370" y2="236" stroke="#1a73e8" stroke-width="1.5"/>
+          <!-- Legend -->
+          <line x1="30" y1="265" x2="55" y2="265" stroke="#dc3545" stroke-width="2" stroke-dasharray="6,3"/>
+          <text x="60" y="269" font-family="system-ui" font-size="9" fill="#888">Disrupted</text>
+          <line x1="120" y1="265" x2="145" y2="265" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="150" y="269" font-family="system-ui" font-size="9" fill="#888">Available for reroute</text>
+        </svg>
+      </div>
+    </div>
+
+  <div class="section-divider">
   <!-- ─────────────────────────────────────────────────────────────
-       STEPS 1-4
+       THE JOURNEY
+       ───────────────────────────────────────────────────────────── -->
+    <h2>The Journey &mdash; Build &rarr; Scale &rarr; Govern &rarr; Optimize</h2>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F5D3;&#xFE0F;</span> Timeline</h3>
+      <table class="data">
+        <thead><tr><th>Time</th><th>Module</th><th>Headline</th><th>Format</th></tr></thead>
+        <tbody>
+          <tr><td>0:00&ndash;0:10</td><td style="font-weight:700;">M0 Setup</td><td>Cockpit check, data, crisis brief, see the empty platform</td><td>Guided</td></tr>
+          <tr style="background:#e8f0fe;"><td>0:10&ndash;0:40</td><td style="font-weight:700; color:var(--accent);">M1 BUILD</td><td>Vibe-build the transit agent + tools; run locally</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#d1e7dd;"><td>0:40&ndash;1:05</td><td style="font-weight:700; color:var(--success);">M2 SCALE</td><td>Deploy to Agent Runtime; Sessions, Memory Bank, sandbox</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#ede9fe;"><td>1:05&ndash;1:30</td><td style="font-weight:700; color:var(--govern);">M3 GOVERN</td><td>Registry, Identity, Gateway, Model Armor</td><td>Guided demo</td></tr>
+          <tr style="background:#e0f7fa;"><td>1:30&ndash;1:50</td><td style="font-weight:700; color:var(--optimize);">M4 OPTIMIZE</td><td>Quality Flywheel: simulate, score, cluster, optimize</td><td style="font-weight:600;">Hands-on</td></tr>
+          <tr style="background:#fff3e0;"><td>1:50&ndash;2:00</td><td style="font-weight:700; color:#b45309;">M5 ENGAGE</td><td>Publish to Gemini Enterprise; talk to your agent</td><td>Guided</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F3D7;&#xFE0F;</span> What You'll Build &mdash; Platform Artifacts</h3>
+      <div class="map-wrap">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;">
+          <defs>
+            <marker id="ar2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6" fill="#666"/>
+            </marker>
+          </defs>
+          <!-- BUILD -->
+          <rect x="10" y="30" width="120" height="140" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+          <text x="70" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#1a73e8">BUILD</text>
+          <text x="70" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">ADK Agent</text>
+          <text x="70" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">3 Tools</text>
+          <text x="70" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">System Instruction</text>
+          <text x="70" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Local Playground</text>
+          <text x="70" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">gemini-3.5-flash</text>
+
+          <line x1="132" y1="100" x2="150" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- SCALE -->
+          <rect x="152" y="30" width="130" height="140" rx="10" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+          <text x="217" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#198754">SCALE</text>
+          <text x="217" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Runtime</text>
+          <text x="217" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Sessions</text>
+          <text x="217" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Memory Bank</text>
+          <text x="217" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Code Exec Sandbox</text>
+          <text x="217" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Serverless 0&rarr;&infin;</text>
+
+          <line x1="284" y1="100" x2="302" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- GOVERN -->
+          <rect x="304" y="30" width="130" height="140" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="369" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#7c3aed">GOVERN</text>
+          <text x="369" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Registry</text>
+          <text x="369" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Identity (IAM)</text>
+          <text x="369" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent Gateway</text>
+          <text x="369" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Model Armor</text>
+          <text x="369" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Attack-surface control</text>
+
+          <line x1="436" y1="100" x2="454" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- OPTIMIZE -->
+          <rect x="456" y="30" width="130" height="140" rx="10" fill="#e0f7fa" stroke="#0891b2" stroke-width="1.5"/>
+          <text x="521" y="22" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#0891b2">OPTIMIZE</text>
+          <text x="521" y="55" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">User Simulation</text>
+          <text x="521" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Env Simulation</text>
+          <text x="521" y="95" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Multi-turn Autoraters</text>
+          <text x="521" y="115" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Loss Clusters</text>
+          <text x="521" y="145" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Quality Flywheel</text>
+
+          <line x1="588" y1="100" x2="606" y2="100" stroke="#666" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+          <!-- ENGAGE -->
+          <rect x="608" y="55" width="82" height="90" rx="10" fill="#fff3e0" stroke="#b45309" stroke-width="1.5"/>
+          <text x="649" y="47" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="800" fill="#b45309">ENGAGE</text>
+          <text x="649" y="85" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Gemini</text>
+          <text x="649" y="100" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Enterprise</text>
+          <text x="649" y="130" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Chat UI</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+  <!-- ─────────────────────────────────────────────────────────────
+       SETUP IN 4 STEPS
        ───────────────────────────────────────────────────────────── -->
     <h2>Setup in 4 Steps</h2>
 
     <!-- Step 1 -->
     <div class="step">
       <div class="step-num">1</div>
-      <span class="step-time">3 min</span>
-      <h3>Read the Crisis Briefing</h3>
-      <p>Understand the scenario before you touch any code. Read the <strong>Crisis Briefing</strong> above,
-      or here's the short version:</p>
-      <div class="callout callout-danger" style="margin-top:.5rem;">
-        <div class="callout-title">Signal Failure at London St Pancras</div>
-        <p>Peak evening departures. A signal failure has halted all cross-border services.
-        Hundreds of travelers asking: <strong>"Will I still make it, and how?"</strong></p>
-        <p>A plain LLM will hallucinate train times. An <strong>agent</strong> with tools can query
-        the schedule, read the disruption feed, and <strong>compute</strong> a verified reroute.</p>
+      <span class="step-time">2 min</span>
+      <h3>Brief Your Coding Agent</h3>
+      <p>Open <strong>Antigravity</strong> and paste the block below to give your coding agent the scenario background.
+      This is context only &mdash; no file paths, no build instructions. Building starts in M1.</p>
+
+      <div class="card agent-section" style="margin-top:.75rem;">
+        <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+        <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Paste into AGY</span>
+# Rush Hour: Transit-Crisis Agent — Scenario Background
+
+## What we're building
+A transit-crisis assistant for cross-border high-speed rail. A signal
+failure has disrupted peak-hour departures from London St Pancras.
+Hundreds of travelers need real-time answers: "Is my train running?
+How do I still get to Paris?"
+
+## Why an agent, not a chatbot
+A plain LLM knows timetables but not what's happening right now.
+Our agent must RECONCILE two data sources:
+- The published schedule ("what SHOULD happen") — static GTFS data
+- A disruption feed ("what IS happening") — which services are
+  cancelled or delayed, and why
+
+The join of schedule × disruption on trip_id/stop_id is the core
+pattern. Without it, the agent is guessing.
+
+## The network
+17 stations across UK, France, Belgium, Netherlands, and Germany.
+Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
+Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
+
+## What the agent must do
+1. Look up scheduled departures for a station and time window
+2. Check which of those services are disrupted (delayed/cancelled)
+3. Compute a concrete reroute avoiding disrupted services
+4. Present the answer calmly with specific times, stations, and
+   number of changes
+5. End with one clear recommended action
+
+## The crisis scenario
+A signal failure at the St Pancras throat during peak hours.
+Multiple Eurostar and cross-border services are affected — some
+cancelled outright, others delayed 15–45 minutes. Travelers need
+to know: which trains are still running, and what's the best
+alternative route to their destination?
+
+## What's next
+In the following modules you will set up your workspace (M0), then
+build the agent with 3 tools by prompting in Antigravity (M1).
+Do NOT start building yet — this context is background only.</div>
       </div>
-      <p>By 2:00 you'll have a governed agent that a non-technical ops manager can simply chat with
-      in Gemini Enterprise. That's the deliverable.</p>
     </div>
 
     <!-- Step 2 -->
@@ -610,8 +815,6 @@
       <div class="step-num">2</div>
       <span class="step-time">3 min</span>
       <h3>Verify Your Cockpit</h3>
-      <p>Open <strong>Antigravity</strong> (the agentic IDE). This is your single workspace for the entire session &mdash;
-      you prompt, it builds.</p>
       <p>Confirm that <code>agents-cli</code> and its skills are installed:</p>
       <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
@@ -635,7 +838,7 @@
     <!-- Step 3 -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">2 min</span>
+      <span class="step-time">3 min</span>
       <h3>Download the Data</h3>
       <p>Download the <strong>static London GTFS bundle</strong> from the provided GCS / Drive link.
       Place it into your project's <code>data/</code> directory:</p>
@@ -689,13 +892,14 @@
       <ul class="checklist">
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Antigravity is open and responsive</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><code>agents-cli</code> skills are installed and recognized</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Scenario context pasted into Antigravity</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data is downloaded into <code>data/gtfs/</code></div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Disruption file is at <code>data/disruptions.json</code></div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console is open (empty)</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app is open (empty)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You understand the crisis scenario and the deliverable</div></li>
       </ul>
     </div>
+  </div>
 
   <!-- ─────────────────────────────────────────────────────────────
        DATA ORIENTATION
