@@ -115,6 +115,10 @@
   .beat-3 { background: #d1e7dd; color: #198754; }
   .beat-4 { background: #ede9fe; color: #7c3aed; }
 
+  /* Doc citation line */
+  .doc-cite { font-size:.8rem; color: var(--text-muted); margin-top:.5rem; }
+  .doc-cite a { color: var(--accent); }
+
   .prompt-block {
     background: #1e1e1e; color: #d4d4d4; padding: 1rem 1.25rem;
     border-radius: var(--radius); font-family: var(--mono); font-size: .85rem;
@@ -228,13 +232,13 @@
   <div class="hero-track">Build with Gemini World Tour &middot; Track 2</div>
   <div class="hero-module">Module 4</div>
   <h1>OPTIMIZE</h1>
-  <p class="hero-sub">Move from "looks right" to measured quality with the Quality Flywheel &mdash;<br>simulate, score, cluster failures, optimize automatically.</p>
-  <div class="hero-time">20 minutes &middot; 1:30 &ndash; 1:50 &middot; Hands-on</div>
+  <p class="hero-sub">Move from "looks right" to measured quality &mdash;<br>score your agent locally, fix what fails, and prove the improvement. No deployment.</p>
+  <div class="hero-time">20 minutes &middot; 1:30 &ndash; 1:50 &middot; Hands-on &middot; Local only</div>
   <div class="hero-pills">
-    <span class="hero-pill">Quality Flywheel</span>
-    <span class="hero-pill">User Simulation</span>
-    <span class="hero-pill">AutoRaters</span>
-    <span class="hero-pill">Prompt Optimization</span>
+    <span class="hero-pill">Eval-Fix Loop</span>
+    <span class="hero-pill">Scenario Simulation</span>
+    <span class="hero-pill">agents-cli eval</span>
+    <span class="hero-pill">pytest</span>
   </div>
 </div>
 
@@ -242,9 +246,17 @@
 
   <div class="callout callout-optimize">
     <div class="callout-title">Objective</div>
-    <p>Run the <strong>Quality Flywheel</strong>: simulate the crisis at scale, score your agent with autoraters,
-    find failure clusters, and <strong>automatically optimize</strong> the system instruction. This is the difference
+    <p>Run the local <strong>eval-fix loop</strong>: simulate the crisis at scale, turn the scenarios into a
+    <strong>graded eval suite</strong>, find the weakest case, fix the agent's logic, and prove the improvement
+    with before/after scores and tests &mdash; all <strong>locally, no deployment</strong>. This is the difference
     between a demo and a production agent.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-title">Everything here runs locally</div>
+    <p>M4 is about quality, not shipping. You already deployed in M2 &mdash; here you evaluate and improve the agent
+    on your machine with <code>agents-cli eval</code> and <code>pytest</code>, with <strong>no redeploy</strong>.
+    Publishing the improved agent happens later.</p>
   </div>
 
   <!-- THE QUALITY FLYWHEEL (methodology overview) -->
@@ -264,8 +276,8 @@
       <!-- Evaluate -->
       <rect x="210" y="10" width="180" height="70" rx="12" fill="#e0f7fa" stroke="#0891b2" stroke-width="2.5"/>
       <text x="300" y="36" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#0891b2">1. EVALUATE</text>
-      <text x="300" y="55" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Run 100 scenarios</text>
-      <text x="300" y="70" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">User + Environment simulation</text>
+      <text x="300" y="55" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Run scenarios locally</text>
+      <text x="300" y="70" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Scenario simulation + graded eval</text>
 
       <!-- Arrow down-right -->
       <path d="M 395 60 Q 480 60 480 130" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
@@ -273,8 +285,8 @@
       <!-- Analyze -->
       <rect x="390" y="140" width="180" height="70" rx="12" fill="#fde8ea" stroke="#dc3545" stroke-width="2"/>
       <text x="480" y="166" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#dc3545">2. ANALYZE</text>
-      <text x="480" y="185" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Find loss clusters</text>
-      <text x="480" y="200" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Group failures by cause</text>
+      <text x="480" y="185" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Find the weakest case</text>
+      <text x="480" y="200" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Why did it fail?</text>
 
       <!-- Arrow down-left -->
       <path d="M 480 215 Q 480 280 395 280" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
@@ -282,8 +294,8 @@
       <!-- Optimize -->
       <rect x="210" y="250" width="180" height="70" rx="12" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
       <text x="300" y="276" text-anchor="middle" font-family="system-ui" font-size="13" font-weight="800" fill="#198754">3. OPTIMIZE</text>
-      <text x="300" y="295" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Refine system instruction</text>
-      <text x="300" y="310" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">adk optimize</text>
+      <text x="300" y="295" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Fix instructions / tools</text>
+      <text x="300" y="310" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">then re-eval &amp; compare</text>
 
       <!-- Arrow up-left -->
       <path d="M 210 280 Q 120 280 120 175" stroke="#0891b2" stroke-width="2" fill="none" marker-end="url(#at)"/>
@@ -304,33 +316,33 @@
       <!-- Metrics -->
       <rect x="140" y="350" width="320" height="55" rx="10" fill="#f1f3f5" stroke="#dee2e6" stroke-width="1.5"/>
       <text x="300" y="370" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#333">Metrics That Matter</text>
-      <text x="300" y="390" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Task Success &middot; Tool-use Quality &middot; Factual Accuracy &middot; Action Clarity</text>
+      <text x="300" y="390" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">tool_trajectory &middot; response_match &middot; hallucinations_v1 &middot; rubric quality</text>
     </svg>
   </div>
 
   <div class="card">
     <h3>Why This Works</h3>
     <ul>
-      <li><strong>Simulation creates coverage</strong> &mdash; 100 scenarios catch failures your one test query never will</li>
-      <li><strong>AutoRaters remove subjectivity</strong> &mdash; metrics are defined, measured, compared</li>
-      <li><strong>Loss clusters reveal patterns</strong> &mdash; not random failures, but systematic weaknesses</li>
-      <li><strong>Automatic optimization closes the loop</strong> &mdash; the system proposes and tests a fix, not you</li>
+      <li><strong>Simulation creates coverage</strong> &mdash; many scenarios catch failures your one test query never will</li>
+      <li><strong>Graded metrics remove subjectivity</strong> &mdash; quality becomes a number you can define, measure, and compare</li>
+      <li><strong>The weakest case reveals the fix</strong> &mdash; you target a real failure, not a guess</li>
+      <li><strong>Before/after closes the loop</strong> &mdash; <code>agents-cli eval compare</code> proves the change actually helped</li>
     </ul>
   </div>
 
   <div class="card">
-    <h3>Example: Before vs. After</h3>
+    <h3>Example: Before vs. After <span style="font-weight:400; font-size:.85rem; color:var(--text-muted);">(illustrative)</span></h3>
     <table class="data">
-      <thead><tr><th>Metric</th><th>Before Optimization</th><th>After Optimization</th></tr></thead>
+      <thead><tr><th>Metric (what it checks)</th><th>Before</th><th>After</th></tr></thead>
       <tbody>
-        <tr><td>Task Success</td><td>72%</td><td>91%</td></tr>
-        <tr><td>Tool-use Quality</td><td>85%</td><td>97%</td></tr>
-        <tr><td>Factual Accuracy</td><td>88%</td><td>95%</td></tr>
-        <tr><td>Action Clarity</td><td>78%</td><td>94%</td></tr>
+        <tr><td><code>tool_trajectory_avg_score</code> &mdash; right tools, right order</td><td>0.85</td><td>1.00</td></tr>
+        <tr><td><code>response_match_score</code> &mdash; close to reference answer</td><td>0.74</td><td>0.88</td></tr>
+        <tr><td><code>hallucinations_v1</code> &mdash; grounded, no invented data</td><td>0.60</td><td>0.95</td></tr>
       </tbody>
     </table>
-    <p>The biggest jump comes from fixing the top loss cluster. One refined instruction,
-    empirically validated, raises quality across the board.</p>
+    <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
+    stops inventing times/platforms. One change, validated by re-running the eval. <em>Your real numbers come from
+    <code>agents-cli eval compare</code>.</em></p>
   </div>
 
   <!-- STEPS -->
@@ -340,95 +352,116 @@
   <div class="step">
     <div class="step-num">1</div>
     <span class="step-time">2 min</span>
-    <h3>The Quality Flywheel Concept</h3>
-    <p>Quality improvement for agents is a loop, not a one-time check:</p>
+    <h3>The Local Eval-Fix Loop</h3>
+    <p>Quality improvement for agents is a loop, not a one-time check &mdash; and it all runs locally:</p>
     <ol>
       <li><strong>Evaluate</strong> &mdash; run the agent against many scenarios and score it</li>
-      <li><strong>Analyze</strong> &mdash; find <strong>loss clusters</strong> (groups of failures with a common cause)</li>
-      <li><strong>Optimize</strong> &mdash; fix the biggest cluster (often by refining the system instruction)</li>
-      <li><strong>Repeat</strong> &mdash; each turn raises quality empirically</li>
+      <li><strong>Analyze</strong> &mdash; find the <strong>weakest case</strong> and why it failed</li>
+      <li><strong>Fix</strong> &mdash; change the agent's instructions or tool logic to address it</li>
+      <li><strong>Re-eval &amp; compare</strong> &mdash; rerun and prove the score improved</li>
     </ol>
-    <p>This is how you go from "it works on my one test query" to "it works on every query."</p>
+    <p>This is how you go from "it works on my one test query" to "it works on every query" &mdash;
+    with no deployment in the loop.</p>
   </div>
 
   <!-- Step 2: Simulate -->
   <div class="step">
     <div class="step-num">2</div>
-    <span class="step-time">7 min</span>
-    <h3>Simulate the Crisis at Scale</h3>
-    <p>We need to test the agent against many different scenarios, not just one query.
-    User simulation generates diverse commuter questions; environment simulation injects
-    edge cases like the disruption feed going down.</p>
+    <span class="step-time">6 min</span>
+    <h3>Simulate the Crisis at Scale (Breadth)</h3>
+    <p>Test the agent against many scenarios, not just one query. AGY generates diverse commuter
+    requests and an edge case where the disruption feed goes down &mdash; and runs them all
+    <strong>locally, in parallel</strong>.</p>
 
     <div class="card agent-section">
       <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
       <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Generate 10 commuter scenarios during a St Pancras signal failure
-and run them in parallel against my agent, including a case where
-the disruption feed is unavailable.</div>
+Generate 10 commuter scenarios during a St Pancras signal failure and
+run them in parallel against my agent LOCALLY, including a case where the
+disruption feed is unavailable (HTTP 503). Do not deploy — local only.
+When done, PRINT a final report table: each scenario, what the agent did,
+which tools it used, and whether it resolved sensibly.</div>
     </div>
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY writes a Python script that generates 10 scenarios and runs them concurrently (async semaphore of 5).
-      Completes in <strong>~1.5 minutes</strong>. Saves a dataset (<code>st_pancras_10_scenarios.json</code>) and a report (<code>scenarios_run_report.md</code>).</p>
+      <p>AGY writes a local parallel runner (e.g. <code>tests/integration/parallel_test.py</code>) and runs all 10
+      scenarios concurrently (~1&ndash;2 min), then prints a report table. Coverage includes:</p>
       <ul>
-        <li><strong>6 disrupted departures</strong> &mdash; cancelled/delayed St Pancras services, all 3 tools called</li>
-        <li><strong>2 inbound return legs</strong> &mdash; queries about returning to disrupted St Pancras</li>
-        <li><strong>1 unaffected route</strong> &mdash; continental route not impacted by London signal failure</li>
-        <li><strong>1 offline feed edge case</strong> &mdash; disruptions.json temporarily removed; agent falls back to GTFS schedules and adds a disclaimer to check station departure boards</li>
+        <li><strong>Cancellations + reroutes</strong> &mdash; e.g. cancelled Paris/Amsterdam services, alternatives computed via Brussels/Rotterdam</li>
+        <li><strong>Delays</strong> &mdash; revised departure times with next steps</li>
+        <li><strong>Code-exec math</strong> &mdash; the sandbox computes stats like the cancellation ratio or peak bottleneck hour</li>
+        <li><strong>Personalization</strong> &mdash; home-station recall</li>
+        <li><strong>Offline-feed fallback</strong> &mdash; a 503 outage; the agent falls back to GTFS schedules and tells the user to check station boards</li>
       </ul>
-      <p>Target: <strong>100% pass rate (10/10)</strong>, every response ends with a recommended action.</p>
+      <p>This step is <strong>breadth</strong> &mdash; a qualitative check that the agent resolves sensibly. We turn it
+      into measured <strong>scores</strong> next.</p>
     </div>
   </div>
 
   <!-- Step 3: Fix -->
   <div class="step">
     <div class="step-num">3</div>
-    <span class="step-time">11 min</span>
-    <h3>Analyze &amp; Fix</h3>
-    <p>Even with a perfect score, AGY can analyze the eval traces to find grounding improvements
-    and harden the system instruction. If any scenarios scored below 5.0, AGY groups failures
-    by common cause into <strong>loss clusters</strong> and optimizes the instruction to fix them.</p>
+    <span class="step-time">12 min</span>
+    <h3>Grade, Fix, and Prove It (One Cycle)</h3>
+    <p>Now turn the scenarios into a <strong>graded eval suite</strong>, find the single weakest case, make
+    <strong>one</strong> targeted fix, and prove the improvement with before/after scores &mdash; all locally,
+    in a single bounded cycle so it stays fast.</p>
 
     <div class="card agent-section">
       <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
       <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Analyze the failures and optimize my system instruction to fix
-the biggest cluster.</div>
+Score my agent locally, fix the single biggest issue, and show me
+before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
+1) Build a small 4-case graded eval from our scenarios: a cancellation
+   + reroute, a delay, the offline-feed 503 fallback, and a grounding
+   trap that asks for something no tool returns (e.g. "which platform
+   does the 18:16 to Paris depart from?"). Reuse my existing tests/eval
+   files.
+2) Use fast metrics: tool_trajectory_avg_score (IN_ORDER) and
+   response_match_score; add hallucinations_v1 on ONLY the grounding
+   -trap case.
+3) Run `agents-cli eval run` once for a baseline and save it.
+4) Make ONE targeted fix (e.g. a strict grounding rule so it never
+   states a time/platform/number not returned by a tool), add a pytest
+   test for it, then re-run `agents-cli eval run` and `pytest tests/`
+   once.
+5) STOP and PRINT a report: weakest case, the fix, before->after via
+   `agents-cli eval compare`, and pytest result. No further iteration.
+   No deploy.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
-      <div class="callout-title">While you wait &mdash; how <code>agents-cli eval run</code> works</div>
-      <p>AGY runs <code>agents-cli eval run</code> to score each scenario (~5 min, sequential).
-      Each scenario is graded by an <strong>LLM-as-judge</strong> against these metrics:</p>
+      <div class="callout-title">How <code>agents-cli eval run</code> scores (while you wait)</div>
+      <p><code>agents-cli eval run</code> wraps <code>adk eval</code> and scores each case against the metrics
+      below. The first two are <strong>fast and deterministic</strong>; <code>hallucinations_v1</code> uses an
+      <strong>LLM-as-judge</strong>, so we run it on just one case to keep things quick.</p>
       <table class="data" style="margin-top:.5rem;">
-        <thead><tr><th>Metric</th><th>What it measures</th></tr></thead>
+        <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
         <tbody>
-          <tr><td><strong>Task Success</strong></td><td>Did the commuter get a valid reroute with times and stations?</td></tr>
-          <tr><td><strong>Tool-use Quality</strong></td><td>Were the right tools called before answering?</td></tr>
-          <tr><td><strong>Factual Accuracy</strong></td><td>Are all referenced trains real GTFS trip_ids?</td></tr>
-          <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear recommendation?</td></tr>
+          <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, called in the right order (e.g. <code>check_disruptions</code> before <code>compute_reroute</code>)</td><td>fast</td></tr>
+          <tr><td><code>response_match_score</code></td><td>How close the answer is to a reference (ROUGE)</td><td>fast</td></tr>
+          <tr><td><code>hallucinations_v1</code></td><td>Is the answer grounded in tool output &mdash; no invented times/platforms?</td><td>LLM judge</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:.5rem;">Watch AGY's chat for progress updates (e.g., "inference 5/10").
-      Results are saved as JSON and an <strong>interactive HTML report</strong> in <code>artifacts/</code>.</p>
-    </div>
-
-    <div class="callout callout-warning" style="margin-top:.75rem;">
-      <div class="callout-title">AGY will ask to redeploy</div>
-      <p>After optimizing the system instruction, AGY will ask if you want to deploy the updated agent.
-      Select <strong>"Proceed with the deployment"</strong> to push the improved instruction to your live endpoint.</p>
+      <p style="margin-top:.5rem;">Results are saved as JSON; compare two runs with
+      <code>agents-cli eval compare baseline.json candidate.json</code>.</p>
+      <p class="doc-cite">Docs: <a href="https://adk.dev/evaluate/" target="_blank">ADK evaluation</a> &middot; <a href="https://adk.dev/evaluate/criteria/" target="_blank">Criteria reference</a> &middot; <a href="https://adk.dev/evaluate/user-sim/" target="_blank">User simulation</a></p>
     </div>
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY analyzes the eval traces and tightens the system instruction &mdash; for example,
-      adding a strict grounding rule that prevents the agent from guessing arrival times
-      not explicitly returned by <code>compute_reroute</code>. It then redeploys and re-runs the
-      eval to confirm the improvement.</p>
-      <p><strong>What just happened:</strong> Quality improvement is <strong>empirical and automatable</strong>,
-      not guesswork. The eval &rarr; analyze &rarr; fix &rarr; re-eval loop is the quality flywheel.</p>
+      <p>AGY builds the 4-case evalset, runs a baseline, and finds the <strong>grounding-trap</strong> case
+      scoring low &mdash; the agent tries to answer a platform/time no tool returned. It adds a
+      <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
+      station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
+      <ul>
+        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli eval compare</code> shows the grounding case improving (e.g. <code>hallucinations_v1</code> jumps), other cases unchanged</li>
+        <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
+        <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
+      </ul>
+      <p><strong>What just happened:</strong> quality became a <strong>number</strong>, you fixed the
+      <strong>real</strong> weakest case, and you <strong>proved</strong> the fix &mdash; the local eval-fix loop.</p>
     </div>
   </div>
 
@@ -436,10 +469,10 @@ the biggest cluster.</div>
   <div class="done-when">
     <h3>Mentor Checkpoint &mdash; Done When:</h3>
     <ul class="checklist">
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 simulated scenarios have been run against your agent</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Evaluation dashboard shows scores for all metrics</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You've identified at least one loss cluster</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>System instruction has been optimized with a before/after score improvement</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 scenarios were simulated against your agent locally</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>agents-cli eval run</code>)</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You identified the single weakest case and fixed the agent's logic</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown via <code>agents-cli eval compare</code>, with <code>pytest</code> green &mdash; no deployment</div></li>
     </ul>
   </div>
 
@@ -452,8 +485,8 @@ the biggest cluster.</div>
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
-          <tr><td>4.2 Simulate</td><td>"Generate 10 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent, including a case where the disruption feed is unavailable."</td></tr>
-          <tr><td>4.3 Analyze &amp; Fix</td><td>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</td></tr>
+          <tr><td>4.2 Simulate</td><td>"Generate 10 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent locally (incl. a disruption-feed outage). Print a report."</td></tr>
+          <tr><td>4.3 Grade &amp; Fix</td><td>"Score my agent locally, fix the single biggest issue, and show me before/after &mdash; one cycle, no deploy."</td></tr>
         </tbody>
       </table>
     </div>
@@ -463,18 +496,21 @@ the biggest cluster.</div>
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>4.2</td><td><code>agents-cli eval</code> &mdash; parallel scenario generation + trace collection for 10 scenarios</td></tr>
-          <tr><td>4.3</td><td><code>agents-cli eval run</code> &mdash; LLM-as-judge scoring, loss cluster analysis, instruction optimization, redeploy</td></tr>
+          <tr><td>4.2</td><td>A local parallel runner (ADK <code>Runner</code>) executing 10 scenarios concurrently</td></tr>
+          <tr><td>4.3</td><td><code>agents-cli eval run</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli eval compare</code> for before/after</td></tr>
         </tbody>
       </table>
+      <p>The analysis and the fix are done by the coding agent reasoning over the scores &mdash; there is no
+      auto-optimize command. You stay in control of the change.</p>
     </div>
 
     <div class="card">
-      <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See in the Console</h3>
+      <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See Locally</h3>
       <ul>
-        <li><strong>Evaluation dashboard</strong> &mdash; scores across all 10 scenarios with pass/fail breakdown</li>
-        <li><strong>Trace viewer</strong> &mdash; drill into a failed run and see exactly where the agent went wrong</li>
-        <li><strong>Before/after scores</strong> &mdash; concrete evidence that the optimization worked</li>
+        <li><strong>Eval scores</strong> &mdash; per-case, per-metric, saved as JSON (and an HTML report)</li>
+        <li><strong>Trace viewer</strong> &mdash; <code>adk web</code> Eval tab: drill into a case and see exactly where the agent went wrong</li>
+        <li><strong>Before/after</strong> &mdash; <code>agents-cli eval compare</code> as concrete evidence the fix worked</li>
+        <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> locking in the new behavior</li>
       </ul>
     </div>
 
@@ -482,9 +518,9 @@ the biggest cluster.</div>
       <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>Empirical quality</strong> &mdash; measured, not guessed</li>
-        <li><strong>Automatable improvement</strong> &mdash; the system finds and fixes weaknesses</li>
-        <li><strong>Production readiness</strong> &mdash; you know your agent works because you've tested it at scale</li>
-        <li><strong>Continuous improvement</strong> &mdash; the flywheel keeps turning as you add scenarios and edge cases</li>
+        <li><strong>Fast local feedback</strong> &mdash; evaluate and fix without a deploy in the loop</li>
+        <li><strong>Fix the real weakness</strong> &mdash; you target the failing case, then prove the fix moved the score</li>
+        <li><strong>Regression-proof</strong> &mdash; the eval suite + tests keep quality from sliding as you add scenarios</li>
       </ul>
     </div>
   </div>
