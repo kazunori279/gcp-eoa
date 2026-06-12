@@ -165,26 +165,7 @@
   /* Layout */
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-  .tab-btn {
-    padding: .75rem 1.25rem;
-    border: none;
-    background: none;
-    font-family: var(--font);
-    font-size: .95rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    white-space: nowrap;
-    transition: color .15s, border-color .15s;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--success); border-bottom-color: var(--success); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  .section-divider { border-top: 2px solid var(--border); margin-top: 2rem; padding-top: .5rem; }
 
   /* Cards */
   .card {
@@ -531,123 +512,8 @@
     All by prompting in Antigravity.</p>
   </div>
 
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
-    <button class="tab-btn" data-tab="artifacts" role="tab">Platform Artifacts</button>
-    <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
-  </div>
-
-  <!-- TAB 1: STEP-BY-STEP -->
-  <div id="tab-steps" class="tab-panel active">
-    <h2>Scale in 3 Steps</h2>
-
-    <div class="callout callout-warning">
-      <div class="callout-title">The Leap</div>
-      <p>In M1, your agent ran locally. Now you'll deploy it to a <strong>managed cloud service</strong>
-      that scales from zero to thousands of concurrent users &mdash; without infrastructure management.
-      The same project shape from M1 deploys directly.</p>
-    </div>
-
-    <!-- Step 1: Deploy -->
-    <div class="step">
-      <div class="step-num">1</div>
-      <span class="step-time">9 min</span>
-      <h3>Deploy to Agent Runtime</h3>
-      <p>Your agent is working locally. Now let's make it a managed cloud service with an HTTPS
-      endpoint, auto-scaling, and health monitoring. The <code>agents-cli deploy</code> skill packages
-      your ADK app and creates an Agent Runtime instance.</p>
-
-      <div class="card agent-section">
-        <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
-        <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Deploy this agent to Agent Runtime and give me an endpoint I can
-query. Package the agent code, tools, and data together.</div>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>AGY runs <code>agents-cli deploy</code> and creates:</p>
-        <ul>
-          <li>A managed <strong>Agent Runtime instance</strong> with an HTTPS endpoint</li>
-          <li>Health status showing "HEALTHY" in the Agent Platform console</li>
-          <li>The same crisis query returns a correct answer from the cloud endpoint</li>
-        </ul>
-        <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
-        of concurrent users without managing infrastructure. Your M1 code deployed without changes.
-        Open the <strong>Agent Platform console</strong> to see your deployed agent.</p>
-      </div>
-    </div>
-
-    <!-- Step 2: Sessions + Memory -->
-    <div class="step">
-      <div class="step-num">2</div>
-      <span class="step-time">9 min</span>
-      <h3>Remember the Commuter &mdash; Sessions + Memory Bank</h3>
-      <p>Right now, each query is stateless. We need two kinds of memory: <strong>Sessions</strong>
-      (short-term, within a conversation) so "What about the next one?" makes sense, and
-      <strong>Memory Bank</strong> (long-term, cross-session) so the agent remembers your home station next week.</p>
-
-      <div class="card agent-section">
-        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
-        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Add session state for the current conversation and long-term memory
-so the agent remembers my home station across visits. Use ADK's
-session service for short-term state and Memory Bank for cross-session
-personalization.</div>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>AGY configures two state layers:</p>
-        <ul>
-          <li><strong>Sessions</strong> &mdash; multi-turn coherence within a conversation. "What about the 14:05?" works because the agent remembers you were asking about St Pancras to Paris.</li>
-          <li><strong>Memory Bank</strong> &mdash; cross-session recall. Set your home station, start a new session, and the agent greets you with "Your usual 18:02 to Brussels is on time today."</li>
-        </ul>
-        <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
-        not app code you maintain. See the <strong>Platform Artifacts</strong> tab for details on each.</p>
-      </div>
-    </div>
-
-    <!-- Step 3: Sandbox -->
-    <div class="step">
-      <div class="step-num">3</div>
-      <span class="step-time">5 min</span>
-      <h3>Safe Math &mdash; Code Execution Sandbox</h3>
-      <p>The reroute computation and any model-generated Python run inside an <strong>isolated,
-      secure sandbox</strong> &mdash; not on the host runtime. This is already configured as part of
-      Agent Runtime.</p>
-
-      <div class="callout callout-danger" style="margin-top:.75rem;">
-        <div class="callout-title">Why this matters for platform owners</div>
-        <p>Non-deterministic or model-generated code can't touch your environment.
-        The sandbox enforces resource limits (CPU, memory, time) and network isolation.
-        A compromised prompt can't exfiltrate data or harm the host.</p>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>The Code Execution sandbox is active as part of Agent Runtime. Tool computations
-        (like <code>compute_reroute</code>'s BFS pathfinding) run in ephemeral containers that are
-        destroyed after each execution &mdash; no persistent state, no host access.</p>
-      </div>
-    </div>
-
-    <!-- Done-when -->
-    <div class="done-when">
-      <h3>Mentor Checkpoint &mdash; Done When:</h3>
-      <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is deployed to Agent Runtime with a live endpoint</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Endpoint answers the crisis question correctly</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Session state maintains conversation context across turns</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Memory Bank stores and recalls the commuter's home station</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A new session recalls the stored home station</div></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- TAB 2: PLATFORM ARTIFACTS -->
-  <div id="tab-artifacts" class="tab-panel">
-    <h2>Platform Artifacts &mdash; What You Build in M2</h2>
+  <!-- PLATFORM ARTIFACTS -->
+  <h2>Platform Artifacts &mdash; What You Build in M2</h2>
 
     <p>Every artifact is a real, managed enterprise service. After M2, your agent has moved
     from a local script to a production-grade cloud deployment.</p>
@@ -742,10 +608,115 @@ personalization.</div>
       <p><strong>Guarantee:</strong> Even if the model is tricked into generating malicious code,
       the sandbox prevents it from touching your environment or data.</p>
     </div>
-  </div>
 
-  <!-- TAB 3: 4-BEAT RHYTHM -->
-  <div id="tab-beats" class="tab-panel">
+  <!-- STEPS -->
+  <h2>Scale in 3 Steps</h2>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">The Leap</div>
+      <p>In M1, your agent ran locally. Now you'll deploy it to a <strong>managed cloud service</strong>
+      that scales from zero to thousands of concurrent users &mdash; without infrastructure management.
+      The same project shape from M1 deploys directly.</p>
+    </div>
+
+    <!-- Step 1: Deploy -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <span class="step-time">9 min</span>
+      <h3>Deploy to Agent Runtime</h3>
+      <p>Your agent is working locally. Now let's make it a managed cloud service with an HTTPS
+      endpoint, auto-scaling, and health monitoring. The <code>agents-cli deploy</code> skill packages
+      your ADK app and creates an Agent Runtime instance.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
+        <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Deploy this agent to Agent Runtime and give me an endpoint I can
+query. Package the agent code, tools, and data together.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY runs <code>agents-cli deploy</code> and creates:</p>
+        <ul>
+          <li>A managed <strong>Agent Runtime instance</strong> with an HTTPS endpoint</li>
+          <li>Health status showing "HEALTHY" in the Agent Platform console</li>
+          <li>The same crisis query returns a correct answer from the cloud endpoint</li>
+        </ul>
+        <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
+        of concurrent users without managing infrastructure. Your M1 code deployed without changes.
+        Open the <strong>Agent Platform console</strong> to see your deployed agent.</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Sessions + Memory -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <span class="step-time">9 min</span>
+      <h3>Remember the Commuter &mdash; Sessions + Memory Bank</h3>
+      <p>Right now, each query is stateless. We need two kinds of memory: <strong>Sessions</strong>
+      (short-term, within a conversation) so "What about the next one?" makes sense, and
+      <strong>Memory Bank</strong> (long-term, cross-session) so the agent remembers your home station next week.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
+        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Add session state for the current conversation and long-term memory
+so the agent remembers my home station across visits. Use ADK's
+session service for short-term state and Memory Bank for cross-session
+personalization.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY configures two state layers:</p>
+        <ul>
+          <li><strong>Sessions</strong> &mdash; multi-turn coherence within a conversation. "What about the 14:05?" works because the agent remembers you were asking about St Pancras to Paris.</li>
+          <li><strong>Memory Bank</strong> &mdash; cross-session recall. Set your home station, start a new session, and the agent greets you with "Your usual 18:02 to Brussels is on time today."</li>
+        </ul>
+        <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
+        not app code you maintain. See the <strong>Platform Artifacts</strong> section above for details on each.</p>
+      </div>
+    </div>
+
+    <!-- Step 3: Sandbox -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <span class="step-time">5 min</span>
+      <h3>Safe Math &mdash; Code Execution Sandbox</h3>
+      <p>The reroute computation and any model-generated Python run inside an <strong>isolated,
+      secure sandbox</strong> &mdash; not on the host runtime. This is already configured as part of
+      Agent Runtime.</p>
+
+      <div class="callout callout-danger" style="margin-top:.75rem;">
+        <div class="callout-title">Why this matters for platform owners</div>
+        <p>Non-deterministic or model-generated code can't touch your environment.
+        The sandbox enforces resource limits (CPU, memory, time) and network isolation.
+        A compromised prompt can't exfiltrate data or harm the host.</p>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>The Code Execution sandbox is active as part of Agent Runtime. Tool computations
+        (like <code>compute_reroute</code>'s BFS pathfinding) run in ephemeral containers that are
+        destroyed after each execution &mdash; no persistent state, no host access.</p>
+      </div>
+    </div>
+
+    <!-- Done-when -->
+    <div class="done-when">
+      <h3>Mentor Checkpoint &mdash; Done When:</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is deployed to Agent Runtime with a live endpoint</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Endpoint answers the crisis question correctly</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Session state maintains conversation context across turns</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Memory Bank stores and recalls the commuter's home station</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A new session recalls the stored home station</div></li>
+      </ul>
+    </div>
+
+  <!-- 4-BEAT RHYTHM -->
+  <div class="section-divider">
     <h2>The 4-Beat Rhythm &mdash; Module 2</h2>
 
     <p>Every module follows the same 4 beats. Here's how they play out in SCALE:</p>
@@ -802,15 +773,6 @@ personalization.</div>
 </div><!-- /container -->
 
 <script>
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    });
-  });
-
   function copyBlock(id) {
     const el = document.getElementById(id);
     const clone = el.cloneNode(true);

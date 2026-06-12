@@ -165,26 +165,8 @@
   /* Layout */
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-  .tab-btn {
-    padding: .75rem 1.25rem;
-    border: none;
-    background: none;
-    font-family: var(--font);
-    font-size: .95rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    white-space: nowrap;
-    transition: color .15s, border-color .15s;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  /* Section divider */
+  .section-divider { border-top: 2px solid var(--border); margin-top: 2rem; padding-top: .5rem; }
 
   /* Cards */
   .card {
@@ -548,18 +530,7 @@
     in the ADK playground. You describe what you want; the coding agent writes the code.</p>
   </div>
 
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
-    <button class="tab-btn" data-tab="tools" role="tab">The 3 Tools</button>
-    <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
-    <button class="tab-btn" data-tab="test" role="tab">Test &amp; Trace</button>
-  </div>
-
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 1: STEP-BY-STEP
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-steps" class="tab-panel active">
-    <h2>Build in 4 Steps</h2>
+  <h2>Build in 4 Steps</h2>
 
     <!-- Step 1: Scaffold -->
     <div class="step">
@@ -595,141 +566,9 @@ change it), and uv for dependency management.</div>
       </div>
     </div>
 
-    <!-- Step 2: Tools -->
-    <div class="step">
-      <div class="step-num">2</div>
-      <span class="step-time">12 min</span>
-      <h3>Give the Agent Its Tools</h3>
-      <p>A plain LLM knows timetables but not what's happening <em>right now</em>. Our agent needs
-      three deterministic tools to reconcile the published schedule against the live disruption feed.
-      The magic is the <strong>join</strong> of schedule &times; disruption on <code>trip_id</code> / <code>stop_id</code> &mdash;
-      this is <em>the</em> pattern that makes the agent more than a chatbot.</p>
-
-      <div class="card agent-section">
-        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
-        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Add three tools to the agent:
-1. get_scheduled_departures &mdash; queries the static GTFS data in data/gtfs/
-   to list departures from a given station within a time window.
-   Join stops.txt, stop_times.txt, trips.txt, and routes.txt.
-2. check_disruptions &mdash; reads data/disruptions.json and returns affected
-   services, delays, and cancellations. Supports filtering by station
-   or trip_id.
-3. compute_reroute &mdash; given origin, destination, and departure_after,
-   builds a station graph from GTFS connections, removes disrupted
-   services, and finds an alternative path (BFS/shortest-path).
-Write clear docstrings and type hints so the model can call them
-correctly. The critical pattern is reconciliation: joining schedule
-data with disruption data on trip_id and stop_id.</div>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>AGY creates three functions in <code>tools.py</code> with type hints and docstrings:</p>
-        <ul>
-          <li><strong>Tool 1: <code>get_scheduled_departures</code></strong> &mdash; "what SHOULD happen" (GTFS query)</li>
-          <li><strong>Tool 2: <code>check_disruptions</code></strong> &mdash; "what IS happening" (disruption feed)</li>
-          <li><strong>Tool 3: <code>compute_reroute</code></strong> &mdash; "how to get there anyway" (BFS pathfinding)</li>
-        </ul>
-        <p><strong>What just happened:</strong> The agent now has deterministic capabilities.
-        The reconciliation pattern (Tool 1 + Tool 2 joined on <code>trip_id</code>) is the core
-        of what makes this agent useful. See the <strong>The 3 Tools</strong> tab for detailed specs.</p>
-      </div>
-    </div>
-
-    <!-- Step 3: System Instruction -->
-    <div class="step">
-      <div class="step-num">3</div>
-      <span class="step-time">4 min</span>
-      <h3>Write the System Instruction</h3>
-      <p>The system instruction defines the agent's behavior as an engineering asset &mdash;
-      explicit, reviewable, version-controlled. This is what governance (M3) and
-      optimization (M4) will target in later modules.</p>
-
-      <div class="card agent-section">
-        <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
-        <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Write the system instruction for the agent: stay calm and factual,
-always reconcile schedule against disruptions before answering,
-never invent a train, proactively compute reroutes when services are
-disrupted, and end every response with one clear recommended action.</div>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>AGY updates <code>agent.py</code> with a system instruction that includes these rules:</p>
-        <ol>
-          <li>Always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code> before answering</li>
-          <li>Never invent a train &mdash; only reference trips in the GTFS data</li>
-          <li>Proactively call <code>compute_reroute</code> when services are disrupted</li>
-          <li>Stay calm and factual; end with one clear recommended action</li>
-        </ol>
-        <p><strong>What just happened:</strong> The system instruction is not a vibe &mdash; it's a
-        specification. In M3 you'll see how governance enforces it; in M4 you'll
-        measure how well the agent follows it.</p>
-      </div>
-    </div>
-
-    <!-- Step 4: Run locally -->
-    <div class="step">
-      <div class="step-num">4</div>
-      <span class="step-time">5 min</span>
-      <h3>Run It Locally &mdash; The Playground</h3>
-      <p>Time to see the agent in action. Launch the ADK local web playground and
-      send the crisis question. Watch the reasoning trace to see <em>why</em> the agent
-      does what it does.</p>
-
-      <div class="card agent-section">
-        <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
-        <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Run the agent in the ADK local playground (adk web). Test with:
-"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still
-get to Paris?"
-Verify the reasoning trace shows all 3 tools being called.</div>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>The agent answers the crisis question by calling all 3 tools in sequence:</p>
-        <ol>
-          <li><code>get_scheduled_departures("St Pancras", "13:00")</code> &mdash; finds the 13:31 service</li>
-          <li><code>check_disruptions(station_name="St Pancras")</code> &mdash; confirms it's disrupted</li>
-          <li><code>compute_reroute("St Pancras", "Paris", "13:31")</code> &mdash; finds an alternative</li>
-        </ol>
-        <p>The response ends with a concrete recommendation: a specific train, with times,
-        stations, and number of changes.</p>
-        <p><strong>What just happened:</strong> The reasoning trace proves the agent is reconciling
-        data, not guessing. This traceability is the foundation for governance (M3) and
-        optimization (M4). See the <strong>Test &amp; Trace</strong> tab for what to look for.</p>
-      </div>
-    </div>
-
-    <!-- Backup -->
-    <div class="callout callout-success">
-      <div class="callout-title">Backup Plan</div>
-      <p>If anyone's tools misbehave, a <strong>reference agent project</strong> is available to clone
-      so no one is blocked from continuing to M2.</p>
-    </div>
-
-    <!-- Done-when -->
-    <div class="done-when">
-      <h3>Mentor Checkpoint &mdash; Done When:</h3>
-      <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>ADK project is scaffolded with correct structure</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>All 3 tools are implemented with docstrings and type hints</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>System instruction is written and attached to the agent</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent runs in the ADK local playground</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent answers the crisis question by calling all 3 tools</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent recommends a concrete reroute (not a vague answer)</div></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 2: THE 3 TOOLS
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-tools" class="tab-panel">
-    <h2>The 3 Tools &mdash; In Detail</h2>
+  <!-- ─── The 3 Tools Reference ─── -->
+  <div class="section-divider">
+  <h2>The 3 Tools &mdash; In Detail</h2>
 
     <p>Your agent needs three deterministic tools. Each one answers a specific question.
     Together, they implement the <strong>reconciliation pattern</strong>.</p>
@@ -845,11 +684,215 @@ Verify the reasoning trace shows all 3 tools being called.</div>
     </div>
   </div>
 
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 3: 4-BEAT RHYTHM
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-beats" class="tab-panel">
-    <h2>The 4-Beat Rhythm &mdash; Module 1</h2>
+    <!-- Step 2: Tools -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <span class="step-time">12 min</span>
+      <h3>Give the Agent Its Tools</h3>
+      <p>A plain LLM knows timetables but not what's happening <em>right now</em>. Our agent needs
+      three deterministic tools to reconcile the published schedule against the live disruption feed.
+      The magic is the <strong>join</strong> of schedule &times; disruption on <code>trip_id</code> / <code>stop_id</code> &mdash;
+      this is <em>the</em> pattern that makes the agent more than a chatbot.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
+        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Add three tools to the agent:
+1. get_scheduled_departures &mdash; queries the static GTFS data in data/gtfs/
+   to list departures from a given station within a time window.
+   Join stops.txt, stop_times.txt, trips.txt, and routes.txt.
+2. check_disruptions &mdash; reads data/disruptions.json and returns affected
+   services, delays, and cancellations. Supports filtering by station
+   or trip_id.
+3. compute_reroute &mdash; given origin, destination, and departure_after,
+   builds a station graph from GTFS connections, removes disrupted
+   services, and finds an alternative path (BFS/shortest-path).
+Write clear docstrings and type hints so the model can call them
+correctly. The critical pattern is reconciliation: joining schedule
+data with disruption data on trip_id and stop_id.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY creates three functions in <code>tools.py</code> with type hints and docstrings:</p>
+        <ul>
+          <li><strong>Tool 1: <code>get_scheduled_departures</code></strong> &mdash; "what SHOULD happen" (GTFS query)</li>
+          <li><strong>Tool 2: <code>check_disruptions</code></strong> &mdash; "what IS happening" (disruption feed)</li>
+          <li><strong>Tool 3: <code>compute_reroute</code></strong> &mdash; "how to get there anyway" (BFS pathfinding)</li>
+        </ul>
+        <p><strong>What just happened:</strong> The agent now has deterministic capabilities.
+        The reconciliation pattern (Tool 1 + Tool 2 joined on <code>trip_id</code>) is the core
+        of what makes this agent useful. See the tool specifications above for details.</p>
+      </div>
+    </div>
+
+    <!-- Step 3: System Instruction -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <span class="step-time">4 min</span>
+      <h3>Write the System Instruction</h3>
+      <p>The system instruction defines the agent's behavior as an engineering asset &mdash;
+      explicit, reviewable, version-controlled. This is what governance (M3) and
+      optimization (M4) will target in later modules.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
+        <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Write the system instruction for the agent: stay calm and factual,
+always reconcile schedule against disruptions before answering,
+never invent a train, proactively compute reroutes when services are
+disrupted, and end every response with one clear recommended action.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY updates <code>agent.py</code> with a system instruction that includes these rules:</p>
+        <ol>
+          <li>Always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code> before answering</li>
+          <li>Never invent a train &mdash; only reference trips in the GTFS data</li>
+          <li>Proactively call <code>compute_reroute</code> when services are disrupted</li>
+          <li>Stay calm and factual; end with one clear recommended action</li>
+        </ol>
+        <p><strong>What just happened:</strong> The system instruction is not a vibe &mdash; it's a
+        specification. In M3 you'll see how governance enforces it; in M4 you'll
+        measure how well the agent follows it.</p>
+      </div>
+    </div>
+
+    <!-- Step 4: Run locally -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <span class="step-time">5 min</span>
+      <h3>Run It Locally &mdash; The Playground</h3>
+      <p>Time to see the agent in action. Launch the ADK local web playground and
+      send the crisis question. Watch the reasoning trace to see <em>why</em> the agent
+      does what it does.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
+        <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Run the agent in the ADK local playground (adk web). Test with:
+"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still
+get to Paris?"
+Verify the reasoning trace shows all 3 tools being called.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>The agent answers the crisis question by calling all 3 tools in sequence:</p>
+        <ol>
+          <li><code>get_scheduled_departures("St Pancras", "13:00")</code> &mdash; finds the 13:31 service</li>
+          <li><code>check_disruptions(station_name="St Pancras")</code> &mdash; confirms it's disrupted</li>
+          <li><code>compute_reroute("St Pancras", "Paris", "13:31")</code> &mdash; finds an alternative</li>
+        </ol>
+        <p>The response ends with a concrete recommendation: a specific train, with times,
+        stations, and number of changes.</p>
+        <p><strong>What just happened:</strong> The reasoning trace proves the agent is reconciling
+        data, not guessing. This traceability is the foundation for governance (M3) and
+        optimization (M4). See the troubleshooting guide below for what to look for.</p>
+      </div>
+    </div>
+
+  <!-- ─── Test & Trace ─── -->
+  <div class="section-divider">
+  <h2>Test &amp; Trace</h2>
+
+    <div class="card">
+      <h3>What to Look For in the Trace</h3>
+      <p>Open the reasoning trace after the agent responds. You should see:</p>
+      <table class="data">
+        <thead><tr><th>Order</th><th>Tool called</th><th>Expected behavior</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><code>get_scheduled_departures</code></td>
+            <td>Queries St Pancras departures around 13:31 &mdash; finds the Paris service</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><code>check_disruptions</code></td>
+            <td>Checks the 13:31 trip &mdash; finds it's cancelled/delayed due to signal failure</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><code>compute_reroute</code></td>
+            <td>Finds alternative: e.g., via Lille or Brussels, with a later departure</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>What a Good Answer Looks Like</h3>
+      <p>The agent should:</p>
+      <ul>
+        <li>Confirm the 13:31 service is affected (with specific status: cancelled/delayed)</li>
+        <li>Explain <em>why</em> (signal failure at St Pancras)</li>
+        <li>Offer a <strong>concrete reroute</strong> with specific times and stations</li>
+        <li>End with <strong>one clear recommended action</strong></li>
+      </ul>
+      <div class="callout callout-success" style="margin-top:.75rem;">
+        <div class="callout-title">Example good answer</div>
+        <p>"Your 13:31 St Pancras&ndash;Paris Eurostar is cancelled due to the signal failure.
+        The next available route is the <strong>14:05 via Brussels Midi</strong>, changing in Brussels
+        with arrival at Paris Gare du Nord at <strong>17:32</strong> (1 change, ~3h27m total).
+        <strong>Recommended: head to Platform 5 for the 14:05 Brussels service.</strong>"</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Common Issues</h3>
+      <table class="data">
+        <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Agent doesn't call tools</td>
+            <td>Missing/bad docstrings or type hints</td>
+            <td>Check tool function signatures and docstrings</td>
+          </tr>
+          <tr>
+            <td>Agent invents train times</td>
+            <td>System instruction not enforced</td>
+            <td>Strengthen: "NEVER invent &mdash; only reference trips in the data"</td>
+          </tr>
+          <tr>
+            <td>Tool returns empty results</td>
+            <td>GTFS data path wrong or not loaded</td>
+            <td>Verify <code>data/gtfs/</code> files exist and paths in tools are correct</td>
+          </tr>
+          <tr>
+            <td>Reroute tool fails</td>
+            <td>Graph not built from GTFS connections</td>
+            <td>Ensure the tool builds a station graph from <code>stop_times.txt</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+    <!-- Backup -->
+    <div class="callout callout-success">
+      <div class="callout-title">Backup Plan</div>
+      <p>If anyone's tools misbehave, a <strong>reference agent project</strong> is available to clone
+      so no one is blocked from continuing to M2.</p>
+    </div>
+
+    <!-- Done-when -->
+    <div class="done-when">
+      <h3>Mentor Checkpoint &mdash; Done When:</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>ADK project is scaffolded with correct structure</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>All 3 tools are implemented with docstrings and type hints</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>System instruction is written and attached to the agent</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent runs in the ADK local playground</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent answers the crisis question by calling all 3 tools</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent recommends a concrete reroute (not a vague answer)</div></li>
+      </ul>
+    </div>
+
+  <!-- ─── 4-Beat Rhythm Recap ─── -->
+  <div class="section-divider">
+  <h2>The 4-Beat Rhythm &mdash; Module 1</h2>
 
     <p>Every module follows the same 4 beats. Here's how they play out in BUILD:</p>
 
@@ -905,111 +948,10 @@ Verify the reasoning trace shows all 3 tools being called.</div>
     </div>
   </div>
 
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 4: TEST & TRACE
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-test" class="tab-panel">
-    <h2>Test &amp; Trace &mdash; Running the Agent Locally</h2>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F3AE;</span> Launch the Playground</h3>
-      <div class="prompt-block" id="cmd-adk-web"><button class="copy-btn" onclick="copyBlock('cmd-adk-web')">Copy</button><span class="prompt-label">shell</span>! adk web</div>
-      <p>This starts the ADK local development playground &mdash; a web UI where you can chat with
-      your agent, see tool calls in real time, and inspect the reasoning trace.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F9EA;</span> The Test Query</h3>
-      <div class="prompt-block prompt-antigravity" id="cmd-test-query"><button class="copy-btn" onclick="copyBlock('cmd-test-query')">Copy</button><span class="prompt-label">playground</span>"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still get to Paris?"</div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F50D;</span> What to Look For in the Trace</h3>
-      <p>Open the reasoning trace after the agent responds. You should see:</p>
-      <table class="data">
-        <thead><tr><th>Order</th><th>Tool called</th><th>Expected behavior</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td><code>get_scheduled_departures</code></td>
-            <td>Queries St Pancras departures around 13:31 &mdash; finds the Paris service</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td><code>check_disruptions</code></td>
-            <td>Checks the 13:31 trip &mdash; finds it's cancelled/delayed due to signal failure</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td><code>compute_reroute</code></td>
-            <td>Finds alternative: e.g., via Lille or Brussels, with a later departure</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x2705;</span> What a Good Answer Looks Like</h3>
-      <p>The agent should:</p>
-      <ul>
-        <li>Confirm the 13:31 service is affected (with specific status: cancelled/delayed)</li>
-        <li>Explain <em>why</em> (signal failure at St Pancras)</li>
-        <li>Offer a <strong>concrete reroute</strong> with specific times and stations</li>
-        <li>End with <strong>one clear recommended action</strong></li>
-      </ul>
-      <div class="callout callout-success" style="margin-top:.75rem;">
-        <div class="callout-title">Example good answer</div>
-        <p>"Your 13:31 St Pancras&ndash;Paris Eurostar is cancelled due to the signal failure.
-        The next available route is the <strong>14:05 via Brussels Midi</strong>, changing in Brussels
-        with arrival at Paris Gare du Nord at <strong>17:32</strong> (1 change, ~3h27m total).
-        <strong>Recommended: head to Platform 5 for the 14:05 Brussels service.</strong>"</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F6A8;</span> Common Issues</h3>
-      <table class="data">
-        <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>Agent doesn't call tools</td>
-            <td>Missing/bad docstrings or type hints</td>
-            <td>Check tool function signatures and docstrings</td>
-          </tr>
-          <tr>
-            <td>Agent invents train times</td>
-            <td>System instruction not enforced</td>
-            <td>Strengthen: "NEVER invent &mdash; only reference trips in the data"</td>
-          </tr>
-          <tr>
-            <td>Tool returns empty results</td>
-            <td>GTFS data path wrong or not loaded</td>
-            <td>Verify <code>data/gtfs/</code> files exist and paths in tools are correct</td>
-          </tr>
-          <tr>
-            <td>Reroute tool fails</td>
-            <td>Graph not built from GTFS connections</td>
-            <td>Ensure the tool builds a station graph from <code>stop_times.txt</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
 
 </div><!-- /container -->
 
 <script>
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    });
-  });
-
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);

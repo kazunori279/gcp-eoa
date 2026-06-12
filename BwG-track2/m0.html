@@ -151,26 +151,7 @@
   /* Layout */
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-  .tab-btn {
-    padding: .75rem 1.25rem;
-    border: none;
-    background: none;
-    font-family: var(--font);
-    font-size: .95rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    white-space: nowrap;
-    transition: color .15s, border-color .15s;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  .section-divider { border-top: 2px solid var(--border); margin-top: 2rem; padding-top: .5rem; }
 
   /* Cards */
   .card {
@@ -495,7 +476,7 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     TABS
+     CONTENT
      ═══════════════════════════════════════════════════════════════ -->
 <div class="container">
 
@@ -505,134 +486,9 @@
     and has <strong>seen the empty platform</strong> they will fill by 2:00.</p>
   </div>
 
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
-    <button class="tab-btn" data-tab="crisis" role="tab">Crisis Briefing</button>
-    <button class="tab-btn" data-tab="data" role="tab">Data Orientation</button>
-    <button class="tab-btn" data-tab="before" role="tab">Before &rarr; After</button>
-  </div>
-
   <!-- ─────────────────────────────────────────────────────────────
-       TAB 1: STEP-BY-STEP
+       CRISIS BRIEFING (intro context)
        ───────────────────────────────────────────────────────────── -->
-  <div id="tab-steps" class="tab-panel active">
-    <h2>Setup in 4 Steps</h2>
-
-    <!-- Step 1 -->
-    <div class="step">
-      <div class="step-num">1</div>
-      <span class="step-time">3 min</span>
-      <h3>Read the Crisis Briefing</h3>
-      <p>Understand the scenario before you touch any code. Switch to the <strong>Crisis Briefing</strong> tab
-      and read through it, or here's the short version:</p>
-      <div class="callout callout-danger" style="margin-top:.5rem;">
-        <div class="callout-title">Signal Failure at London St Pancras</div>
-        <p>Peak evening departures. A signal failure has halted all cross-border services.
-        Hundreds of travelers asking: <strong>"Will I still make it, and how?"</strong></p>
-        <p>A plain LLM will hallucinate train times. An <strong>agent</strong> with tools can query
-        the schedule, read the disruption feed, and <strong>compute</strong> a verified reroute.</p>
-      </div>
-      <p>By 2:00 you'll have a governed agent that a non-technical ops manager can simply chat with
-      in Gemini Enterprise. That's the deliverable.</p>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="step">
-      <div class="step-num">2</div>
-      <span class="step-time">3 min</span>
-      <h3>Verify Your Cockpit</h3>
-      <p>Open <strong>Antigravity</strong> (the agentic IDE). This is your single workspace for the entire session &mdash;
-      you prompt, it builds.</p>
-      <p>Confirm that <code>agents-cli</code> and its skills are installed:</p>
-      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
-      <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
-      <table class="data">
-        <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
-        <tbody>
-          <tr><td><code>scaffold</code></td><td>Ask: <em>"Can you scaffold an ADK project?"</em></td></tr>
-          <tr><td><code>deploy</code></td><td>Ask: <em>"Can you deploy to Agent Runtime?"</em></td></tr>
-          <tr><td><code>eval</code></td><td>Ask: <em>"Can you run evaluations?"</em></td></tr>
-          <tr><td><code>publish</code></td><td>Ask: <em>"Can you publish to Gemini Enterprise?"</em></td></tr>
-        </tbody>
-      </table>
-      <p style="margin-top:.5rem;">The mantra: <strong>"Describe the outcome; let the skills do the wiring."</strong></p>
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
-        by the coding agent. Your cockpit is ready.</p>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="step">
-      <div class="step-num">3</div>
-      <span class="step-time">2 min</span>
-      <h3>Download the Data</h3>
-      <p>Download the <strong>static London GTFS bundle</strong> from the provided GCS / Drive link.
-      Place it into your project's <code>data/</code> directory:</p>
-      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs</div>
-      <p>Extract the GTFS bundle into <code>data/gtfs/</code>.
-      You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
-      <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
-      you'll layer on top of the schedule. Place it at <code>data/disruptions.json</code>.</p>
-      <p>Quick orientation (no deep analysis yet):</p>
-      <ul>
-        <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>
-        <li><code>stop_times.txt</code> &mdash; departure/arrival times per trip per stop</li>
-        <li><code>trips.txt</code> &mdash; trip definitions with route references</li>
-        <li><code>disruptions.json</code> &mdash; which services are cancelled/delayed and why</li>
-      </ul>
-      <p>Switch to the <strong>Data Orientation</strong> tab for the full breakdown.</p>
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>Your workspace has this data layout:</p>
-        <ul>
-          <li><code>data/gtfs/stops.txt</code> &mdash; 17 stations with coordinates</li>
-          <li><code>data/gtfs/stop_times.txt</code> &mdash; departure/arrival per trip per stop</li>
-          <li><code>data/gtfs/trips.txt</code> &mdash; trip definitions with route references</li>
-          <li><code>data/gtfs/routes.txt</code> &mdash; route metadata (Eurostar, Thalys, etc.)</li>
-          <li><code>data/gtfs/calendar.txt</code> &mdash; service day patterns</li>
-          <li><code>data/disruptions.json</code> &mdash; simulated signal failure at St Pancras</li>
-        </ul>
-        <p><strong>Key joins you'll use in M1:</strong> <code>stops.stop_id &rarr; stop_times.stop_id</code>,
-        <code>stop_times.trip_id &rarr; trips.trip_id</code>, <code>trips.route_id &rarr; routes.route_id</code>,
-        <code>disruptions.trip_id &rarr; trips.trip_id</code>.</p>
-      </div>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="step">
-      <div class="step-num">4</div>
-      <span class="step-time">2 min</span>
-      <h3>Open the "Before" Shot</h3>
-      <p>Open two browser tabs now, while they're still <strong>empty</strong> &mdash; this is your "before" picture:</p>
-      <ol>
-        <li><strong>Agent Platform console</strong> &mdash; no agents deployed yet, no registry entries, no policies.</li>
-        <li><strong>Gemini Enterprise app</strong> &mdash; no custom agents published yet.</li>
-      </ol>
-      <p>By the end of the workshop, both will be populated with the agent you built.
-      Switch to the <strong>Before &rarr; After</strong> tab to see the full comparison.</p>
-    </div>
-
-    <!-- Done-when -->
-    <div class="done-when">
-      <h3>Mentor Checkpoint &mdash; Done When:</h3>
-      <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Antigravity is open and responsive</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><code>agents-cli</code> skills are installed and recognized</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data is downloaded into <code>data/gtfs/</code></div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Disruption file is at <code>data/disruptions.json</code></div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console is open (empty)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app is open (empty)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You understand the crisis scenario and the deliverable</div></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 2: CRISIS BRIEFING
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-crisis" class="tab-panel">
     <h2>The Crisis Briefing</h2>
 
     <div class="card">
@@ -725,12 +581,126 @@
       <p>And gets a <strong>concrete, verified answer</strong> with a specific reroute, departure time, and estimated arrival.
       The agent you build in M1 will be deployed (M2), governed (M3), optimized (M4), and published (M5) to make this work.</p>
     </div>
-  </div>
 
   <!-- ─────────────────────────────────────────────────────────────
-       TAB 3: DATA ORIENTATION
+       STEPS 1-4
        ───────────────────────────────────────────────────────────── -->
-  <div id="tab-data" class="tab-panel">
+    <h2>Setup in 4 Steps</h2>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <span class="step-time">3 min</span>
+      <h3>Read the Crisis Briefing</h3>
+      <p>Understand the scenario before you touch any code. Read the <strong>Crisis Briefing</strong> above,
+      or here's the short version:</p>
+      <div class="callout callout-danger" style="margin-top:.5rem;">
+        <div class="callout-title">Signal Failure at London St Pancras</div>
+        <p>Peak evening departures. A signal failure has halted all cross-border services.
+        Hundreds of travelers asking: <strong>"Will I still make it, and how?"</strong></p>
+        <p>A plain LLM will hallucinate train times. An <strong>agent</strong> with tools can query
+        the schedule, read the disruption feed, and <strong>compute</strong> a verified reroute.</p>
+      </div>
+      <p>By 2:00 you'll have a governed agent that a non-technical ops manager can simply chat with
+      in Gemini Enterprise. That's the deliverable.</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <span class="step-time">3 min</span>
+      <h3>Verify Your Cockpit</h3>
+      <p>Open <strong>Antigravity</strong> (the agentic IDE). This is your single workspace for the entire session &mdash;
+      you prompt, it builds.</p>
+      <p>Confirm that <code>agents-cli</code> and its skills are installed:</p>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
+      <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
+      <table class="data">
+        <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
+        <tbody>
+          <tr><td><code>scaffold</code></td><td>Ask: <em>"Can you scaffold an ADK project?"</em></td></tr>
+          <tr><td><code>deploy</code></td><td>Ask: <em>"Can you deploy to Agent Runtime?"</em></td></tr>
+          <tr><td><code>eval</code></td><td>Ask: <em>"Can you run evaluations?"</em></td></tr>
+          <tr><td><code>publish</code></td><td>Ask: <em>"Can you publish to Gemini Enterprise?"</em></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.5rem;">The mantra: <strong>"Describe the outcome; let the skills do the wiring."</strong></p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
+        by the coding agent. Your cockpit is ready.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <span class="step-time">2 min</span>
+      <h3>Download the Data</h3>
+      <p>Download the <strong>static London GTFS bundle</strong> from the provided GCS / Drive link.
+      Place it into your project's <code>data/</code> directory:</p>
+      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs</div>
+      <p>Extract the GTFS bundle into <code>data/gtfs/</code>.
+      You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
+      <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
+      you'll layer on top of the schedule. Place it at <code>data/disruptions.json</code>.</p>
+      <p>Quick orientation (no deep analysis yet):</p>
+      <ul>
+        <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>
+        <li><code>stop_times.txt</code> &mdash; departure/arrival times per trip per stop</li>
+        <li><code>trips.txt</code> &mdash; trip definitions with route references</li>
+        <li><code>disruptions.json</code> &mdash; which services are cancelled/delayed and why</li>
+      </ul>
+      <p>See the <strong>Data Orientation</strong> section below for the full breakdown.</p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>Your workspace has this data layout:</p>
+        <ul>
+          <li><code>data/gtfs/stops.txt</code> &mdash; 17 stations with coordinates</li>
+          <li><code>data/gtfs/stop_times.txt</code> &mdash; departure/arrival per trip per stop</li>
+          <li><code>data/gtfs/trips.txt</code> &mdash; trip definitions with route references</li>
+          <li><code>data/gtfs/routes.txt</code> &mdash; route metadata (Eurostar, Thalys, etc.)</li>
+          <li><code>data/gtfs/calendar.txt</code> &mdash; service day patterns</li>
+          <li><code>data/disruptions.json</code> &mdash; simulated signal failure at St Pancras</li>
+        </ul>
+        <p><strong>Key joins you'll use in M1:</strong> <code>stops.stop_id &rarr; stop_times.stop_id</code>,
+        <code>stop_times.trip_id &rarr; trips.trip_id</code>, <code>trips.route_id &rarr; routes.route_id</code>,
+        <code>disruptions.trip_id &rarr; trips.trip_id</code>.</p>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <span class="step-time">2 min</span>
+      <h3>Open the "Before" Shot</h3>
+      <p>Open two browser tabs now, while they're still <strong>empty</strong> &mdash; this is your "before" picture:</p>
+      <ol>
+        <li><strong>Agent Platform console</strong> &mdash; no agents deployed yet, no registry entries, no policies.</li>
+        <li><strong>Gemini Enterprise app</strong> &mdash; no custom agents published yet.</li>
+      </ol>
+      <p>By the end of the workshop, both will be populated with the agent you built.
+      See the <strong>Before &rarr; After</strong> section below for the full comparison.</p>
+    </div>
+
+    <!-- Done-when -->
+    <div class="done-when">
+      <h3>Mentor Checkpoint &mdash; Done When:</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Antigravity is open and responsive</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><code>agents-cli</code> skills are installed and recognized</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data is downloaded into <code>data/gtfs/</code></div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Disruption file is at <code>data/disruptions.json</code></div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console is open (empty)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app is open (empty)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You understand the crisis scenario and the deliverable</div></li>
+      </ul>
+    </div>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       DATA ORIENTATION
+       ───────────────────────────────────────────────────────────── -->
+  <div class="section-divider">
     <h2>Data Orientation</h2>
 
     <div class="callout callout-warning">
@@ -868,9 +838,9 @@
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────
-       TAB 4: BEFORE → AFTER
+       BEFORE → AFTER
        ───────────────────────────────────────────────────────────── -->
-  <div id="tab-before" class="tab-panel">
+  <div class="section-divider">
     <h2>Platform Reveal #0 &mdash; The "Before" Shot</h2>
 
     <div class="callout callout-info">
@@ -993,16 +963,6 @@
 </div><!-- /container -->
 
 <script>
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    });
-  });
-
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);

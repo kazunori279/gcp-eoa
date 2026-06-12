@@ -83,18 +83,7 @@
 
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-  .tab-btn {
-    padding: .75rem 1.25rem; border: none; background: none;
-    font-family: var(--font); font-size: .95rem; font-weight: 600; color: var(--text-muted);
-    cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
-    white-space: nowrap; transition: color .15s, border-color .15s;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--govern); border-bottom-color: var(--govern); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  .section-divider { border-top: 2px solid var(--border); margin-top: 2rem; padding-top: .5rem; }
 
   /* Cards */
   .card {
@@ -296,15 +285,74 @@
     <strong>Registry registration step</strong> hands-on to your own agent.</p>
   </div>
 
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
-    <button class="tab-btn" data-tab="security" role="tab">Security Model</button>
-    <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
+  <!-- SECURITY MODEL -->
+  <h2>The 4-Layer Security Model</h2>
+
+  <p>Governance is enforced at four layers. Each layer protects against a different class of threat.</p>
+
+  <div class="map-wrap">
+    <svg viewBox="0 0 780 380" xmlns="http://www.w3.org/2000/svg" style="max-width:740px;">
+      <!-- Layer 1: Registry -->
+      <rect x="40" y="10" width="700" height="70" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="390" y="32" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#7c3aed">LAYER 1 &middot; Agent Registry</text>
+      <text x="390" y="50" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Discovery &middot; Versioning &middot; Tool Catalog &middot; A2A Metadata</text>
+      <text x="390" y="66" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: agent sprawl, unknown tools, version drift</text>
+
+      <!-- Layer 2: Identity -->
+      <rect x="70" y="100" width="640" height="70" rx="12" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+      <text x="390" y="122" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#1a73e8">LAYER 2 &middot; Agent Identity (IAM)</text>
+      <text x="390" y="140" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Mutual TLS &middot; DPoP &middot; Least-privilege grants &middot; Context-Aware Access</text>
+      <text x="390" y="156" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: token theft, privilege escalation, impersonation</text>
+
+      <!-- Layer 3: Gateway -->
+      <rect x="100" y="190" width="580" height="70" rx="12" fill="#fde8ea" stroke="#dc3545" stroke-width="2"/>
+      <text x="390" y="212" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#dc3545">LAYER 3 &middot; Agent Gateway + Model Armor</text>
+      <text x="390" y="230" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Prompt injection &middot; Jailbreak &middot; PII filter &middot; Toxicity screening</text>
+      <text x="390" y="246" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: adversarial prompts, data leakage, policy violations</text>
+
+      <!-- Layer 4: Semantic -->
+      <rect x="130" y="280" width="520" height="70" rx="12" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+      <text x="390" y="302" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#198754">LAYER 4 &middot; Semantic Governance</text>
+      <text x="390" y="320" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Action boundaries &middot; Intent alignment &middot; Org constraints</text>
+      <text x="390" y="336" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: out-of-scope actions, instruction override, misuse</text>
+
+      <!-- Agent in center -->
+      <rect x="305" y="355" width="170" height="22" rx="6" fill="#fff3e0" stroke="#fd7e14" stroke-width="1.5"/>
+      <text x="390" y="370" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#b45309">Your Rush Hour Agent</text>
+    </svg>
   </div>
 
-  <!-- TAB 1: STEP-BY-STEP -->
-  <div id="tab-steps" class="tab-panel active">
-    <h2>Govern in 5 Sections</h2>
+  <div class="govern-card">
+    <h4><span class="gov-num">1</span> Agent Registry</h4>
+    <p><strong>Threat:</strong> Agent sprawl &mdash; nobody knows which agents exist, what tools they call, or what version is running.</p>
+    <p><strong>Protection:</strong> Every agent is registered with its name, version, tool catalog, and A2A metadata.
+    Teams discover agents through the catalog. Tool schemas are versioned centrally.</p>
+  </div>
+
+  <div class="govern-card" style="border-color:#1a73e8;">
+    <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> Agent Identity (IAM)</h4>
+    <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
+    <p><strong>Protection:</strong> Every agent gets an IAM identity with mutual TLS and DPoP attestation.
+    Least-privilege grants scope what the agent can access. A stolen token is useless without the attested context.</p>
+  </div>
+
+  <div class="govern-card" style="border-color:#dc3545;">
+    <h4 style="color:#dc3545;"><span class="gov-num" style="background:#dc3545;">3</span> Agent Gateway + Model Armor</h4>
+    <p><strong>Threat:</strong> Prompt injection, jailbreaks, PII leakage, toxicity.</p>
+    <p><strong>Protection:</strong> All traffic flows through the Gateway. Model Armor screens requests and responses
+    at the network layer &mdash; before the agent's reasoning loop even fires. One policy protects all agents.</p>
+  </div>
+
+  <div class="govern-card" style="border-color:#198754;">
+    <h4 style="color:#198754;"><span class="gov-num" style="background:#198754;">4</span> Semantic Governance</h4>
+    <p><strong>Threat:</strong> Out-of-scope actions (agent books a ticket when it should only recommend),
+    instruction override, misuse beyond intended purpose.</p>
+    <p><strong>Protection:</strong> Platform-enforced constraints on agent actions and intent alignment.
+    The agent can recommend but not act beyond its defined boundaries.</p>
+  </div>
+
+  <!-- STEPS -->
+  <h2>Govern in 5 Sections</h2>
 
     <!-- Section 1: Why govern -->
     <div class="step">
@@ -430,78 +478,9 @@ with schemas.</div>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You understand the 4 governance layers: Registry, Identity, Gateway, Model Armor</div></li>
       </ul>
     </div>
-  </div>
 
-  <!-- TAB 2: SECURITY MODEL -->
-  <div id="tab-security" class="tab-panel">
-    <h2>The 4-Layer Security Model</h2>
-
-    <p>Governance is enforced at four layers. Each layer protects against a different class of threat.</p>
-
-    <div class="map-wrap">
-      <svg viewBox="0 0 780 380" xmlns="http://www.w3.org/2000/svg" style="max-width:740px;">
-        <!-- Layer 1: Registry -->
-        <rect x="40" y="10" width="700" height="70" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
-        <text x="390" y="32" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#7c3aed">LAYER 1 &middot; Agent Registry</text>
-        <text x="390" y="50" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Discovery &middot; Versioning &middot; Tool Catalog &middot; A2A Metadata</text>
-        <text x="390" y="66" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: agent sprawl, unknown tools, version drift</text>
-
-        <!-- Layer 2: Identity -->
-        <rect x="70" y="100" width="640" height="70" rx="12" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
-        <text x="390" y="122" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#1a73e8">LAYER 2 &middot; Agent Identity (IAM)</text>
-        <text x="390" y="140" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Mutual TLS &middot; DPoP &middot; Least-privilege grants &middot; Context-Aware Access</text>
-        <text x="390" y="156" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: token theft, privilege escalation, impersonation</text>
-
-        <!-- Layer 3: Gateway -->
-        <rect x="100" y="190" width="580" height="70" rx="12" fill="#fde8ea" stroke="#dc3545" stroke-width="2"/>
-        <text x="390" y="212" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#dc3545">LAYER 3 &middot; Agent Gateway + Model Armor</text>
-        <text x="390" y="230" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Prompt injection &middot; Jailbreak &middot; PII filter &middot; Toxicity screening</text>
-        <text x="390" y="246" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: adversarial prompts, data leakage, policy violations</text>
-
-        <!-- Layer 4: Semantic -->
-        <rect x="130" y="280" width="520" height="70" rx="12" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
-        <text x="390" y="302" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#198754">LAYER 4 &middot; Semantic Governance</text>
-        <text x="390" y="320" text-anchor="middle" font-family="system-ui" font-size="10" fill="#333">Action boundaries &middot; Intent alignment &middot; Org constraints</text>
-        <text x="390" y="336" text-anchor="middle" font-family="system-ui" font-size="9" fill="#666">Prevents: out-of-scope actions, instruction override, misuse</text>
-
-        <!-- Agent in center -->
-        <rect x="305" y="355" width="170" height="22" rx="6" fill="#fff3e0" stroke="#fd7e14" stroke-width="1.5"/>
-        <text x="390" y="370" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#b45309">Your Rush Hour Agent</text>
-      </svg>
-    </div>
-
-    <div class="govern-card">
-      <h4><span class="gov-num">1</span> Agent Registry</h4>
-      <p><strong>Threat:</strong> Agent sprawl &mdash; nobody knows which agents exist, what tools they call, or what version is running.</p>
-      <p><strong>Protection:</strong> Every agent is registered with its name, version, tool catalog, and A2A metadata.
-      Teams discover agents through the catalog. Tool schemas are versioned centrally.</p>
-    </div>
-
-    <div class="govern-card" style="border-color:#1a73e8;">
-      <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> Agent Identity (IAM)</h4>
-      <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
-      <p><strong>Protection:</strong> Every agent gets an IAM identity with mutual TLS and DPoP attestation.
-      Least-privilege grants scope what the agent can access. A stolen token is useless without the attested context.</p>
-    </div>
-
-    <div class="govern-card" style="border-color:#dc3545;">
-      <h4 style="color:#dc3545;"><span class="gov-num" style="background:#dc3545;">3</span> Agent Gateway + Model Armor</h4>
-      <p><strong>Threat:</strong> Prompt injection, jailbreaks, PII leakage, toxicity.</p>
-      <p><strong>Protection:</strong> All traffic flows through the Gateway. Model Armor screens requests and responses
-      at the network layer &mdash; before the agent's reasoning loop even fires. One policy protects all agents.</p>
-    </div>
-
-    <div class="govern-card" style="border-color:#198754;">
-      <h4 style="color:#198754;"><span class="gov-num" style="background:#198754;">4</span> Semantic Governance</h4>
-      <p><strong>Threat:</strong> Out-of-scope actions (agent books a ticket when it should only recommend),
-      instruction override, misuse beyond intended purpose.</p>
-      <p><strong>Protection:</strong> Platform-enforced constraints on agent actions and intent alignment.
-      The agent can recommend but not act beyond its defined boundaries.</p>
-    </div>
-  </div>
-
-  <!-- TAB 3: 4-BEAT RHYTHM -->
-  <div id="tab-beats" class="tab-panel">
+  <!-- 4-BEAT RHYTHM -->
+  <div class="section-divider">
     <h2>The 4-Beat Rhythm &mdash; Module 3</h2>
 
     <div class="card">
@@ -553,15 +532,6 @@ with schemas.</div>
 </div><!-- /container -->
 
 <script>
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    });
-  });
-
   function copyBlock(id) {
     const el = document.getElementById(id);
     const clone = el.cloneNode(true);
