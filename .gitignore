@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-local agent context and config
+.context/
+cloudcode.json
+.DS_Store
