@@ -508,6 +508,14 @@
     All by prompting in Antigravity.</p>
   </div>
 
+  <div class="callout callout-info">
+    <div class="callout-title">Heads up &mdash; deployment takes a few minutes</div>
+    <p>Several steps in this module deploy or redeploy your agent to Agent Runtime.
+    Each deployment can take a few minutes &mdash; let it run, no need to babysit it.
+    AGY will tell you automatically once the deployment is live and the endpoint or
+    Console Playground link is ready to test.</p>
+  </div>
+
   <!-- PLATFORM ARTIFACTS -->
   <h2>Platform Artifacts &mdash; What You Build in M2</h2>
 
@@ -669,7 +677,10 @@ query. Package the agent code, tools, and data together.</div>
 Add session state for the current conversation and long-term memory
 so the agent remembers my home station across visits. Use ADK's
 session service for short-term state and Memory Bank for cross-session
-personalization.</div>
+personalization.
+Then open the deployed agent in the Console Playground, share the link,
+and give me a few queries to verify both short-term session state and
+cross-session memory.</div>
       </div>
 
       <div class="step-expected">
@@ -680,11 +691,36 @@ personalization.</div>
           <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
           <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
-        <p>AGY then verifies with two queries using the same <code>--session-id</code>:</p>
+        <p>AGY then shares a Console Playground link plus test queries. Work through these scenarios:</p>
+
+        <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Short-Term Session State (set the home station)</strong></p>
+        <p>Verifies the agent processes <code>set_home_station</code> and stores it in the active session's state.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt 1</span>Hello, please set my home station to Paris Gare du Nord.</div>
+        <p><em>What to watch for:</em> the trace shows <code>set_home_station(station_name='Paris Gare du Nord')</code>; the agent confirms it's set.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt 2</span>What is my home station again?</div>
+        <p><em>What to watch for:</em> the agent answers immediately <em>without</em> calling any tool, reading "Paris Gare du Nord" from the injected session state.</p>
+
+        <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Cross-Session Memory (Memory Bank)</strong></p>
+        <p>Click <strong>New Session</strong> / <strong>Reset Session</strong> (top-right of the Console Playground). This starts a new session ID but keeps your <code>user_id</code>.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt</span>What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?</div>
+        <p><em>What to watch for:</em></p>
         <ol>
-          <li><em>"Set my home station to Paris"</em> &rarr; agent persists Paris Nord in session state</li>
-          <li><em>"Are there any departures from my home station?"</em> &rarr; agent retrieves Paris Nord from state <strong>without you specifying it again</strong>, queries GTFS departures, and warns about evening signal failures on return trips to London</li>
+          <li>The agent preloads your <code>user:home_station</code> memory ("Paris Gare du Nord") &mdash; proving recall across a brand-new session.</li>
+          <li>It queries <code>check_disruptions(station_name='Paris Gare du Nord')</code>.</li>
+          <li>It lists the active disruptions on Paris-bound Eurostar services from the St Pancras throat signal failure (e.g., the cancelled 15:31 and 16:31 departures and the delayed 17:31/18:31 services).</li>
         </ol>
+
+        <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; Personalized Reconciliation &amp; Reroute (memory + the full chain)</strong></p>
+        <p>Confirms the deployed agent fuses long-term memory with live reconciliation: it infers "home" from Memory Bank, then reconciles and reroutes.</p>
+        <div class="prompt-block"><span class="prompt-label">prompt</span>I'm heading home from St Pancras this evening &mdash; what are my options given the disruption?</div>
+        <p><em>What to watch for:</em></p>
+        <ol>
+          <li>Recalls your <code>user:home_station</code> ("Paris Gare du Nord") from memory &mdash; you never restate the destination.</li>
+          <li>Calls <code>get_scheduled_departures(station_name='St Pancras', start_time='17:00', end_time='20:00', date_str='2026-07-15')</code> and <code>check_disruptions</code>, reconciling on <code>trip_id</code> to flag the cancelled/delayed evening Paris services.</li>
+          <li>Proactively calls <code>compute_reroute(origin='St Pancras', destination='Paris Gare du Nord', departure_after='17:31', date_str='2026-07-15')</code> for the earliest alternative (e.g., via Brussels Midi).</li>
+          <li>Closes with exactly one prominent recommended action.</li>
+        </ol>
+
         <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
         not app code you maintain.</p>
       </div>
@@ -693,14 +729,26 @@ personalization.</div>
     <!-- Step 3: Sandbox -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">5 min</span>
+      <span class="step-time">7 min</span>
       <h3>Safe Math &mdash; Code Execution Sandbox</h3>
-      <p>The reroute computation and any model-generated Python run inside an <strong>isolated,
-      secure sandbox</strong> &mdash; not on the host runtime. This is already configured as part of
-      Agent Runtime.</p>
+      <p>Give the agent a <strong>code execution sandbox</strong> so it can write and run
+      Python on the fly for ad-hoc math the fixed tools don't cover &mdash; safely, without
+      running model-generated code on the host.</p>
 
-      <p>Open the <strong>Agent Engine Console Playground</strong> link from AGY's <code>deployment_results.md</code>
-      and try the crisis query directly in the browser. This is the same endpoint your users will hit.</p>
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
+        <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Add a code execution sandbox so the agent can write and run Python
+on the fly for ad-hoc math the tools don't already return &mdash; like
+the average delay across delayed trains, the cancellation ratio, or
+the peak bottleneck hour. Use BuiltInCodeExecutor from
+google.adk.code_executors (the model's built-in sandbox, no external
+infra). Run the math over the data the existing tools return, and
+update the system instruction to mention the sandbox. Then test it
+with agents-cli run using a question that needs this math, and show
+me from the trace that the built-in code execution actually ran
+(not a hardcoded tool). Once verified, redeploy to Agent Runtime.</div>
+      </div>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">
         <div class="callout-title">Why this matters for platform owners</div>
@@ -709,12 +757,33 @@ personalization.</div>
         A compromised prompt can't exfiltrate data or harm the host.</p>
       </div>
 
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">Lab environment &mdash; use the built-in sandbox</div>
+        <p>The managed <strong>Agent Platform / Vertex AI code sandbox</strong>
+        (<code>VertexAiCodeExecutor</code>, backed by a Vertex AI code-interpreter Extension)
+        is <strong>blocked in lab/training projects</strong>: it fails with a
+        <code>500 INTERNAL</code> error because these projects can't create the external
+        VPC-isolated VM the extension needs. So for the lab we use the <strong>built-in
+        model sandbox</strong> (<code>BuiltInCodeExecutor</code>), which runs Python inside
+        Gemini itself with zero external infra &mdash; just to see code execution work end to end.</p>
+        <p><strong>Tradeoff:</strong> the built-in sandbox has <strong>no file I/O</strong>, so it
+        can't read <code>data/gtfs/*</code> or <code>data/disruptions.json</code> directly &mdash; it
+        computes over the structured data your tools return. In a real (non-lab) project,
+        use the managed Agent Platform sandbox for file-based data science.</p>
+      </div>
+
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>In the Playground, ask: <em>"My 15:31 St Pancras&ndash;Paris is cancelled &mdash; how do I get to Paris?"</em>
-        and confirm the agent calls all three tools and returns a reroute recommendation.
-        The Code Execution sandbox runs tool computations (like pathfinding) in ephemeral containers &mdash;
-        no persistent state, no host access.</p>
+        <p>AGY configures <code>BuiltInCodeExecutor</code>, updates the system instruction, then verifies with <code>agents-cli run</code> before redeploying. Test question that needs math no single tool returns:</p>
+        <div class="prompt-block"><span class="prompt-label">agents-cli run</span>Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?</div>
+        <p><em>What to watch for:</em></p>
+        <ol>
+          <li>Calls <code>check_disruptions</code> to pull the affected trips.</li>
+          <li>The trace shows the model <strong>writing and running Python in the built-in sandbox</strong> over that data &mdash; confirming code execution actually fired, not a hardcoded tool.</li>
+          <li>Returns computed values: average delay <strong>26.25 min</strong> across the 4 delayed trains (45/30/15/15) and a <strong>50% cancellation rate</strong> (4 of 8 affected), then closes with one recommended action.</li>
+          <li>Once verified, AGY redeploys to Agent Runtime.</li>
+        </ol>
+        <p>Then open the <strong>Agent Engine Console Playground</strong> link from AGY's <code>deployment_results.md</code> and try the same question in the browser &mdash; the same endpoint your users hit.</p>
       </div>
     </div>
 
@@ -727,6 +796,7 @@ personalization.</div>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Session state maintains conversation context across turns</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Memory Bank stores and recalls the commuter's home station</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A new session recalls the stored home station</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent uses code execution to compute an ad-hoc stat (e.g., average delay)</div></li>
       </ul>
     </div>
 
@@ -741,11 +811,12 @@ personalization.</div>
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
           <tr><td>2.1 Deploy</td><td>"Deploy this agent to Agent Runtime and give me an endpoint I can query."</td></tr>
-          <tr><td>2.2 Memory</td><td>"Add session state for the current conversation and long-term memory so the agent remembers my home station across visits."</td></tr>
+          <tr><td>2.2 Memory</td><td>"Add session state and long-term memory so the agent remembers my home station &mdash; then share a playground link and test queries."</td></tr>
+          <tr><td>2.3 Code Exec</td><td>"Add a code execution sandbox (BuiltInCodeExecutor) for ad-hoc math, test it with agents-cli, then redeploy."</td></tr>
         </tbody>
       </table>
-      <p><strong>Why it matters:</strong> Two prompts take you from a local script to a deployed, stateful,
-      personalized cloud service. The coding agent handles all the infrastructure wiring.</p>
+      <p><strong>Why it matters:</strong> Three prompts take you from a local script to a deployed, stateful,
+      personalized cloud service that can compute on the fly. The coding agent handles all the infrastructure wiring.</p>
     </div>
 
     <div class="card">
@@ -756,7 +827,7 @@ personalization.</div>
         <tbody>
           <tr><td>2.1</td><td><code>agents-cli deploy</code> &mdash; packaged ADK app, created Agent Runtime instance, provisioned HTTPS endpoint</td></tr>
           <tr><td>2.2</td><td>ADK Session service + Memory Bank integration &mdash; configured state persistence and cross-session recall</td></tr>
-          <tr><td>2.3</td><td>Code Execution sandbox &mdash; isolated environment for tool computations</td></tr>
+          <tr><td>2.3</td><td><code>BuiltInCodeExecutor</code> &mdash; model-written Python runs in Gemini's built-in sandbox for ad-hoc math, then redeployed</td></tr>
         </tbody>
       </table>
     </div>
@@ -768,6 +839,7 @@ personalization.</div>
         <li><strong>Agent Platform console</strong> &mdash; find your deployed agent, see its endpoint and health status</li>
         <li><strong>Live endpoint</strong> &mdash; query it over HTTPS and get the crisis answer from the cloud</li>
         <li><strong>Memory write + new session</strong> &mdash; see a memory stored, then recalled in a fresh session</li>
+        <li><strong>Code execution trace</strong> &mdash; watch the model write and run Python for a stat like average delay</li>
       </ul>
     </div>
 
