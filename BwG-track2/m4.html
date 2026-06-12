@@ -334,7 +334,7 @@
   </div>
 
   <!-- STEPS -->
-  <h2>Optimize in 4 Steps</h2>
+  <h2>Optimize in 3 Steps</h2>
 
   <!-- Step 1: Concept -->
   <div class="step">
@@ -382,57 +382,36 @@ the disruption feed is unavailable.</div>
     </div>
   </div>
 
-  <!-- Step 3: Score -->
+  <!-- Step 3: Fix -->
   <div class="step">
     <div class="step-num">3</div>
-    <span class="step-time">5 min</span>
-    <span class="beat-badge beat-3">What You Can See in the Console</span>
-    <h3>Score It &mdash; Multi-turn AutoRaters</h3>
-
-    <p>These are the metrics the AutoRater scores against:</p>
-    <table class="data">
-      <thead><tr><th>Metric</th><th>What it measures</th><th>How</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Task Success</strong></td><td>Did the commuter get a valid reroute?</td><td>AutoRater checks if the response contains a concrete alternative with times and stations</td></tr>
-        <tr><td><strong>Tool-use Quality</strong></td><td>Did the agent reconcile correctly?</td><td>AutoRater checks that Tool 1 + Tool 2 were called before answering</td></tr>
-        <tr><td><strong>Factual Accuracy</strong></td><td>Are all referenced trains real?</td><td>Cross-check trip_ids in the response against GTFS data</td></tr>
-        <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear action?</td><td>AutoRater checks for a specific recommendation at the end</td></tr>
-      </tbody>
-    </table>
-    <div class="step-expected">
-      <h4>Expected Result</h4>
-      <p><code>agents-cli eval run</code> scores all 10 scenarios with LLM-as-judge grading.
-      Results are saved as JSON and an <strong>interactive HTML report</strong> in <code>artifacts/</code>.</p>
-      <ul>
-        <li><strong>Mean quality score: 5.0 / 5.0</strong> across all 10 cases</li>
-        <li>Offline feed resilience: agent falls back to static timetable + passenger warning</li>
-        <li>Personalization: session state correctly recalls home station</li>
-        <li>Arrival projections properly grounded &mdash; agent omits times not returned by tools</li>
-      </ul>
-      <p><strong>Platform Reveal:</strong> Open the generated <code>results_*.html</code> file to browse scores and reasoning traces per scenario.</p>
-    </div>
-  </div>
-
-  <!-- Step 4: Fix -->
-  <div class="step">
-    <div class="step-num">4</div>
-    <span class="step-time">6 min</span>
-    <h3>Find the Weak Spots &amp; Fix Them</h3>
+    <span class="step-time">11 min</span>
+    <h3>Analyze &amp; Fix</h3>
     <p>Even with a perfect score, AGY can analyze the eval traces to find grounding improvements
     and harden the system instruction. If any scenarios scored below 5.0, AGY groups failures
     by common cause into <strong>loss clusters</strong> and optimizes the instruction to fix them.</p>
 
     <div class="card agent-section">
-      <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
-      <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
+      <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
+      <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Analyze the failures and optimize my system instruction to fix
 the biggest cluster.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
-      <div class="callout-title">While you wait &mdash; watch the eval logs</div>
+      <div class="callout-title">While you wait &mdash; how <code>agents-cli eval run</code> works</div>
       <p>AGY runs <code>agents-cli eval run</code> to score each scenario (~5 min, sequential).
-      Open a second terminal tab to watch progress:</p>
+      Each scenario is graded by an <strong>LLM-as-judge</strong> against these metrics:</p>
+      <table class="data" style="margin-top:.5rem;">
+        <thead><tr><th>Metric</th><th>What it measures</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Task Success</strong></td><td>Did the commuter get a valid reroute with times and stations?</td></tr>
+          <tr><td><strong>Tool-use Quality</strong></td><td>Were the right tools called before answering?</td></tr>
+          <tr><td><strong>Factual Accuracy</strong></td><td>Are all referenced trains real GTFS trip_ids?</td></tr>
+          <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear recommendation?</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.5rem;">Open a second terminal tab to watch progress:</p>
     </div>
     <div class="prompt-block">ls -lt artifacts/traces/          # watch traces appear as each scenario completes
 tail -f .google-agents-cli/*.log   # live eval runner output</div>
@@ -475,7 +454,7 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
           <tr><td>4.2 Simulate</td><td>"Generate 10 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent, including a case where the disruption feed is unavailable."</td></tr>
-          <tr><td>4.4 Optimize</td><td>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</td></tr>
+          <tr><td>4.3 Analyze &amp; Fix</td><td>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</td></tr>
         </tbody>
       </table>
     </div>
@@ -485,9 +464,8 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>4.2</td><td><code>agents-cli eval</code> &mdash; User + Environment simulation, trace collection for 100 scenarios</td></tr>
-          <tr><td>4.3</td><td>Multi-turn AutoRaters scored task success, tool-use quality, factual accuracy, action clarity</td></tr>
-          <tr><td>4.4</td><td><code>adk optimize</code> / Optimizer service &mdash; identified loss cluster, refined instruction, re-tested</td></tr>
+          <tr><td>4.2</td><td><code>agents-cli eval</code> &mdash; parallel scenario generation + trace collection for 10 scenarios</td></tr>
+          <tr><td>4.3</td><td><code>agents-cli eval run</code> &mdash; LLM-as-judge scoring, loss cluster analysis, instruction optimization, redeploy</td></tr>
         </tbody>
       </table>
     </div>
@@ -495,7 +473,7 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
     <div class="card">
       <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See in the Console</h3>
       <ul>
-        <li><strong>Evaluation dashboard</strong> &mdash; scores across all 100 scenarios with pass/fail breakdown</li>
+        <li><strong>Evaluation dashboard</strong> &mdash; scores across all 10 scenarios with pass/fail breakdown</li>
         <li><strong>Trace viewer</strong> &mdash; drill into a failed run and see exactly where the agent went wrong</li>
         <li><strong>Before/after scores</strong> &mdash; concrete evidence that the optimization worked</li>
       </ul>
