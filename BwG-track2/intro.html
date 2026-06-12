@@ -523,177 +523,9 @@
       </div>
     </div>
 
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4E6;</span> Brief Your Coding Agent</h3>
-      <p>Paste this once into Antigravity to give your coding agent the scenario background.
-      It describes the mission and the crisis &mdash; no file paths, no build instructions.
-      Setup comes in M0, building starts in M1.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Paste into AGY</span>
-# Rush Hour: Transit-Crisis Agent — Scenario Background
-
-## What we're building
-A transit-crisis assistant for cross-border high-speed rail. A signal
-failure has disrupted peak-hour departures from London St Pancras.
-Hundreds of travelers need real-time answers: "Is my train running?
-How do I still get to Paris?"
-
-## Why an agent, not a chatbot
-A plain LLM knows timetables but not what's happening right now.
-Our agent must RECONCILE two data sources:
-- The published schedule ("what SHOULD happen") — static GTFS data
-- A disruption feed ("what IS happening") — which services are
-  cancelled or delayed, and why
-
-The join of schedule × disruption on trip_id/stop_id is the core
-pattern. Without it, the agent is guessing.
-
-## The network
-17 stations across UK, France, Belgium, Netherlands, and Germany.
-Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
-Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
-
-## What the agent must do
-1. Look up scheduled departures for a station and time window
-2. Check which of those services are disrupted (delayed/cancelled)
-3. Compute a concrete reroute avoiding disrupted services
-4. Present the answer calmly with specific times, stations, and
-   number of changes
-5. End with one clear recommended action
-
-## The crisis scenario
-A signal failure at the St Pancras throat during peak hours.
-Multiple Eurostar and cross-border services are affected — some
-cancelled outright, others delayed 15–45 minutes. Travelers need
-to know: which trains are still running, and what's the best
-alternative route to their destination?
-
-## What's next
-In the following modules you will set up your workspace (M0), then
-build the agent with 3 tools by prompting in Antigravity (M1).
-Do NOT start building yet — this context is background only.</div>
-    </div>
-
   <div class="section-divider">
   <!-- ─────────────────────────────────────────────────────────────
-       YOUR COCKPIT
-       ───────────────────────────────────────────────────────────── -->
-    <h2>Your Cockpit — Antigravity + agents-cli + Skills</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">The Mantra</div>
-      <p><strong>"Describe the outcome; let the skills do the wiring."</strong> You prompt in natural language.
-      The coding agent in Antigravity, powered by <code>agents-cli</code> skills, does the scaffolding,
-      deploying, evaluating, and publishing.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F680;</span> Antigravity — The Agentic IDE</h3>
-      <p>Antigravity is your cockpit for the entire session. It's an IDE with a built-in coding agent
-      that can read your project, generate code, run commands, and interact with the Agent Platform —
-      all from natural-language prompts.</p>
-      <p>You don't hand-write boilerplate. You describe what you want, and the agent builds it.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x2699;&#xFE0F;</span> agents-cli &amp; Skills</h3>
-      <p>The <code>agents-cli</code> is a CLI that comes with <strong>ADK development skills</strong> —
-      pre-built capabilities the coding agent can invoke:</p>
-      <table class="data">
-        <thead><tr><th>Skill</th><th>What it does</th><th>Used in</th></tr></thead>
-        <tbody>
-          <tr><td><code>scaffold</code></td><td>Creates a full ADK project structure from a description</td><td>M1 Build</td></tr>
-          <tr><td><code>deploy</code></td><td>Packages and deploys to Agent Runtime</td><td>M2 Scale</td></tr>
-          <tr><td><code>eval</code></td><td>Runs evaluation suite with autoraters</td><td>M4 Optimize</td></tr>
-          <tr><td><code>optimize</code></td><td>Analyzes failures and refines system instruction</td><td>M4 Optimize</td></tr>
-          <tr><td><code>publish</code></td><td>Registers agent with Gemini Enterprise</td><td>M5 Engage</td></tr>
-          <tr><td><code>observe</code></td><td>Surfaces traces, logs, metrics</td><td>Throughout</td></tr>
-        </tbody>
-      </table>
-      <p style="margin-top:.75rem;">Install with:</p>
-      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x2705;</span> Prerequisites Checklist</h3>
-      <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Antigravity</strong> installed and open</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>agents-cli</strong> installed with skills (<code>uvx google-agents-cli setup</code>)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Google Cloud project</strong> with Agent Platform enabled</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Access to a <strong>Gemini Enterprise</strong> app</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Python 3.11+</strong> and <strong>uv</strong></div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Model: <strong>gemini-3.5-flash</strong> (GA-stable, fast, strong tool-calling)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data bundle downloaded (see "The Data" tab)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console open in a browser tab (empty — "before" shot)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app open in a browser tab (empty — "before" shot)</div></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="section-divider">
-  <!-- ─────────────────────────────────────────────────────────────
-       THE DATA
-       ───────────────────────────────────────────────────────────── -->
-    <h2>The Data — Static GTFS + Simulated Disruption</h2>
-
-    <div class="callout callout-warning">
-      <div class="callout-title">No Live APIs</div>
-      <p>We use <strong>static data only</strong>. This keeps the lab 100% reliable in a room of 100+ people
-      on conference Wi-Fi, and keeps the focus on the <em>platform</em>, not on flaky feeds.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F4C5;</span> The GTFS Bundle</h3>
-      <p>A <strong>static London GTFS dataset</strong> covering Eurostar / St Pancras cross-border rail:</p>
-      <table class="data">
-        <thead><tr><th>Property</th><th>Value</th></tr></thead>
-        <tbody>
-          <tr><td>Coverage</td><td>17 stations across UK, France, Belgium, Netherlands, Germany</td></tr>
-          <tr><td>Schedule horizon</td><td>~10 months</td></tr>
-          <tr><td>Type</td><td>Intercity / cross-border rail (not metro/tube)</td></tr>
-          <tr><td>Source</td><td>Downloaded from provided GCS link / Drive zip</td></tr>
-          <tr><td>Key files</td><td><code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x26A0;&#xFE0F;</span> The Disruption File</h3>
-      <p>A small file that simulates the <strong>"signal failure at St Pancras"</strong> crisis.
-      You'll layer this on top of the GTFS schedule data to create the disruption scenario.</p>
-      <p>The disruption specifies:</p>
-      <ul style="margin-left:1.25rem; margin-bottom:.5rem;">
-        <li>Which <strong>trip IDs</strong> are affected (cancelled / delayed)</li>
-        <li>The <strong>delay magnitude</strong> (in minutes)</li>
-        <li>Which <strong>stops</strong> are impacted</li>
-        <li>The <strong>cause</strong> ("signal failure") and <strong>time window</strong></li>
-      </ul>
-      <p>Your agent's tools must reconcile this file against the GTFS schedule to produce answers.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F5C2;&#xFE0F;</span> Workspace Layout</h3>
-      <div class="prompt-block" id="cmd-tree-layout"><span class="prompt-label">tree</span>workshop-project/
-├── data/
-│   ├── gtfs/            # Static GTFS bundle
-│   │   ├── stops.txt
-│   │   ├── stop_times.txt
-│   │   ├── trips.txt
-│   │   ├── routes.txt
-│   │   └── calendar.txt
-│   └── disruptions.json # Simulated signal failure
-├── agent/               # ADK agent (scaffolded in M1)
-│   ├── agent.py
-│   ├── tools.py
-│   └── __init__.py
-├── pyproject.toml
-└── .env</div>
-    </div>
-  </div>
-
-  <div class="section-divider">
-  <!-- ─────────────────────────────────────────────────────────────
-       JOURNEY MAP
+       THE JOURNEY
        ───────────────────────────────────────────────────────────── -->
     <h2>The Journey — Build &rarr; Scale &rarr; Govern &rarr; Optimize</h2>
 
@@ -773,6 +605,181 @@ Do NOT start building yet — this context is background only.</div>
           <text x="649" y="130" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">Chat UI</text>
         </svg>
       </div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+  <!-- ─────────────────────────────────────────────────────────────
+       THE DATA
+       ───────────────────────────────────────────────────────────── -->
+    <h2>The Data — Static GTFS + Simulated Disruption</h2>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">No Live APIs</div>
+      <p>We use <strong>static data only</strong>. This keeps the lab 100% reliable in a room of 100+ people
+      on conference Wi-Fi, and keeps the focus on the <em>platform</em>, not on flaky feeds.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F4C5;</span> The GTFS Bundle</h3>
+      <p>A <strong>static London GTFS dataset</strong> covering Eurostar / St Pancras cross-border rail:</p>
+      <table class="data">
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Coverage</td><td>17 stations across UK, France, Belgium, Netherlands, Germany</td></tr>
+          <tr><td>Schedule horizon</td><td>~10 months</td></tr>
+          <tr><td>Type</td><td>Intercity / cross-border rail (not metro/tube)</td></tr>
+          <tr><td>Source</td><td>Downloaded from provided GCS link / Drive zip</td></tr>
+          <tr><td>Key files</td><td><code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x26A0;&#xFE0F;</span> The Disruption File</h3>
+      <p>A small file that simulates the <strong>"signal failure at St Pancras"</strong> crisis.
+      You'll layer this on top of the GTFS schedule data to create the disruption scenario.</p>
+      <p>The disruption specifies:</p>
+      <ul style="margin-left:1.25rem; margin-bottom:.5rem;">
+        <li>Which <strong>trip IDs</strong> are affected (cancelled / delayed)</li>
+        <li>The <strong>delay magnitude</strong> (in minutes)</li>
+        <li>Which <strong>stops</strong> are impacted</li>
+        <li>The <strong>cause</strong> ("signal failure") and <strong>time window</strong></li>
+      </ul>
+      <p>Your agent's tools must reconcile this file against the GTFS schedule to produce answers.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F5C2;&#xFE0F;</span> Workspace Layout</h3>
+      <div class="prompt-block" id="cmd-tree-layout"><span class="prompt-label">tree</span>workshop-project/
+├── data/
+│   ├── gtfs/            # Static GTFS bundle
+│   │   ├── stops.txt
+│   │   ├── stop_times.txt
+│   │   ├── trips.txt
+│   │   ├── routes.txt
+│   │   └── calendar.txt
+│   └── disruptions.json # Simulated signal failure
+├── agent/               # ADK agent (scaffolded in M1)
+│   ├── agent.py
+│   ├── tools.py
+│   └── __init__.py
+├── pyproject.toml
+└── .env</div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+  <!-- ─────────────────────────────────────────────────────────────
+       YOUR COCKPIT
+       ───────────────────────────────────────────────────────────── -->
+    <h2>Your Cockpit — Antigravity + agents-cli + Skills</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">The Mantra</div>
+      <p><strong>"Describe the outcome; let the skills do the wiring."</strong> You prompt in natural language.
+      The coding agent in Antigravity, powered by <code>agents-cli</code> skills, does the scaffolding,
+      deploying, evaluating, and publishing.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x1F680;</span> Antigravity — The Agentic IDE</h3>
+      <p>Antigravity is your cockpit for the entire session. It's an IDE with a built-in coding agent
+      that can read your project, generate code, run commands, and interact with the Agent Platform —
+      all from natural-language prompts.</p>
+      <p>You don't hand-write boilerplate. You describe what you want, and the agent builds it.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x2699;&#xFE0F;</span> agents-cli &amp; Skills</h3>
+      <p>The <code>agents-cli</code> is a CLI that comes with <strong>ADK development skills</strong> —
+      pre-built capabilities the coding agent can invoke:</p>
+      <table class="data">
+        <thead><tr><th>Skill</th><th>What it does</th><th>Used in</th></tr></thead>
+        <tbody>
+          <tr><td><code>scaffold</code></td><td>Creates a full ADK project structure from a description</td><td>M1 Build</td></tr>
+          <tr><td><code>deploy</code></td><td>Packages and deploys to Agent Runtime</td><td>M2 Scale</td></tr>
+          <tr><td><code>eval</code></td><td>Runs evaluation suite with autoraters</td><td>M4 Optimize</td></tr>
+          <tr><td><code>optimize</code></td><td>Analyzes failures and refines system instruction</td><td>M4 Optimize</td></tr>
+          <tr><td><code>publish</code></td><td>Registers agent with Gemini Enterprise</td><td>M5 Engage</td></tr>
+          <tr><td><code>observe</code></td><td>Surfaces traces, logs, metrics</td><td>Throughout</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem;">Install with:</p>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">&#x2705;</span> Prerequisites Checklist</h3>
+      <ul class="checklist">
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Antigravity</strong> installed and open</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>agents-cli</strong> installed with skills (<code>uvx google-agents-cli setup</code>)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Google Cloud project</strong> with Agent Platform enabled</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Access to a <strong>Gemini Enterprise</strong> app</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><strong>Python 3.11+</strong> and <strong>uv</strong></div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Model: <strong>gemini-3.5-flash</strong> (GA-stable, fast, strong tool-calling)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data bundle downloaded (see the Data section above)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console open in a browser tab (empty — "before" shot)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app open in a browser tab (empty — "before" shot)</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-divider">
+  <!-- ─────────────────────────────────────────────────────────────
+       BRIEF YOUR CODING AGENT
+       ───────────────────────────────────────────────────────────── -->
+    <h2>Brief Your Coding Agent</h2>
+
+    <p>Everything above is context for <em>you</em>. The block below is context for your <strong>coding agent</strong>.
+    Paste it into Antigravity once to give it the scenario background &mdash; no file paths, no build instructions.
+    Setup begins in M0.</p>
+
+    <div class="card agent-section">
+      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Paste into AGY</span>
+# Rush Hour: Transit-Crisis Agent — Scenario Background
+
+## What we're building
+A transit-crisis assistant for cross-border high-speed rail. A signal
+failure has disrupted peak-hour departures from London St Pancras.
+Hundreds of travelers need real-time answers: "Is my train running?
+How do I still get to Paris?"
+
+## Why an agent, not a chatbot
+A plain LLM knows timetables but not what's happening right now.
+Our agent must RECONCILE two data sources:
+- The published schedule ("what SHOULD happen") — static GTFS data
+- A disruption feed ("what IS happening") — which services are
+  cancelled or delayed, and why
+
+The join of schedule × disruption on trip_id/stop_id is the core
+pattern. Without it, the agent is guessing.
+
+## The network
+17 stations across UK, France, Belgium, Netherlands, and Germany.
+Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
+Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
+
+## What the agent must do
+1. Look up scheduled departures for a station and time window
+2. Check which of those services are disrupted (delayed/cancelled)
+3. Compute a concrete reroute avoiding disrupted services
+4. Present the answer calmly with specific times, stations, and
+   number of changes
+5. End with one clear recommended action
+
+## The crisis scenario
+A signal failure at the St Pancras throat during peak hours.
+Multiple Eurostar and cross-border services are affected — some
+cancelled outright, others delayed 15–45 minutes. Travelers need
+to know: which trains are still running, and what's the best
+alternative route to their destination?
+
+## What's next
+In the following modules you will set up your workspace (M0), then
+build the agent with 3 tools by prompting in Antigravity (M1).
+Do NOT start building yet — this context is background only.</div>
     </div>
   </div>
 
