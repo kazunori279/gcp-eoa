@@ -568,16 +568,13 @@
       <div class="step-num">3</div>
       <span class="step-time">2 min</span>
       <h3>Download the Data</h3>
-      <p>Download the <strong>static London GTFS bundle</strong> from the provided link into your workspace:</p>
-      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span># Download from the provided GCS / Drive link
-# Place into your project's data/ directory:
-! mkdir -p data/gtfs
-# Extract the GTFS bundle into data/gtfs/
-# You should see: stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt</div>
+      <p>Download the <strong>static London GTFS bundle</strong> from the provided GCS / Drive link.
+      Place it into your project's <code>data/</code> directory:</p>
+      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs</div>
+      <p>Extract the GTFS bundle into <code>data/gtfs/</code>.
+      You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
       <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
-      you'll layer on top of the schedule:</p>
-      <div class="prompt-block" id="cmd-disruption-file"><button class="copy-btn" onclick="copyBlock('cmd-disruption-file')">Copy</button><span class="prompt-label">shell</span># Place the disruption file:
-# data/disruptions.json</div>
+      you'll layer on top of the schedule. Place it at <code>data/disruptions.json</code>.</p>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
         <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>
