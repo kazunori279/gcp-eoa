@@ -161,6 +161,7 @@
     padding: .2rem .5rem; font-size: .7rem; cursor: pointer; font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .prompt-block .copy-btn ~ .prompt-label { right: 4.5rem; }
   .step-expected {
     background: var(--success-light);
     border-left: 4px solid var(--success);
@@ -309,7 +310,7 @@ for personalization.</div>
           <li>End-user identity passed for Memory Bank personalization</li>
         </ul>
         <p>Switch to the <strong>Gemini Enterprise web app</strong> and, as a non-technical ops manager, chat:</p>
-        <div class="prompt-block"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
+        <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
         <p><strong>What just happened:</strong> The pro-code thing you vibe-built is now a chat
         <strong>anyone in the organization</strong> can use. This is the "after" picture &mdash;
         compare it to the empty console you saw in M0.</p>
@@ -497,12 +498,16 @@ for personalization.</div>
 
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('.agent-ctx-label, .prompt-label, .copy-btn').forEach(n => n.remove());
+    const text = clone.textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
-      const btn = el.parentElement.querySelector('.copy-btn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = orig, 1500);
+      const btn = el.querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      }
     });
   }
 </script>

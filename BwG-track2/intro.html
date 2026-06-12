@@ -350,6 +350,7 @@
     font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .prompt-block .copy-btn ~ .prompt-label { right: 4.5rem; }
   .agent-section { position: relative; }
 
   /* Responsive */
@@ -468,7 +469,7 @@
       <h3><span class="icon">&#x1F3AF;</span> Your Deliverable</h3>
       <p>By the end of this workshop you will have built a <strong>governed, deployed, optimized agent</strong>
       that a non-technical ops manager can simply chat with in Gemini Enterprise:</p>
-      <div class="prompt-block"><span class="prompt-label">user prompt</span>"Trains out of St Pancras are disrupted — what do I tell travelers heading to Paris?"</div>
+      <div class="prompt-block" id="cmd-user-prompt"><button class="copy-btn" onclick="copyBlock('cmd-user-prompt')">Copy</button><span class="prompt-label">user prompt</span>"Trains out of St Pancras are disrupted — what do I tell travelers heading to Paris?"</div>
       <p>And the agent will answer with a concrete, verified reroute — not a guess.</p>
     </div>
 
@@ -652,7 +653,7 @@ Do NOT start building yet — this context is background only.</div>
         </tbody>
       </table>
       <p style="margin-top:.75rem;">Install with:</p>
-      <div class="prompt-block"><span class="prompt-label">shell</span>uvx google-agents-cli setup</div>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
     </div>
 
     <div class="card">
@@ -714,7 +715,7 @@ Do NOT start building yet — this context is background only.</div>
 
     <div class="card">
       <h3><span class="icon">&#x1F5C2;&#xFE0F;</span> Workspace Layout</h3>
-      <div class="prompt-block"><span class="prompt-label">tree</span>workshop-project/
+      <div class="prompt-block" id="cmd-tree-layout"><button class="copy-btn" onclick="copyBlock('cmd-tree-layout')">Copy</button><span class="prompt-label">tree</span>workshop-project/
 ├── data/
 │   ├── gtfs/            # Static GTFS bundle
 │   │   ├── stops.txt
@@ -859,13 +860,16 @@ Do NOT start building yet — this context is background only.</div>
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);
-    // Strip the label span text and get just the content
-    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('.agent-ctx-label, .prompt-label, .copy-btn').forEach(n => n.remove());
+    const text = clone.textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
-      const btn = el.parentElement.querySelector('.copy-btn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = orig, 1500);
+      const btn = el.querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      }
     });
   }
 </script>

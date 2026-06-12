@@ -353,6 +353,7 @@
     font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .prompt-block .copy-btn ~ .prompt-label { right: 4.5rem; }
   .step-expected {
     background: var(--success-light);
     border-left: 4px solid var(--success);
@@ -543,7 +544,7 @@
       <p>Open <strong>Antigravity</strong> (the agentic IDE). This is your single workspace for the entire session &mdash;
       you prompt, it builds.</p>
       <p>Confirm that <code>agents-cli</code> and its skills are installed:</p>
-      <div class="prompt-block"><span class="prompt-label">shell</span>uvx google-agents-cli setup</div>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
       <table class="data">
         <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
@@ -568,14 +569,14 @@
       <span class="step-time">2 min</span>
       <h3>Download the Data</h3>
       <p>Download the <strong>static London GTFS bundle</strong> from the provided link into your workspace:</p>
-      <div class="prompt-block"><span class="prompt-label">shell</span># Download from the provided GCS / Drive link
+      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span># Download from the provided GCS / Drive link
 # Place into your project's data/ directory:
-mkdir -p data/gtfs
+! mkdir -p data/gtfs
 # Extract the GTFS bundle into data/gtfs/
 # You should see: stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt</div>
       <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
       you'll layer on top of the schedule:</p>
-      <div class="prompt-block"><span class="prompt-label">shell</span># Place the disruption file:
+      <div class="prompt-block" id="cmd-disruption-file"><button class="copy-btn" onclick="copyBlock('cmd-disruption-file')">Copy</button><span class="prompt-label">shell</span># Place the disruption file:
 # data/disruptions.json</div>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
@@ -645,7 +646,7 @@ mkdir -p data/gtfs
       <p>Eurostar services to <strong>Paris, Brussels, Amsterdam, and Cologne</strong> are either
       cancelled or running with severe delays. Hundreds of travelers are stranded.
       One question, asked a thousand ways:</p>
-      <div class="prompt-block" style="text-align:center; font-size:1.1rem; color:#fff;">"Will I still make it &mdash; and how?"</div>
+      <div class="prompt-block" style="text-align:center; font-size:1.1rem; color:#fff;" id="cmd-crisis-quote"><button class="copy-btn" onclick="copyBlock('cmd-crisis-quote')">Copy</button>"Will I still make it &mdash; and how?"</div>
     </div>
 
     <div class="card">
@@ -723,7 +724,7 @@ mkdir -p data/gtfs
     <div class="card">
       <h3><span class="icon">&#x1F3AF;</span> The Deliverable</h3>
       <p>By the end of the workshop, a non-technical ops manager opens <strong>Gemini Enterprise</strong> and types:</p>
-      <div class="prompt-block"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
+      <div class="prompt-block" id="cmd-gemini-prompt"><button class="copy-btn" onclick="copyBlock('cmd-gemini-prompt')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
       <p>And gets a <strong>concrete, verified answer</strong> with a specific reroute, departure time, and estimated arrival.
       The agent you build in M1 will be deployed (M2), governed (M3), optimized (M4), and published (M5) to make this work.</p>
     </div>
@@ -743,7 +744,7 @@ mkdir -p data/gtfs
 
     <div class="card">
       <h3><span class="icon">&#x1F4C2;</span> What You Downloaded</h3>
-      <div class="prompt-block"><span class="prompt-label">tree</span>data/
+      <div class="prompt-block" id="cmd-data-tree"><button class="copy-btn" onclick="copyBlock('cmd-data-tree')">Copy</button><span class="prompt-label">tree</span>data/
 ├── gtfs/                    # Static GTFS bundle
 │   ├── stops.txt            # 17 stations (St Pancras, Paris, Brussels, ...)
 │   ├── stop_times.txt       # Departure/arrival times per trip per stop
@@ -1008,12 +1009,16 @@ mkdir -p data/gtfs
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('.agent-ctx-label, .prompt-label, .copy-btn').forEach(n => n.remove());
+    const text = clone.textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
-      const btn = el.parentElement.querySelector('.copy-btn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = orig, 1500);
+      const btn = el.querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      }
     });
   }
 </script>

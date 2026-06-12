@@ -363,6 +363,7 @@
     font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .prompt-block .copy-btn ~ .prompt-label { right: 4.5rem; }
 
   /* Expected result box inside steps */
   .step-expected {
@@ -912,14 +913,14 @@ Verify the reasoning trace shows all 3 tools being called.</div>
 
     <div class="card">
       <h3><span class="icon">&#x1F3AE;</span> Launch the Playground</h3>
-      <div class="prompt-block"><span class="prompt-label">shell</span>adk web</div>
+      <div class="prompt-block" id="cmd-adk-web"><button class="copy-btn" onclick="copyBlock('cmd-adk-web')">Copy</button><span class="prompt-label">shell</span>! adk web</div>
       <p>This starts the ADK local development playground &mdash; a web UI where you can chat with
       your agent, see tool calls in real time, and inspect the reasoning trace.</p>
     </div>
 
     <div class="card">
       <h3><span class="icon">&#x1F9EA;</span> The Test Query</h3>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">playground</span>"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still get to Paris?"</div>
+      <div class="prompt-block prompt-antigravity" id="cmd-test-query"><button class="copy-btn" onclick="copyBlock('cmd-test-query')">Copy</button><span class="prompt-label">playground</span>"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still get to Paris?"</div>
     </div>
 
     <div class="card">
@@ -1012,12 +1013,16 @@ Verify the reasoning trace shows all 3 tools being called.</div>
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('.agent-ctx-label, .prompt-label, .copy-btn').forEach(n => n.remove());
+    const text = clone.textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
-      const btn = el.parentElement.querySelector('.copy-btn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = orig, 1500);
+      const btn = el.querySelector('.copy-btn') || el.parentElement.querySelector('.copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      }
     });
   }
 </script>
