@@ -405,7 +405,7 @@ with schemas.</div>
     <div class="step">
       <div class="step-num">3</div>
       <span class="step-time">5 min</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
+      <span class="beat-badge beat-3">What You Can See in the Console</span>
       <h3>Agent Identity &mdash; Who Is This Agent?</h3>
       <p>Every agent gets an <strong>IAM-based identity</strong>, secured by <strong>Context-Aware Access</strong>
       (mutual TLS + DPoP) &mdash; <em>not</em> a shared API key.</p>
@@ -420,7 +420,7 @@ with schemas.</div>
           <tr><td>Call external APIs</td><td>No</td><td>All data is local &mdash; no egress needed</td></tr>
         </tbody>
       </table>
-      <p><strong>So-What:</strong> Even if the prompt logic is compromised, a stolen token can't act without
+      <p><strong>Why It Matters:</strong> Even if the prompt logic is compromised, a stolen token can't act without
       attested identity. The damage radius is bounded by IAM.</p>
     </div>
 
@@ -428,7 +428,7 @@ with schemas.</div>
     <div class="step">
       <div class="step-num">4</div>
       <span class="step-time">9 min</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
+      <span class="beat-badge beat-3">What You Can See in the Console</span>
       <h3>Agent Gateway + Model Armor &mdash; The Policy Front Door</h3>
       <p>All agent traffic routes through the <strong>Agent Gateway</strong>. Policies are enforced at
       the network layer &mdash; not in app code.</p>
@@ -448,7 +448,7 @@ with schemas.</div>
       <p><strong>Result:</strong> Model Armor detects the prompt injection attempt and blocks the request
       before it reaches the agent's reasoning loop. The response explains that the request
       violated safety policy.</p>
-      <p><strong>So-What:</strong> Safety and compliance are enforced by the <strong>platform</strong>, consistently,
+      <p><strong>Why It Matters:</strong> Safety and compliance are enforced by the <strong>platform</strong>, consistently,
       not re-implemented in every agent. One policy protects all agents behind the gateway.</p>
     </div>
 
@@ -484,7 +484,7 @@ with schemas.</div>
     <h2>Module Recap &mdash; GOVERN</h2>
 
     <div class="card">
-      <h3><span class="beat-badge beat-1" style="margin-left:0;">Beat 1</span> The Prompt</h3>
+      <h3><span class="beat-badge beat-1" style="margin-left:0;">Beat 1</span> What You Typed</h3>
       <p>One hands-on prompt in this module:</p>
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
@@ -497,7 +497,7 @@ with schemas.</div>
     </div>
 
     <div class="card">
-      <h3><span class="beat-badge beat-2" style="margin-left:0;">Beat 2</span> Under the Hood</h3>
+      <h3><span class="beat-badge beat-2" style="margin-left:0;">Beat 2</span> What Ran Under the Hood</h3>
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
@@ -509,7 +509,7 @@ with schemas.</div>
     </div>
 
     <div class="card">
-      <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> The Platform Reveal</h3>
+      <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See in the Console</h3>
       <ul>
         <li><strong>Registry catalog</strong> &mdash; your agent listed with tools, version, and discoverability</li>
         <li><strong>Identity console</strong> &mdash; IAM identity with scoped permissions (read GTFS: yes, write: no)</li>
@@ -518,7 +518,7 @@ with schemas.</div>
     </div>
 
     <div class="card">
-      <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> So-What</h3>
+      <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>No agent sprawl</strong> &mdash; every agent is registered, versioned, discoverable</li>
         <li><strong>Attested identity</strong> &mdash; not a shared key; bounded damage radius even if compromised</li>
