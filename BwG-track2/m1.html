@@ -555,13 +555,13 @@ change it), and uv for dependency management.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY creates the project directory with these files:</p>
+        <p>AGY scaffolds the project, sets the model, and verifies with a smoke test:</p>
         <ul>
-          <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code></li>
-          <li><code>agent/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
-          <li><code>agent/tools.py</code> &mdash; empty tools module (we fill this next)</li>
-          <li><code>agent/__init__.py</code> &mdash; exports the agent</li>
-          <li><code>.env</code> &mdash; environment config</li>
+          <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code>, managed by <code>uv</code></li>
+          <li><code>app/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
+          <li><code>app/tools.py</code> &mdash; starter tools module (we replace this next)</li>
+          <li>GCP project ID resolved via <code>gcloud config</code> fallback</li>
+          <li>Smoke test passes: <code>agents-cli run "What is the weather in SF?"</code></li>
         </ul>
         <p><strong>What just happened:</strong> The <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> scaffold</code> skill generated a
         consistent, deployable project shape from a single sentence. This is a real engineering
@@ -717,12 +717,14 @@ data with disruption data on trip_id and stop_id.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY creates three functions in <code>tools.py</code> with type hints and docstrings:</p>
+        <p>AGY writes the three tools into <code>agent.py</code>, runs linting and tests:</p>
         <ul>
-          <li><strong>Tool 1: <code>get_scheduled_departures</code></strong> &mdash; "what SHOULD happen" (GTFS query)</li>
-          <li><strong>Tool 2: <code>check_disruptions</code></strong> &mdash; "what IS happening" (disruption feed)</li>
-          <li><strong>Tool 3: <code>compute_reroute</code></strong> &mdash; "how to get there anyway" (BFS pathfinding)</li>
+          <li><strong><code>get_scheduled_departures</code></strong> &mdash; joins <code>stops.txt</code>, <code>calendar_dates.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>stop_times.txt</code>; normalizes departures with times and route names</li>
+          <li><strong><code>check_disruptions</code></strong> &mdash; parses <code>disruptions.json</code>; filters by <code>station_query</code> (fuzzy) or <code>trip_id</code> (exact)</li>
+          <li><strong><code>compute_reroute</code></strong> &mdash; Dijkstra priority-queue search; filters cancelled trips, adjusts for delays, enforces 5-min transfer buffer</li>
+          <li>Helper: <code>resolve_station_id</code> &mdash; maps user input like "St Pancras" to <code>st_pancras_international</code></li>
         </ul>
+        <p>All unit and integration tests pass (<code>uv run pytest</code>).</p>
         <p><strong>What just happened:</strong> The agent now has deterministic capabilities.
         The reconciliation pattern (Tool 1 + Tool 2 joined on <code>trip_id</code>) is the core
         of what makes this agent useful. See the tool specifications above for details.</p>
@@ -749,13 +751,15 @@ disrupted, and end every response with one clear recommended action.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY updates <code>agent.py</code> with a system instruction that includes these rules:</p>
+        <p>AGY updates the <code>instruction</code> field in <code>agent.py</code> with five core rules:</p>
         <ol>
-          <li>Always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code> before answering</li>
-          <li>Never invent a train &mdash; only reference trips in the GTFS data</li>
-          <li>Proactively call <code>compute_reroute</code> when services are disrupted</li>
-          <li>Stay calm and factual; end with one clear recommended action</li>
+          <li><strong>Calm and factual demeanor</strong> &mdash; reassuring tone, no speculation</li>
+          <li><strong>Mandatory reconciliation</strong> &mdash; always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code>, join on <code>trip_id</code>/<code>stop_id</code> before answering</li>
+          <li><strong>No hallucinated trains</strong> &mdash; only reference trips from the GTFS data and disruption feed</li>
+          <li><strong>Proactive rerouting</strong> &mdash; automatically call <code>compute_reroute</code> when any service is disrupted</li>
+          <li><strong>Actionable conclusion</strong> &mdash; end every response with exactly one clear recommended action</li>
         </ol>
+        <p>Linting and tests still pass after the update.</p>
         <p><strong>What just happened:</strong> The system instruction is not a vibe &mdash; it's a
         specification. In M3 you'll see how governance enforces it; in M4 you'll
         measure how well the agent follows it.</p>
@@ -782,17 +786,19 @@ Verify the reasoning trace shows all 3 tools being called.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>The agent answers the crisis question by calling all 3 tools in sequence:</p>
+        <p>The reasoning trace shows the agent calling all 3 tools:</p>
         <ol>
-          <li><code>get_scheduled_departures("St Pancras", "13:00")</code> &mdash; finds the 13:31 service</li>
-          <li><code>check_disruptions(station_name="St Pancras")</code> &mdash; confirms it's disrupted</li>
-          <li><code>compute_reroute("St Pancras", "Paris", "13:31")</code> &mdash; finds an alternative</li>
+          <li><code>get_scheduled_departures(station_query="St Pancras", start_time="13:00", end_time="14:00")</code> &mdash; finds trip <code>9024-0715</code> departing 13:31</li>
+          <li><code>check_disruptions(station_query="St Pancras")</code> &mdash; retrieves the signal failure window (15:00&ndash;19:30)</li>
+          <li><code>check_disruptions(trip_id="9024-0715")</code> &mdash; confirms this specific trip is <em>not</em> in the affected list (it departs before the disruption)</li>
+          <li><code>compute_reroute(origin="St Pancras", destination="Paris", departure_after="13:31")</code> &mdash; proactively finds the next alternative (<code>9040-0715</code>, delayed to 18:16)</li>
         </ol>
-        <p>The response ends with a concrete recommendation: a specific train, with times,
-        stations, and number of changes.</p>
+        <p>The agent correctly identifies the 13:31 service is <strong>not disrupted</strong> (departs before the 15:00 window),
+        provides disruption context, and proactively offers the next available alternative with the delay factored in.</p>
+        <p>The response ends with: <em>"Proceed to London St Pancras International as planned to board your scheduled 13:31 departure."</em></p>
         <p><strong>What just happened:</strong> The reasoning trace proves the agent is reconciling
         data, not guessing. This traceability is the foundation for governance (M3) and
-        optimization (M4). See the troubleshooting guide below for what to look for.</p>
+        optimization (M4).</p>
       </div>
     </div>
 
