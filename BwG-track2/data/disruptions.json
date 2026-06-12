@@ -1,109 +1,110 @@
 {
-  "disruption_id": "DISRUPT-STP-2025-001",
+  "disruption_id": "DISRUPT-STP-2026-001",
   "cause": "signal_failure",
   "location": "St Pancras International — station throat (all platform approaches)",
   "severity": "major",
+  "date": "2026-07-15",
   "time_window": {
-    "start": "2025-07-15T16:30:00+01:00",
-    "end": "2025-07-15T20:00:00+01:00"
+    "start": "2026-07-15T15:00:00+01:00",
+    "end": "2026-07-15T19:30:00+01:00"
   },
   "summary": "Signal failure at the St Pancras station throat has blocked all platform approaches. Cross-border high-speed services are cancelled or severely delayed during peak evening departures.",
   "affected_trips": [
     {
-      "trip_id": "ES9014",
-      "route_name": "Eurostar London–Paris",
+      "trip_id": "9032-0715",
+      "route_name": "St-Pancras-International → Paris-Nord",
+      "scheduled_departure": "15:31",
+      "origin": "st_pancras_international",
+      "destination": "paris_nord",
+      "status": "cancelled",
+      "delay_minutes": null,
+      "affected_stops": ["st_pancras_international"],
+      "reason": "Cannot depart — all platform approaches blocked by signal failure"
+    },
+    {
+      "trip_id": "9140-0715",
+      "route_name": "St-Pancras-International → Amsterdam-Centraal",
+      "scheduled_departure": "16:04",
+      "origin": "st_pancras_international",
+      "destination": "amsterdam_centraal",
+      "status": "cancelled",
+      "delay_minutes": null,
+      "affected_stops": ["st_pancras_international"],
+      "reason": "Cannot depart — all platform approaches blocked by signal failure"
+    },
+    {
+      "trip_id": "9036-0715",
+      "route_name": "St-Pancras-International → Paris-Nord",
       "scheduled_departure": "16:31",
-      "origin": "London St Pancras International",
-      "destination": "Paris Gare du Nord",
+      "origin": "st_pancras_international",
+      "destination": "paris_nord",
       "status": "cancelled",
       "delay_minutes": null,
-      "affected_stops": ["London St Pancras International"],
+      "affected_stops": ["st_pancras_international"],
       "reason": "Cannot depart — all platform approaches blocked by signal failure"
     },
     {
-      "trip_id": "ES9024",
-      "route_name": "Eurostar London–Paris",
-      "scheduled_departure": "17:01",
-      "origin": "London St Pancras International",
-      "destination": "Paris Gare du Nord",
-      "status": "cancelled",
-      "delay_minutes": null,
-      "affected_stops": ["London St Pancras International"],
-      "reason": "Cannot depart — all platform approaches blocked by signal failure"
-    },
-    {
-      "trip_id": "ES9034",
-      "route_name": "Eurostar London–Paris",
+      "trip_id": "9040-0715",
+      "route_name": "St-Pancras-International → Paris-Nord",
       "scheduled_departure": "17:31",
-      "origin": "London St Pancras International",
-      "destination": "Paris Gare du Nord",
+      "origin": "st_pancras_international",
+      "destination": "paris_nord",
       "status": "delayed",
       "delay_minutes": 45,
-      "affected_stops": ["London St Pancras International"],
+      "affected_stops": ["st_pancras_international"],
       "reason": "Awaiting signal restoration — estimated departure 18:16"
     },
     {
-      "trip_id": "ES9116",
-      "route_name": "Eurostar London–Brussels",
-      "scheduled_departure": "16:58",
-      "origin": "London St Pancras International",
-      "destination": "Brussels Midi",
-      "status": "cancelled",
-      "delay_minutes": null,
-      "affected_stops": ["London St Pancras International"],
-      "reason": "Cannot depart — all platform approaches blocked by signal failure"
-    },
-    {
-      "trip_id": "ES9126",
-      "route_name": "Eurostar London–Brussels",
-      "scheduled_departure": "17:58",
-      "origin": "London St Pancras International",
-      "destination": "Brussels Midi",
+      "trip_id": "9148-0715",
+      "route_name": "St-Pancras-International → Bruxelles-Midi",
+      "scheduled_departure": "18:04",
+      "origin": "st_pancras_international",
+      "destination": "bruxelles_midi",
       "status": "delayed",
       "delay_minutes": 30,
-      "affected_stops": ["London St Pancras International"],
-      "reason": "Awaiting signal restoration — estimated departure 18:28"
+      "affected_stops": ["st_pancras_international"],
+      "reason": "Awaiting signal restoration — estimated departure 18:34"
     },
     {
-      "trip_id": "ES9152",
-      "route_name": "Eurostar London–Amsterdam",
-      "scheduled_departure": "17:16",
-      "origin": "London St Pancras International",
-      "destination": "Amsterdam Centraal",
-      "status": "cancelled",
-      "delay_minutes": null,
-      "affected_stops": ["London St Pancras International", "Rotterdam Centraal"],
-      "reason": "Cannot depart — all platform approaches blocked by signal failure"
-    },
-    {
-      "trip_id": "ES9044",
-      "route_name": "Eurostar London–Paris",
-      "scheduled_departure": "18:01",
-      "origin": "London St Pancras International",
-      "destination": "Paris Gare du Nord",
+      "trip_id": "9044-0715",
+      "route_name": "St-Pancras-International → Paris-Nord",
+      "scheduled_departure": "18:31",
+      "origin": "st_pancras_international",
+      "destination": "paris_nord",
       "status": "delayed",
       "delay_minutes": 15,
-      "affected_stops": ["London St Pancras International"],
+      "affected_stops": ["st_pancras_international"],
       "reason": "Minor delay — signal partially restored, single-track operation"
     },
     {
-      "trip_id": "ES9136",
-      "route_name": "Eurostar London–Brussels",
-      "scheduled_departure": "18:58",
-      "origin": "London St Pancras International",
-      "destination": "Brussels Midi",
+      "trip_id": "9046-0715",
+      "route_name": "St-Pancras-International → Paris-Nord",
+      "scheduled_departure": "19:01",
+      "origin": "st_pancras_international",
+      "destination": "paris_nord",
+      "status": "cancelled",
+      "delay_minutes": null,
+      "affected_stops": ["st_pancras_international"],
+      "reason": "Cannot depart — residual signal issues, insufficient time to recover"
+    },
+    {
+      "trip_id": "9152-0715",
+      "route_name": "St-Pancras-International → Amsterdam-Centraal",
+      "scheduled_departure": "19:04",
+      "origin": "st_pancras_international",
+      "destination": "amsterdam_centraal",
       "status": "delayed",
       "delay_minutes": 15,
-      "affected_stops": ["London St Pancras International"],
+      "affected_stops": ["st_pancras_international"],
       "reason": "Minor delay — signal partially restored, single-track operation"
     }
   ],
   "unaffected_routes": [
-    "Paris Gare du Nord – Brussels Midi",
-    "Brussels Midi – Amsterdam Centraal",
-    "Brussels Midi – Cologne Hbf",
-    "Paris Gare du Nord – Lille Europe",
-    "Lille Europe – Brussels Midi"
+    "Paris-Nord → Bruxelles-Midi (FRPNO-BEBMI)",
+    "Bruxelles-Midi → Amsterdam-Centraal (BEBMI-NLAMA)",
+    "Bruxelles-Midi → Köln Hbf (BEBMI-DEKOH)",
+    "Paris-Nord → Amsterdam-Centraal (FRPNO-NLAMA)",
+    "Amsterdam-Centraal → Bruxelles-Midi (NLAMA-BEBMI)"
   ],
-  "passenger_advice": "Travelers at St Pancras should check departure boards. Services from Paris, Brussels, Lille, and other continental stations are operating normally and may be used for alternative routing."
+  "passenger_advice": "Travelers at St Pancras should check departure boards. Services from Paris, Brussels, and other continental stations are operating normally and may be used for alternative routing via Eurostar services not originating from London."
 }

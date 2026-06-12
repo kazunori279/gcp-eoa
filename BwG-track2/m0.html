@@ -860,7 +860,6 @@ Do NOT start building yet — this context is background only.</div>
         <li><code>trips.txt</code> &mdash; trip definitions with route references</li>
         <li><code>disruptions.json</code> &mdash; which services are cancelled/delayed and why</li>
       </ul>
-      <p>See the <strong>Data Orientation</strong> section below for the full breakdown.</p>
       <div class="step-expected">
         <h4>Expected Result</h4>
         <p>Your workspace has this data layout:</p>
@@ -869,12 +868,139 @@ Do NOT start building yet — this context is background only.</div>
           <li><code>data/gtfs/stop_times.txt</code> &mdash; departure/arrival per trip per stop</li>
           <li><code>data/gtfs/trips.txt</code> &mdash; trip definitions with route references</li>
           <li><code>data/gtfs/routes.txt</code> &mdash; route metadata (Eurostar, Thalys, etc.)</li>
-          <li><code>data/gtfs/calendar.txt</code> &mdash; service day patterns</li>
+          <li><code>data/gtfs/calendar_dates.txt</code> &mdash; service date exceptions</li>
           <li><code>data/disruptions.json</code> &mdash; simulated signal failure at St Pancras</li>
         </ul>
         <p><strong>Key joins you'll use in M1:</strong> <code>stops.stop_id &rarr; stop_times.stop_id</code>,
         <code>stop_times.trip_id &rarr; trips.trip_id</code>, <code>trips.route_id &rarr; routes.route_id</code>,
         <code>disruptions.trip_id &rarr; trips.trip_id</code>.</p>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F4C2;</span> What You Downloaded</h3>
+        <div class="prompt-block" id="cmd-data-tree"><span class="prompt-label">tree</span>data/
+├── gtfs/                    # Static GTFS bundle
+│   ├── stops.txt            # 17 stations (St Pancras, Paris, Brussels, ...)
+│   ├── stop_times.txt       # Departure/arrival times per trip per stop
+│   ├── trips.txt            # Trip definitions &rarr; route references
+│   ├── routes.txt           # Route metadata (Eurostar, Thalys, ICE, ...)
+│   └── calendar_dates.txt   # Service date exceptions
+└── disruptions.json         # Simulated signal failure at St Pancras</div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F4C5;</span> GTFS Files &mdash; Quick Reference</h3>
+        <table class="data">
+          <thead><tr><th>File</th><th>Key columns</th><th>What it tells you</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>stops.txt</code></td>
+              <td><code>stop_id</code>, <code>stop_name</code>, <code>stop_lat</code>, <code>stop_lon</code></td>
+              <td>The 17 stations in the network with coordinates</td>
+            </tr>
+            <tr>
+              <td><code>stop_times.txt</code></td>
+              <td><code>trip_id</code>, <code>stop_id</code>, <code>arrival_time</code>, <code>departure_time</code>, <code>stop_sequence</code></td>
+              <td>When each trip stops at each station, in order</td>
+            </tr>
+            <tr>
+              <td><code>trips.txt</code></td>
+              <td><code>trip_id</code>, <code>route_id</code>, <code>service_id</code>, <code>trip_headsign</code></td>
+              <td>Each individual train service and which route it belongs to</td>
+            </tr>
+            <tr>
+              <td><code>routes.txt</code></td>
+              <td><code>route_id</code>, <code>route_short_name</code>, <code>route_long_name</code></td>
+              <td>Route metadata (e.g., "Eurostar London&ndash;Paris")</td>
+            </tr>
+            <tr>
+              <td><code>calendar_dates.txt</code></td>
+              <td><code>service_id</code>, <code>date</code>, <code>exception_type</code></td>
+              <td>Service date exceptions (additions/removals)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x26A0;&#xFE0F;</span> The Disruption File</h3>
+        <p><code>disruptions.json</code> simulates the signal failure. It contains:</p>
+        <table class="data">
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>affected_trips</code></td><td>List of <code>trip_id</code>s that are cancelled or delayed</td></tr>
+            <tr><td><code>delay_minutes</code></td><td>Delay magnitude per affected trip</td></tr>
+            <tr><td><code>status</code></td><td><code>cancelled</code> or <code>delayed</code></td></tr>
+            <tr><td><code>affected_stops</code></td><td>Which stops are impacted (primarily St Pancras)</td></tr>
+            <tr><td><code>cause</code></td><td><code>"signal_failure"</code></td></tr>
+            <tr><td><code>time_window</code></td><td>Start/end of the disruption period</td></tr>
+          </tbody>
+        </table>
+        <p>Your agent's <code>check_disruptions</code> tool will read this file and cross-reference it
+        with the GTFS schedule via <code>trip_id</code> / <code>stop_id</code>.</p>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F517;</span> How the Files Connect</h3>
+        <div class="map-wrap">
+          <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
+            <defs>
+              <marker id="fk" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+                <path d="M0,0 L7,2.5 L0,5" fill="#1a73e8"/>
+              </marker>
+              <marker id="fk2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+                <path d="M0,0 L7,2.5 L0,5" fill="#dc3545"/>
+              </marker>
+            </defs>
+            <!-- stops -->
+            <rect x="10" y="10" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="75" y="30" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">stops.txt</text>
+            <text x="75" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">stop_id, stop_name</text>
+            <!-- stop_times -->
+            <rect x="200" y="10" width="150" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="275" y="30" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">stop_times.txt</text>
+            <text x="275" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, stop_id, times</text>
+            <!-- trips -->
+            <rect x="200" y="80" width="150" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="275" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">trips.txt</text>
+            <text x="275" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, route_id</text>
+            <!-- routes -->
+            <rect x="410" y="80" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="475" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">routes.txt</text>
+            <text x="475" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">route_id, name</text>
+            <!-- disruptions -->
+            <rect x="410" y="10" width="150" height="50" rx="8" fill="#fde8ea" stroke="#dc3545" stroke-width="1.5"/>
+            <text x="485" y="30" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#dc3545">disruptions.json</text>
+            <text x="485" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, status, delay</text>
+            <!-- calendar -->
+            <rect x="10" y="80" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="75" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">calendar_dates.txt</text>
+            <text x="75" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">service_id, date</text>
+
+            <!-- FK lines -->
+            <line x1="140" y1="35" x2="198" y2="35" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
+            <text x="170" y="28" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">stop_id</text>
+
+            <line x1="275" y1="60" x2="275" y2="78" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
+            <text x="290" y="72" font-family="system-ui" font-size="7" fill="#888">trip_id</text>
+
+            <line x1="350" y1="105" x2="408" y2="105" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
+            <text x="380" y="98" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">route_id</text>
+
+            <line x1="140" y1="105" x2="198" y2="105" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
+            <text x="170" y="98" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">service_id</text>
+
+            <line x1="350" y1="35" x2="408" y2="35" stroke="#dc3545" stroke-width="1.5" marker-end="url(#fk2)"/>
+            <text x="380" y="28" text-anchor="middle" font-family="system-ui" font-size="7" fill="#dc3545">trip_id</text>
+
+            <!-- Legend -->
+            <text x="170" y="160" text-anchor="middle" font-family="system-ui" font-size="9" fill="#1a73e8" font-weight="600">GTFS joins (schedule)</text>
+            <line x1="80" y1="170" x2="260" y2="170" stroke="#1a73e8" stroke-width="1"/>
+            <text x="450" y="160" text-anchor="middle" font-family="system-ui" font-size="9" fill="#dc3545" font-weight="600">Disruption join</text>
+            <line x1="390" y1="170" x2="510" y2="170" stroke="#dc3545" stroke-width="1"/>
+            <text x="310" y="190" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888">The reconciliation pattern: schedule x disruption on trip_id</text>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -883,13 +1009,129 @@ Do NOT start building yet — this context is background only.</div>
       <div class="step-num">4</div>
       <span class="step-time">2 min</span>
       <h3>Open the "Before" Shot</h3>
-      <p>Open two browser tabs now, while they're still <strong>empty</strong> &mdash; this is your "before" picture:</p>
+      <p>Open two browser tabs now &mdash; this is your "before" picture:</p>
       <ol>
-        <li><strong><a href="https://console.cloud.google.com/gen-app-builder" target="_blank">Agent Platform console</a></strong> &mdash; no agents deployed yet, no registry entries, no policies.</li>
-        <li><strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a> app</strong> &mdash; no custom agents published yet.</li>
+        <li><strong><a href="https://console.cloud.google.com/gen-app-builder" target="_blank">Agent Platform console</a></strong> &mdash; no custom agents deployed yet, no registry entries, no policies.</li>
+        <li><strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a> app</strong> &mdash; you'll see a default <em>My Gemini Google Search App</em>. By the end, your transit-crisis agent will sit right alongside it.</li>
       </ol>
-      <p>By the end of the workshop, both will be populated with the agent you built.
-      See the <strong>Before &rarr; After</strong> section below for the full comparison.</p>
+      <p>By the end of the workshop, you'll be able to use your own agents in the Gemini Enterprise app,
+      just like you use Gemini today.</p>
+
+      <div class="callout callout-info" style="margin-top:1rem;">
+        <div class="callout-title">Why take a "Before" shot?</div>
+        <p>The console already has a default <em>My Gemini Google Search App</em>. That's Gemini working for you out of the box.
+        By 2:00, <strong>your own transit-crisis agent</strong> will sit right alongside it &mdash; proof that vibe-coding
+        produces <strong>real enterprise assets</strong> you can use just like Gemini.</p>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F4BB;</span> Agent Platform Console</h3>
+        <p>Open the <strong>Agent Platform console</strong> in a browser tab.</p>
+        <div class="before-after">
+          <div class="ba-card ba-before">
+            <div class="ba-label">Now (M0)</div>
+            <ul class="ba-items">
+              <li>Default Gemini search app only</li>
+              <li>No custom agents deployed</li>
+              <li>No registry entries</li>
+              <li>No gateway policies</li>
+            </ul>
+          </div>
+          <div class="ba-card ba-after">
+            <div class="ba-label">By 2:00 (M5)</div>
+            <ul class="ba-items">
+              <li>Agent Runtime instance</li>
+              <li>Sessions + Memory Bank</li>
+              <li>Registry entry with tools</li>
+              <li>Identity + Gateway + Model Armor</li>
+              <li>Eval scores + optimized prompt</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F4AC;</span> Gemini Enterprise App</h3>
+        <p>Open the <strong>Gemini Enterprise</strong> web app in another tab. You'll see <em>My Gemini Google Search App</em> &mdash; that's the default.</p>
+        <div class="before-after">
+          <div class="ba-card ba-before">
+            <div class="ba-label">Now (M0)</div>
+            <ul class="ba-items">
+              <li>Default Gemini search app</li>
+              <li>No custom agents yet</li>
+            </ul>
+          </div>
+          <div class="ba-card ba-after">
+            <div class="ba-label">By 2:00 (M5)</div>
+            <ul class="ba-items">
+              <li>Transit-crisis agent published</li>
+              <li>Sits alongside the default Gemini app</li>
+              <li>Any user can chat with it</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3><span class="icon">&#x1F5FA;&#xFE0F;</span> The BSGO Arc You'll Traverse</h3>
+        <div class="map-wrap">
+          <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;">
+            <defs>
+              <marker id="ar3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6" fill="#999"/>
+              </marker>
+            </defs>
+            <!-- M0 (you are here) -->
+            <rect x="5" y="30" width="90" height="70" rx="8" fill="#fff3e0" stroke="#fd7e14" stroke-width="2"/>
+            <text x="50" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="800" fill="#b45309">M0</text>
+            <text x="50" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Setup</text>
+            <text x="50" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">YOU ARE HERE</text>
+
+            <line x1="97" y1="65" x2="118" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+            <!-- M1 -->
+            <rect x="120" y="30" width="100" height="70" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+            <text x="170" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#1a73e8">M1 BUILD</text>
+            <text x="170" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent + Tools</text>
+            <text x="170" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">30 min</text>
+
+            <line x1="222" y1="65" x2="238" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+            <!-- M2 -->
+            <rect x="240" y="30" width="100" height="70" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
+            <text x="290" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#198754">M2 SCALE</text>
+            <text x="290" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Deploy + State</text>
+            <text x="290" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">25 min</text>
+
+            <line x1="342" y1="65" x2="358" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+            <!-- M3 -->
+            <rect x="360" y="30" width="100" height="70" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+            <text x="410" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#7c3aed">M3 GOVERN</text>
+            <text x="410" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Security</text>
+            <text x="410" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">25 min</text>
+
+            <line x1="462" y1="65" x2="478" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+            <!-- M4 -->
+            <rect x="480" y="30" width="100" height="70" rx="8" fill="#e0f7fa" stroke="#0891b2" stroke-width="1.5"/>
+            <text x="530" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#0891b2">M4 OPTIMIZE</text>
+            <text x="530" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Quality</text>
+            <text x="530" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">20 min</text>
+
+            <line x1="582" y1="65" x2="598" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
+
+            <!-- M5 -->
+            <rect x="600" y="30" width="90" height="70" rx="8" fill="#fff3e0" stroke="#b45309" stroke-width="1.5"/>
+            <text x="645" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#b45309">M5 ENGAGE</text>
+            <text x="645" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Publish</text>
+            <text x="645" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">10 min</text>
+
+            <!-- Module recap label -->
+            <text x="350" y="120" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888">Each module recap: What You Typed &rarr; What Ran &rarr; What You Can See &rarr; Why It Matters</text>
+          </svg>
+        </div>
+      </div>
     </div>
 
     <!-- Done-when -->
@@ -901,272 +1143,9 @@ Do NOT start building yet — this context is background only.</div>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Scenario context pasted into Antigravity</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data is downloaded into <code>data/gtfs/</code></div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Disruption file is at <code>data/disruptions.json</code></div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console is open (empty)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app is open (empty)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent Platform console is open</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Gemini Enterprise app is open (default search app visible)</div></li>
       </ul>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────────────────────────
-       DATA ORIENTATION
-       ───────────────────────────────────────────────────────────── -->
-  <div class="section-divider">
-    <h2>Data Orientation</h2>
-
-    <div class="callout callout-warning">
-      <div class="callout-title">Static Data Only &mdash; No Live APIs</div>
-      <p>All data is pre-downloaded and local. This keeps the lab 100% reliable in a room of 100+ people
-      on conference Wi-Fi. The focus is on the <em>platform</em>, not on feed reliability.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F4C2;</span> What You Downloaded</h3>
-      <div class="prompt-block" id="cmd-data-tree"><span class="prompt-label">tree</span>data/
-├── gtfs/                    # Static GTFS bundle
-│   ├── stops.txt            # 17 stations (St Pancras, Paris, Brussels, ...)
-│   ├── stop_times.txt       # Departure/arrival times per trip per stop
-│   ├── trips.txt            # Trip definitions → route references
-│   ├── routes.txt           # Route metadata (Eurostar, Thalys, ICE, ...)
-│   └── calendar.txt         # Service day patterns (weekday/weekend)
-└── disruptions.json         # Simulated signal failure at St Pancras</div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F4C5;</span> GTFS Files &mdash; Quick Reference</h3>
-      <table class="data">
-        <thead><tr><th>File</th><th>Key columns</th><th>What it tells you</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>stops.txt</code></td>
-            <td><code>stop_id</code>, <code>stop_name</code>, <code>stop_lat</code>, <code>stop_lon</code></td>
-            <td>The 17 stations in the network with coordinates</td>
-          </tr>
-          <tr>
-            <td><code>stop_times.txt</code></td>
-            <td><code>trip_id</code>, <code>stop_id</code>, <code>arrival_time</code>, <code>departure_time</code>, <code>stop_sequence</code></td>
-            <td>When each trip stops at each station, in order</td>
-          </tr>
-          <tr>
-            <td><code>trips.txt</code></td>
-            <td><code>trip_id</code>, <code>route_id</code>, <code>service_id</code>, <code>trip_headsign</code></td>
-            <td>Each individual train service and which route it belongs to</td>
-          </tr>
-          <tr>
-            <td><code>routes.txt</code></td>
-            <td><code>route_id</code>, <code>route_short_name</code>, <code>route_long_name</code></td>
-            <td>Route metadata (e.g., "Eurostar London&ndash;Paris")</td>
-          </tr>
-          <tr>
-            <td><code>calendar.txt</code></td>
-            <td><code>service_id</code>, <code>monday</code>&ndash;<code>sunday</code>, <code>start_date</code>, <code>end_date</code></td>
-            <td>Which days of the week each service runs</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x26A0;&#xFE0F;</span> The Disruption File</h3>
-      <p><code>disruptions.json</code> simulates the signal failure. It contains:</p>
-      <table class="data">
-        <thead><tr><th>Field</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>affected_trips</code></td><td>List of <code>trip_id</code>s that are cancelled or delayed</td></tr>
-          <tr><td><code>delay_minutes</code></td><td>Delay magnitude per affected trip</td></tr>
-          <tr><td><code>status</code></td><td><code>cancelled</code> or <code>delayed</code></td></tr>
-          <tr><td><code>affected_stops</code></td><td>Which stops are impacted (primarily St Pancras)</td></tr>
-          <tr><td><code>cause</code></td><td><code>"signal_failure"</code></td></tr>
-          <tr><td><code>time_window</code></td><td>Start/end of the disruption period</td></tr>
-        </tbody>
-      </table>
-      <p>Your agent's <code>check_disruptions</code> tool will read this file and cross-reference it
-      with the GTFS schedule via <code>trip_id</code> / <code>stop_id</code>.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F517;</span> How the Files Connect</h3>
-      <div class="map-wrap">
-        <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
-          <defs>
-            <marker id="fk" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-              <path d="M0,0 L7,2.5 L0,5" fill="#1a73e8"/>
-            </marker>
-            <marker id="fk2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-              <path d="M0,0 L7,2.5 L0,5" fill="#dc3545"/>
-            </marker>
-          </defs>
-          <!-- stops -->
-          <rect x="10" y="10" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="75" y="30" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">stops.txt</text>
-          <text x="75" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">stop_id, stop_name</text>
-          <!-- stop_times -->
-          <rect x="200" y="10" width="150" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="275" y="30" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">stop_times.txt</text>
-          <text x="275" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, stop_id, times</text>
-          <!-- trips -->
-          <rect x="200" y="80" width="150" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="275" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">trips.txt</text>
-          <text x="275" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, route_id</text>
-          <!-- routes -->
-          <rect x="410" y="80" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="475" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">routes.txt</text>
-          <text x="475" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">route_id, name</text>
-          <!-- disruptions -->
-          <rect x="410" y="10" width="150" height="50" rx="8" fill="#fde8ea" stroke="#dc3545" stroke-width="1.5"/>
-          <text x="485" y="30" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#dc3545">disruptions.json</text>
-          <text x="485" y="48" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">trip_id, status, delay</text>
-          <!-- calendar -->
-          <rect x="10" y="80" width="130" height="50" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="75" y="100" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="700" fill="#1a73e8">calendar.txt</text>
-          <text x="75" y="118" text-anchor="middle" font-family="system-ui" font-size="9" fill="#555">service_id, days</text>
-
-          <!-- FK lines -->
-          <line x1="140" y1="35" x2="198" y2="35" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
-          <text x="170" y="28" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">stop_id</text>
-
-          <line x1="275" y1="60" x2="275" y2="78" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
-          <text x="290" y="72" font-family="system-ui" font-size="7" fill="#888">trip_id</text>
-
-          <line x1="350" y1="105" x2="408" y2="105" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
-          <text x="380" y="98" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">route_id</text>
-
-          <line x1="140" y1="105" x2="198" y2="105" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#fk)"/>
-          <text x="170" y="98" text-anchor="middle" font-family="system-ui" font-size="7" fill="#888">service_id</text>
-
-          <line x1="350" y1="35" x2="408" y2="35" stroke="#dc3545" stroke-width="1.5" marker-end="url(#fk2)"/>
-          <text x="380" y="28" text-anchor="middle" font-family="system-ui" font-size="7" fill="#dc3545">trip_id</text>
-
-          <!-- Legend -->
-          <text x="170" y="160" text-anchor="middle" font-family="system-ui" font-size="9" fill="#1a73e8" font-weight="600">GTFS joins (schedule)</text>
-          <line x1="80" y1="170" x2="260" y2="170" stroke="#1a73e8" stroke-width="1"/>
-          <text x="450" y="160" text-anchor="middle" font-family="system-ui" font-size="9" fill="#dc3545" font-weight="600">Disruption join</text>
-          <line x1="390" y1="170" x2="510" y2="170" stroke="#dc3545" stroke-width="1"/>
-          <text x="310" y="190" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888">The reconciliation pattern: schedule x disruption on trip_id</text>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────────────────────────
-       BEFORE → AFTER
-       ───────────────────────────────────────────────────────────── -->
-  <div class="section-divider">
-    <h2>Platform Reveal #0 &mdash; The "Before" Shot</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">Why look at empty screens?</div>
-      <p>Opening the platform consoles <strong>now</strong>, while they're empty, creates the contrast.
-      By 2:00, every artifact slot you see below will be filled by what you built.
-      This is the visual proof that vibe-coding produces <strong>real enterprise assets</strong>.</p>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F4BB;</span> Agent Platform Console</h3>
-      <p>Open the <strong>Agent Platform console</strong> in a browser tab. Right now it's empty.</p>
-      <div class="before-after">
-        <div class="ba-card ba-before">
-          <div class="ba-label">Now (M0)</div>
-          <ul class="ba-items">
-            <li>No agents deployed</li>
-            <li>No registry entries</li>
-            <li>No gateway policies</li>
-            <li>No evaluation results</li>
-          </ul>
-        </div>
-        <div class="ba-card ba-after">
-          <div class="ba-label">By 2:00 (M5)</div>
-          <ul class="ba-items">
-            <li>Agent Runtime instance</li>
-            <li>Sessions + Memory Bank</li>
-            <li>Registry entry with tools</li>
-            <li>Identity + Gateway + Model Armor</li>
-            <li>Eval scores + optimized prompt</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F4AC;</span> Gemini Enterprise App</h3>
-      <p>Open the <strong>Gemini Enterprise</strong> web app in another tab. Also empty.</p>
-      <div class="before-after">
-        <div class="ba-card ba-before">
-          <div class="ba-label">Now (M0)</div>
-          <ul class="ba-items">
-            <li>No custom agents</li>
-            <li>Standard Gemini chat only</li>
-          </ul>
-        </div>
-        <div class="ba-card ba-after">
-          <div class="ba-label">By 2:00 (M5)</div>
-          <ul class="ba-items">
-            <li>Transit-crisis agent published</li>
-            <li>Any user can chat with it</li>
-            <li>No code knowledge needed</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F5FA;&#xFE0F;</span> The BSGO Arc You'll Traverse</h3>
-      <div class="map-wrap">
-        <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;">
-          <defs>
-            <marker id="ar3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-              <path d="M0,0 L8,3 L0,6" fill="#999"/>
-            </marker>
-          </defs>
-          <!-- M0 (you are here) -->
-          <rect x="5" y="30" width="90" height="70" rx="8" fill="#fff3e0" stroke="#fd7e14" stroke-width="2"/>
-          <text x="50" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="800" fill="#b45309">M0</text>
-          <text x="50" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Setup</text>
-          <text x="50" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">YOU ARE HERE</text>
-
-          <line x1="97" y1="65" x2="118" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
-
-          <!-- M1 -->
-          <rect x="120" y="30" width="100" height="70" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="170" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#1a73e8">M1 BUILD</text>
-          <text x="170" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Agent + Tools</text>
-          <text x="170" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">30 min</text>
-
-          <line x1="222" y1="65" x2="238" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
-
-          <!-- M2 -->
-          <rect x="240" y="30" width="100" height="70" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="1.5"/>
-          <text x="290" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#198754">M2 SCALE</text>
-          <text x="290" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Deploy + State</text>
-          <text x="290" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">25 min</text>
-
-          <line x1="342" y1="65" x2="358" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
-
-          <!-- M3 -->
-          <rect x="360" y="30" width="100" height="70" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
-          <text x="410" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#7c3aed">M3 GOVERN</text>
-          <text x="410" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Security</text>
-          <text x="410" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">25 min</text>
-
-          <line x1="462" y1="65" x2="478" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
-
-          <!-- M4 -->
-          <rect x="480" y="30" width="100" height="70" rx="8" fill="#e0f7fa" stroke="#0891b2" stroke-width="1.5"/>
-          <text x="530" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#0891b2">M4 OPTIMIZE</text>
-          <text x="530" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Quality</text>
-          <text x="530" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">20 min</text>
-
-          <line x1="582" y1="65" x2="598" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#ar3)"/>
-
-          <!-- M5 -->
-          <rect x="600" y="30" width="90" height="70" rx="8" fill="#fff3e0" stroke="#b45309" stroke-width="1.5"/>
-          <text x="645" y="52" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#b45309">M5 ENGAGE</text>
-          <text x="645" y="68" text-anchor="middle" font-family="system-ui" font-size="9" fill="#333">Publish</text>
-          <text x="645" y="82" text-anchor="middle" font-family="system-ui" font-size="8" fill="#888">10 min</text>
-
-          <!-- Module recap label -->
-          <text x="350" y="120" text-anchor="middle" font-family="system-ui" font-size="9" fill="#888">Each module recap: What You Typed → What Ran → What You Can See → Why It Matters</text>
-        </svg>
-      </div>
     </div>
   </div>
 
