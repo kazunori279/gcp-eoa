@@ -844,7 +844,12 @@ Do NOT start building yet — this context is background only.</div>
       <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
       and extract it into your project's <code>data/gtfs/</code> directory:</p>
       <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/</div>
-      <p>You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
+      <div class="callout callout-warning" style="margin-top:.5rem;">
+        <div class="callout-title">Fallback &mdash; if the official link is unavailable</div>
+        <p>A copy of the GTFS bundle is included in the workshop repo. Use this instead:</p>
+        <div class="prompt-block" id="cmd-download-gtfs-fallback"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs-fallback')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/</div>
+      </div>
+      <p>You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar_dates.txt</code>.</p>
       <p>Also download the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
       you'll layer on top of the schedule:</p>
       <div class="prompt-block" id="cmd-copy-disruptions"><button class="copy-btn" onclick="copyBlock('cmd-copy-disruptions')">Copy</button><span class="prompt-label">shell</span>! curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
