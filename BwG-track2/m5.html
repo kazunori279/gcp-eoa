@@ -285,15 +285,18 @@ for personalization.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY runs <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> publish</code> and:</p>
+        <p>AGY redeploys with <code>--agent-identity</code> for end-user identity propagation,
+        then runs <code>agents-cli publish gemini-enterprise</code> to register the agent with
+        the <code>explore-ai</code> app. It creates/updates <code>registration_results.md</code> with:</p>
         <ul>
-          <li>Registers the Agent Runtime agent with the Gemini Enterprise app</li>
-          <li>VPC-SC compliant &mdash; data stays within your security boundary</li>
-          <li>End-user identity passed for Memory Bank personalization</li>
+          <li>Agent registered in Gemini Enterprise app (<code>explore-ai</code>)</li>
+          <li><strong>Agent Identity</strong> enabled &mdash; end-user credentials propagated to Memory Bank for per-user personalization</li>
+          <li><strong>VPC-SC compliant</strong> &mdash; all downstream API calls run under the caller's IAM context</li>
+          <li>Links to the <strong>Gemini Enterprise console dashboard</strong> and <strong>Agent Engine Playground</strong></li>
         </ul>
-        <p>Switch to the <strong>Gemini Enterprise web app</strong> and, as a non-technical ops manager, chat:</p>
-        <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
-        <p><strong>What just happened:</strong> The pro-code thing you vibe-built is now a chat
+        <p>Open the <strong>Playground</strong> link from <code>registration_results.md</code> and test:</p>
+        <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">playground</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
+        <p><strong>What just happened:</strong> The pro-code agent you built is now a chat
         <strong>anyone in the organization</strong> can use. This is the "after" picture &mdash;
         compare it to the empty console you saw in M0.</p>
       </div>
@@ -312,7 +315,7 @@ for personalization.</div>
           <tr><td><strong>M1 &middot; Build</strong></td><td>Vibe-built agent + 3 tools by prompting</td><td>ADK project, reasoning trace</td></tr>
           <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td>Agent Runtime, Sessions, Memory Bank, Sandbox</td></tr>
           <tr><td><strong>M3 &middot; Govern</strong></td><td>Registered, identity-bound, policy-enforced</td><td>Registry, Identity, Gateway, Model Armor</td></tr>
-          <tr><td><strong>M4 &middot; Optimize</strong></td><td>100 scenarios, loss clusters, auto-optimized</td><td>Evaluation scores, optimized instruction</td></tr>
+          <tr><td><strong>M4 &middot; Optimize</strong></td><td>10 scenarios, LLM-as-judge scoring, instruction optimization</td><td>Evaluation scores, optimized instruction</td></tr>
           <tr><td><strong>M5 &middot; Engage</strong></td><td>Published for business users</td><td>Gemini Enterprise agent</td></tr>
         </tbody>
       </table>
