@@ -840,11 +840,11 @@ Do NOT start building yet — this context is background only.</div>
       <div class="step-num">3</div>
       <span class="step-time">3 min</span>
       <h3>Download the Data</h3>
-      <p>Download the <strong>static London GTFS bundle</strong> from the provided GCS / Drive link.
-      Place it into your project's <code>data/</code> directory:</p>
-      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs</div>
-      <p>Extract the GTFS bundle into <code>data/gtfs/</code>.
-      You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
+      <p>Download the <strong>Eurostar GTFS bundle</strong> (official public feed from
+      <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
+      and extract it into your project's <code>data/gtfs/</code> directory:</p>
+      <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/</div>
+      <p>You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
       <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
       you'll layer on top of the schedule. Place it at <code>data/disruptions.json</code>.</p>
       <p>Quick orientation (no deep analysis yet):</p>
