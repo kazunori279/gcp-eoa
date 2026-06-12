@@ -197,20 +197,6 @@
   .phase-optimize { background: var(--optimize-light); color: var(--optimize); }
   .phase-engage { background: var(--warning-light); color: #b45309; }
 
-  /* Beat table */
-  .beat-grid {
-    display: grid;
-    grid-template-columns: auto 1fr 1fr;
-    gap: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    font-size: .88rem;
-  }
-  .beat-grid > div { padding: .6rem .75rem; border-bottom: 1px solid var(--border); }
-  .beat-grid > div:nth-last-child(-n+3) { border-bottom: none; }
-  .beat-grid .bh { background: #f1f3f5; font-weight: 700; font-size: .82rem; }
-  .beat-num { font-weight: 800; color: var(--accent); }
 
   /* Station map SVG */
   .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
@@ -338,7 +324,7 @@
   @media (max-width: 700px) {
     .hero h1 { font-size: 1.6rem; }
     .phase-bar { grid-template-columns: repeat(3, 1fr); }
-    .beat-grid { font-size: .8rem; }
+
     .container { padding: 1rem .75rem; }
   }
 
@@ -710,32 +696,6 @@ Do NOT start building yet — this context is background only.</div>
        JOURNEY MAP
        ───────────────────────────────────────────────────────────── -->
     <h2>The Journey — Build &rarr; Scale &rarr; Govern &rarr; Optimize</h2>
-
-    <div class="card">
-      <h3><span class="icon">&#x1F3B5;</span> Module Recap Pattern (Every Module)</h3>
-      <p>Each module ends with the same four-part recap:</p>
-      <div class="beat-grid">
-        <div class="bh"><span class="beat-num">#</span></div>
-        <div class="bh">What happens</div>
-        <div class="bh">Why it matters</div>
-
-        <div><span class="beat-num">1</span></div>
-        <div><strong>The Prompt</strong> — what you type into Antigravity</div>
-        <div>Proves the "do it with a prompt" promise</div>
-
-        <div><span class="beat-num">2</span></div>
-        <div><strong>Under the Hood</strong> — which skill / ADK feature ran</div>
-        <div>Demystifies the automation</div>
-
-        <div><span class="beat-num">3</span></div>
-        <div><strong>Platform Reveal</strong> — see it in the Cloud console</div>
-        <div>Proves it's a real enterprise asset</div>
-
-        <div><span class="beat-num">4</span></div>
-        <div><strong>So-What</strong> — the enterprise value</div>
-        <div>Speaks to the platform-builder audience</div>
-      </div>
-    </div>
 
     <div class="card">
       <h3><span class="icon">&#x1F5D3;&#xFE0F;</span> Timeline</h3>
