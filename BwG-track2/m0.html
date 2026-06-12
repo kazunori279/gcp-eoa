@@ -602,7 +602,7 @@
 
     <div class="card">
       <h3><span class="icon">&#x1F3AF;</span> The Deliverable</h3>
-      <p>By the end of the workshop, a non-technical ops manager opens <strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a></strong> and types:</p>
+      <p>By the end of the workshop, a non-technical ops manager opens <strong><a href="https://cloud.google.com/gemini-enterprise" target="_blank">Gemini Enterprise</a></strong> and types:</p>
       <div class="prompt-block" id="cmd-gemini-prompt"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
       <p>And gets a <strong>concrete, verified answer</strong> with a specific reroute, departure time, and estimated arrival.
       The agent you build in M1 will be deployed (M2), governed (M3), optimized (M4), and published (M5) to make this work.</p>
@@ -815,6 +815,18 @@ Do NOT start building yet — this context is background only.</div>
       <div class="step-num">2</div>
       <span class="step-time">3 min</span>
       <h3>Verify Your Cockpit</h3>
+      <div class="card" style="margin-bottom:1rem;">
+        <h3><span class="icon">&#x1F6E0;&#xFE0F;</span> What is agents-cli?</h3>
+        <p><strong><a href="https://google.github.io/agents-cli/guide/getting-started/" target="_blank">agents-cli</a></strong>
+        is Google's CLI for the full agent development lifecycle &mdash; scaffold, deploy, evaluate, and publish &mdash;
+        all on top of the <a href="https://google.github.io/adk-docs/" target="_blank">Agent Development Kit (ADK)</a>.</p>
+        <p>It installs <strong>context-aware skills</strong> into your coding agent (Antigravity, Gemini CLI, Claude Code, etc.)
+        so you can describe what you want in natural language and let the skills handle the wiring:
+        project structure, deployment configs, eval harnesses, and more.</p>
+        <p>In this workshop, agents-cli is your primary tool. You'll use its skills in every module
+        from scaffolding (M1) through publishing (M5).</p>
+      </div>
+
       <p>Confirm that <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a></code> and its skills are installed:</p>
       <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
@@ -1007,7 +1019,7 @@ Do NOT start building yet — this context is background only.</div>
       <h3>Open the "Before" Shot</h3>
       <p>Open two browser tabs now &mdash; this is your "before" picture:</p>
       <ol>
-        <li><strong><a href="https://console.cloud.google.com/gen-app-builder" target="_blank">Agent Platform console</a></strong> &mdash; no custom agents deployed yet, no registry entries, no policies.</li>
+        <li><strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong> &mdash; no custom agents deployed yet, no registry entries, no policies.</li>
         <li><strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a> app</strong> &mdash; you'll see a default <em>My Gemini Google Search App</em>. By the end, your transit-crisis agent will sit right alongside it.</li>
       </ol>
       <p>By the end of the workshop, you'll be able to use your own agents in the Gemini Enterprise app,
