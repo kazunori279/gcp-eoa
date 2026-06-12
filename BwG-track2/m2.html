@@ -632,19 +632,6 @@
       endpoint, auto-scaling, and health monitoring. The <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> deploy</code> skill packages
       your ADK app and creates an Agent Runtime instance.</p>
 
-      <div class="callout callout-danger" style="margin-top:.75rem;">
-        <div class="callout-title">Pre-flight &mdash; verify auth before deploying</div>
-        <p>Auth failures mid-deploy are hard to recover from. Run this in your terminal (not through AGY):</p>
-        <div class="prompt-block" id="step1-auth"><button class="copy-btn" onclick="copyBlock('step1-auth')">Copy</button><span class="prompt-label">terminal</span>gcloud auth print-access-token > /dev/null && echo "Auth OK"</div>
-        <ul>
-          <li><strong>If it prints "Auth OK"</strong> &mdash; you're good, proceed to the AGY prompt below.</li>
-          <li><strong>If it fails in a lab / Qwiklabs environment</strong> &mdash; this is expected.
-          The lab's service account is pre-configured and <code>agents-cli deploy</code> will still work.
-          Skip this check and proceed. <strong>Do not let AGY try to fix auth</strong> &mdash; it will spiral.</li>
-          <li><strong>If it fails outside a lab</strong> &mdash; run <code>gcloud auth login</code> and re-authenticate before continuing.</li>
-        </ul>
-      </div>
-
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
