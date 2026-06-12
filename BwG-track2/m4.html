@@ -370,15 +370,16 @@ the disruption feed is unavailable.</div>
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY runs <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> eval</code> and generates:</p>
+      <p>AGY writes a Python script that generates 20 scenarios and runs them concurrently (async semaphore of 5).
+      Completes in <strong>~1.5 minutes</strong>. Saves a dataset (<code>st_pancras_20_scenarios.json</code>) and a report (<code>scenarios_run_report.md</code>).</p>
       <ul>
-        <li>100 synthetic commuter queries in different styles (direct, intent-based, vague, emotional)</li>
-        <li>Edge case environments (feed unavailable, empty data, multiple disruptions)</li>
-        <li>Traces collected for every scenario</li>
+        <li><strong>12 disrupted departures</strong> &mdash; cancelled/delayed St Pancras services, all 3 tools called</li>
+        <li><strong>4 inbound return legs</strong> &mdash; queries about returning to disrupted St Pancras</li>
+        <li><strong>2 unaffected routes</strong> &mdash; continental routes not impacted by London signal failure</li>
+        <li><strong>1 state &amp; memory</strong> &mdash; uses <code>set_home_station</code> then queries from session state</li>
+        <li><strong>1 offline feed edge case</strong> &mdash; disruptions.json temporarily removed; agent falls back to GTFS schedules and adds a disclaimer to check station departure boards</li>
       </ul>
-      <p><strong>What just happened:</strong> The eval skill orchestrated simulation at scale.
-      100 scenarios catch failures your one test query never will. See the
-      <strong>evaluation dashboard</strong> in the next step.</p>
+      <p>Target: <strong>100% pass rate (20/20)</strong>, every response ends with a recommended action.</p>
     </div>
   </div>
 
