@@ -294,19 +294,8 @@ for personalization.</div>
           <li><strong>VPC-SC compliant</strong> &mdash; all downstream API calls run under the caller's IAM context</li>
           <li>Links to the <strong>Gemini Enterprise console dashboard</strong> and <strong>Agent Engine Playground</strong></li>
         </ul>
-        <p>Open the <strong><a href="https://console.cloud.google.com/gemini-enterprise" target="_blank">Gemini Enterprise console</a></strong> and test your agent:</p>
-
-        <div class="callout callout-warning" style="margin-top:.75rem;">
-          <div class="callout-title">Select your agent first</div>
-          <p>The default "Core Assistant" uses Google Search, not your agent.
-          In the Gemini Enterprise chat, select <strong>"Transit-Crisis Agent"</strong> from the agent list
-          before sending your query. If you see two entries, pick the most recent one.</p>
-        </div>
-
-        <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
-        <p><strong>What just happened:</strong> The pro-code agent you built is now a chat
-        <strong>anyone in the organization</strong> can use. This is the "after" picture &mdash;
-        compare it to the empty console you saw in M0.</p>
+        <p><strong>What just happened:</strong> The pro-code agent you built is now registered
+        in Gemini Enterprise &mdash; ready for business users. You'll test it in Step 2.</p>
       </div>
     </div>
 
@@ -326,6 +315,16 @@ for personalization.</div>
         </ol>
         <p>In M0, these were empty. Now they show a production agent with identity, governance, and memory.</p>
       </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">Select your agent first</div>
+        <p>The default "Core Assistant" uses Google Search, not your agent.
+        In the Gemini Enterprise chat, select <strong>"Transit-Crisis Agent"</strong> from the agent list
+        before sending your query. If you see two entries, pick the most recent one.</p>
+      </div>
+
+      <p>Now test it as a business user:</p>
+      <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
 
       <p>Recap the <strong>BSGO journey</strong> and the artifacts now living in the platform:</p>
       <table class="data">
