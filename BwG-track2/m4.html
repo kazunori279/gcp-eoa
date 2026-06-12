@@ -389,16 +389,6 @@ the disruption feed is unavailable.</div>
     <span class="beat-badge beat-3">What You Can See in the Console</span>
     <h3>Score It &mdash; Multi-turn AutoRaters</h3>
 
-    <p>Next, AGY runs <code>agents-cli eval run</code> to score each scenario with LLM-as-judge grading.
-    This takes <strong>~5 minutes</strong> (sequential inference). While it runs:</p>
-
-    <div class="callout callout-info">
-      <div class="callout-title">While you wait &mdash; watch the eval logs</div>
-      <p>Open a second terminal tab and run:</p>
-    </div>
-    <div class="prompt-block">ls -lt artifacts/traces/          # watch traces appear as each scenario completes
-tail -f .google-agents-cli/*.log   # live eval runner output</div>
-
     <p>These are the metrics the AutoRater scores against:</p>
     <table class="data">
       <thead><tr><th>Metric</th><th>What it measures</th><th>How</th></tr></thead>
@@ -438,6 +428,14 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
 Analyze the failures and optimize my system instruction to fix
 the biggest cluster.</div>
     </div>
+
+    <div class="callout callout-info" style="margin-top:.75rem;">
+      <div class="callout-title">While you wait &mdash; watch the eval logs</div>
+      <p>AGY runs <code>agents-cli eval run</code> to score each scenario (~5 min, sequential).
+      Open a second terminal tab to watch progress:</p>
+    </div>
+    <div class="prompt-block">ls -lt artifacts/traces/          # watch traces appear as each scenario completes
+tail -f .google-agents-cli/*.log   # live eval runner output</div>
 
     <div class="callout callout-warning" style="margin-top:.75rem;">
       <div class="callout-title">AGY will ask to redeploy</div>
