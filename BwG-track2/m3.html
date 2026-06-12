@@ -174,6 +174,19 @@
     padding: .2rem .5rem; font-size: .7rem; cursor: pointer; font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .step-expected {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: .75rem;
+  }
+  .step-expected h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: .5rem;
+  }
 
   .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
   .map-wrap svg { max-width: 100%; height: auto; }
@@ -286,7 +299,6 @@
     <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
     <button class="tab-btn" data-tab="security" role="tab">Security Model</button>
     <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- TAB 1: STEP-BY-STEP -->
@@ -313,21 +325,31 @@
     <div class="step">
       <div class="step-num">2</div>
       <span class="step-time">6 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
       <h3>Agent Registry &mdash; The Control Tower</h3>
-      <p><strong>Hands-on step:</strong> Register your agent in the Registry.</p>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Register my deployed agent and its tools in the Agent Registry."</div>
-      <p><strong>Under the Hood:</strong> <code>agents-cli</code> / SDK registers the agent with A2A-style metadata:
-      name, version, description, tool catalog, and skills.</p>
-      <p><strong>Platform Reveal:</strong> Browse the <strong>Registry catalog</strong>:</p>
-      <ul>
-        <li>Your agent is listed with its name, version, and status</li>
-        <li>Tools are cataloged with their schemas, parameters, and descriptions</li>
-        <li>Other teams can discover and reuse your agent through the catalog</li>
-      </ul>
-      <p><strong>So-What:</strong> <strong>Tool versioning</strong> means if the GTFS source schema changes,
-      you update the tool centrally without breaking downstream consumers.</p>
+      <p>This is the hands-on step of the module. Register your deployed agent in the
+      enterprise Registry so it's discoverable, versioned, and its tools are cataloged.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
+        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Register my deployed agent and its tools in the Agent Registry.
+Include the agent name, version, description, and full tool catalog
+with schemas.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY registers the agent with A2A-style metadata:</p>
+        <ul>
+          <li>Agent listed in the <strong>Registry catalog</strong> with name, version, and status</li>
+          <li>All 3 tools cataloged with schemas, parameters, and descriptions</li>
+          <li>Other teams can discover and reuse your agent through the catalog</li>
+        </ul>
+        <p><strong>What just happened:</strong> Your agent is now a discoverable corporate asset.
+        <strong>Tool versioning</strong> means if the GTFS source schema changes, you update the
+        tool centrally without breaking downstream consumers. Browse the Registry in the
+        <strong>Agent Platform console</strong> to see it.</p>
+      </div>
     </div>
 
     <!-- Section 3: Agent Identity -->
@@ -526,66 +548,6 @@
     </div>
   </div>
 
-  <!-- TAB 4: AGENT CONTEXT -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>Structured context blocks for your coding agent. The hands-on step in this module
-      is the Registry registration &mdash; use the prompt below.</p>
-    </div>
-
-    <div class="card agent-section">
-      <h3>Antigravity Prompts</h3>
-      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
-      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; M3 Prompts</span>
-## Antigravity prompts for Module 3
-
-### Prompt 1 &mdash; Register (6 min, hands-on)
-"Register my deployed agent and its tools in the Agent Registry.
-Include the agent name, version, description, and full tool catalog
-with schemas."
-
-### The rest of M3 is guided demo &mdash; follow along:
-- Agent Identity: view IAM identity and least-privilege grants
-- Agent Gateway: view traffic routing and policy enforcement
-- Model Armor: watch a prompt injection get blocked</div>
-    </div>
-
-    <div class="card agent-section">
-      <h3>Combined Context (All-in-One for M3)</h3>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M3 Combined</span>
-# Module 3: GOVERN &mdash; Full Agent Context
-
-## Goal
-Turn the deployed agent into a governed corporate asset:
-discoverable, identity-bound, policy-enforced.
-
-## Hands-on step: Agent Registry registration
-Register the agent and its tools in the Agent Registry using
-agents-cli or the SDK. Include:
-- Agent name, version, description
-- Tool catalog with schemas (3 tools from M1)
-- A2A-style metadata for discoverability
-
-## Guided demo sections (observe, don't build)
-1. Agent Identity &mdash; IAM-based identity with mutual TLS + DPoP
-   - Least-privilege: read GTFS (yes), write data (no)
-2. Agent Gateway &mdash; all traffic routed through policy layer
-3. Model Armor &mdash; screens for prompt injection, PII, toxicity
-   - Demo: send "Ignore your rules..." &rarr; blocked
-
-## 4 governance layers
-1. Registry &mdash; discovery, versioning, tool catalog
-2. Identity &mdash; IAM, mutual TLS, least-privilege
-3. Gateway + Model Armor &mdash; network-layer policy enforcement
-4. Semantic governance &mdash; action boundaries, intent alignment
-
-## Success = agent in Registry + understanding of all 4 layers</div>
-    </div>
-  </div>
 
 </div><!-- /container -->
 
@@ -601,7 +563,7 @@ agents-cli or the SDK. Include:
 
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;

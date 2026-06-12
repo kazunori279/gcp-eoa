@@ -161,6 +161,19 @@
     padding: .2rem .5rem; font-size: .7rem; cursor: pointer; font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .step-expected {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: .75rem;
+  }
+  .step-expected h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: .5rem;
+  }
 
   .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
   .map-wrap svg { max-width: 100%; height: auto; }
@@ -265,7 +278,6 @@
   <div class="tabs" role="tablist">
     <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
     <button class="tab-btn" data-tab="arc" role="tab">The Full Arc</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- TAB 1: STEP-BY-STEP -->
@@ -276,27 +288,32 @@
     <div class="step">
       <div class="step-num">1</div>
       <span class="step-time">5 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
-      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
       <h3>Publish to Gemini Enterprise</h3>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Publish my agent to our Gemini Enterprise app so business users can use it."</div>
-      <p><strong>Under the Hood:</strong> <code>agents-cli publish</code>:</p>
-      <ul>
-        <li>Registers the Agent Runtime agent with the Gemini Enterprise app</li>
-        <li>VPC-SC compliant &mdash; data stays within your security boundary</li>
-        <li>Supports cross-project publishing</li>
-        <li>Passes the end-user's identity for personalization (Memory Bank integration)</li>
-      </ul>
+      <p>This is the payoff. The agent you built, scaled, governed, and optimized is about
+      to become a chat that anyone in the organization can use &mdash; no IDE, no code, no API calls.</p>
 
-      <div class="callout callout-success" style="margin-top:.75rem;">
-        <div class="callout-title">Platform Reveal &mdash; The Payoff</div>
-        <p>Switch to the <strong>Gemini Enterprise web app</strong>. As a <strong>non-technical ops manager</strong>,
-        simply chat:</p>
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
+        <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Publish my agent to our Gemini Enterprise app so business users
+can use it. Ensure VPC-SC compliance and pass end-user identity
+for personalization.</div>
       </div>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
-      <p>The pro-code thing you vibe-built is now a chat <strong>anyone in the organization</strong> can use.
-      No IDE, no code, no API calls &mdash; just a conversation.</p>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY runs <code>agents-cli publish</code> and:</p>
+        <ul>
+          <li>Registers the Agent Runtime agent with the Gemini Enterprise app</li>
+          <li>VPC-SC compliant &mdash; data stays within your security boundary</li>
+          <li>End-user identity passed for Memory Bank personalization</li>
+        </ul>
+        <p>Switch to the <strong>Gemini Enterprise web app</strong> and, as a non-technical ops manager, chat:</p>
+        <div class="prompt-block"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
+        <p><strong>What just happened:</strong> The pro-code thing you vibe-built is now a chat
+        <strong>anyone in the organization</strong> can use. This is the "after" picture &mdash;
+        compare it to the empty console you saw in M0.</p>
+      </div>
     </div>
 
     <!-- Step 2: Wrap -->
@@ -464,61 +481,7 @@
     </div>
   </div>
 
-  <!-- TAB 3: AGENT CONTEXT -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
 
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>Structured context blocks for your coding agent. M5 has one prompt &mdash; the publish step.</p>
-    </div>
-
-    <div class="card agent-section">
-      <h3>Antigravity Prompt</h3>
-      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
-      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; M5 Prompt</span>
-## Antigravity prompt for Module 5
-
-### Prompt 1 &mdash; Publish (5 min)
-"Publish my agent to our Gemini Enterprise app so business users
-can use it. Ensure VPC-SC compliance and pass end-user identity
-for personalization."</div>
-    </div>
-
-    <div class="card agent-section">
-      <h3>Combined Context (All-in-One for M5)</h3>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M5 Combined</span>
-# Module 5: ENGAGE &mdash; Full Agent Context
-
-## Goal
-Publish the governed, optimized agent to Gemini Enterprise so
-non-technical business users can chat with it.
-
-## Publish command
-Use agents-cli publish skill. This:
-- Registers the Agent Runtime agent with Gemini Enterprise
-- Ensures VPC-SC compliance (data stays in security boundary)
-- Supports cross-project publishing
-- Passes end-user identity for Memory Bank personalization
-
-## Test as a business user
-Switch to the Gemini Enterprise web app and chat:
-"Trains out of St Pancras are disrupted &mdash; what do I tell
-travelers heading to Paris?"
-
-The agent should answer with the same quality as in M4 &mdash;
-concrete reroute, specific times, one clear recommendation.
-
-## The full BSGO arc is complete:
-Build (ADK) &rarr; Scale (Runtime/Sessions/Memory/Sandbox) &rarr;
-Govern (Registry/Identity/Gateway/Model Armor) &rarr;
-Optimize (Quality Flywheel) &rarr; Engage (Gemini Enterprise)
-
-## Success = business user can chat with your agent in
-Gemini Enterprise and get a concrete, accurate answer</div>
-    </div>
-  </div>
 
 </div><!-- /container -->
 
@@ -534,7 +497,7 @@ Gemini Enterprise and get a concrete, accurate answer</div>
 
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;

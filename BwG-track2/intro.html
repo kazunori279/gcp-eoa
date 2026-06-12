@@ -441,7 +441,6 @@
     <button class="tab-btn" data-tab="cockpit" role="tab">Your Cockpit</button>
     <button class="tab-btn" data-tab="data" role="tab">The Data</button>
     <button class="tab-btn" data-tab="journey" role="tab">Journey Map</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────
@@ -562,6 +561,57 @@
           <text x="150" y="269" font-family="system-ui" font-size="9" fill="#888">Available for reroute</text>
         </svg>
       </div>
+    </div>
+
+    <div class="card agent-section">
+      <h3><span class="icon">&#x1F4E6;</span> Brief Your Coding Agent</h3>
+      <p>Paste this once into Antigravity to give your coding agent the scenario background.
+      It describes the mission and the crisis &mdash; no file paths, no build instructions.
+      Setup comes in M0, building starts in M1.</p>
+      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
+      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Paste into AGY</span>
+# Rush Hour: Transit-Crisis Agent — Scenario Background
+
+## What we're building
+A transit-crisis assistant for cross-border high-speed rail. A signal
+failure has disrupted peak-hour departures from London St Pancras.
+Hundreds of travelers need real-time answers: "Is my train running?
+How do I still get to Paris?"
+
+## Why an agent, not a chatbot
+A plain LLM knows timetables but not what's happening right now.
+Our agent must RECONCILE two data sources:
+- The published schedule ("what SHOULD happen") — static GTFS data
+- A disruption feed ("what IS happening") — which services are
+  cancelled or delayed, and why
+
+The join of schedule × disruption on trip_id/stop_id is the core
+pattern. Without it, the agent is guessing.
+
+## The network
+17 stations across UK, France, Belgium, Netherlands, and Germany.
+Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
+Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
+
+## What the agent must do
+1. Look up scheduled departures for a station and time window
+2. Check which of those services are disrupted (delayed/cancelled)
+3. Compute a concrete reroute avoiding disrupted services
+4. Present the answer calmly with specific times, stations, and
+   number of changes
+5. End with one clear recommended action
+
+## The crisis scenario
+A signal failure at the St Pancras throat during peak hours.
+Multiple Eurostar and cross-border services are affected — some
+cancelled outright, others delayed 15–45 minutes. Travelers need
+to know: which trains are still running, and what's the best
+alternative route to their destination?
+
+## What's next
+In the following modules you will set up your workspace (M0), then
+build the agent with 3 tools by prompting in Antigravity (M1).
+Do NOT start building yet — this context is background only.</div>
     </div>
   </div>
 
@@ -793,72 +843,6 @@
     </div>
   </div>
 
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 5: AGENT CONTEXT (machine-readable + human-readable)
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context — Feed This to Your Coding Agent</h2>
-
-    <div class="callout callout-warning">
-      <div class="callout-title">Scenario background only &mdash; do not build yet</div>
-      <p>This block orients your coding agent on <strong>what</strong> we're building and <strong>why</strong>.
-      It does <em>not</em> contain file paths, project setup, or build instructions &mdash; those come in
-      <strong>M0</strong> (workspace setup) and <strong>M1</strong> (build). Paste the context below
-      to give your agent the mission briefing, then move to M0.</p>
-    </div>
-
-    <!-- Combined scenario context (the only block in intro) -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4E6;</span> Mission Briefing</h3>
-      <p>Paste this once to give your coding agent the scenario background.
-      It describes the mission and the crisis &mdash; no file paths, no build instructions.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; Combined</span>
-# Rush Hour: Transit-Crisis Agent — Scenario Background
-
-## What we're building
-A transit-crisis assistant for cross-border high-speed rail. A signal
-failure has disrupted peak-hour departures from London St Pancras.
-Hundreds of travelers need real-time answers: "Is my train running?
-How do I still get to Paris?"
-
-## Why an agent, not a chatbot
-A plain LLM knows timetables but not what's happening right now.
-Our agent must RECONCILE two data sources:
-- The published schedule ("what SHOULD happen") — static GTFS data
-- A disruption feed ("what IS happening") — which services are
-  cancelled or delayed, and why
-
-The join of schedule × disruption on trip_id/stop_id is the core
-pattern. Without it, the agent is guessing.
-
-## The network
-17 stations across UK, France, Belgium, Netherlands, and Germany.
-Key routes: London–Paris (Eurostar), London–Brussels, London–Amsterdam,
-Paris–Brussels, Brussels–Cologne, Paris–Strasbourg, Paris–Lyon–Marseille.
-
-## What the agent must do
-1. Look up scheduled departures for a station and time window
-2. Check which of those services are disrupted (delayed/cancelled)
-3. Compute a concrete reroute avoiding disrupted services
-4. Present the answer calmly with specific times, stations, and
-   number of changes
-5. End with one clear recommended action
-
-## The crisis scenario
-A signal failure at the St Pancras throat during peak hours.
-Multiple Eurostar and cross-border services are affected — some
-cancelled outright, others delayed 15–45 minutes. Travelers need
-to know: which trains are still running, and what's the best
-alternative route to their destination?
-
-## What's next
-In the following modules you will set up your workspace (M0), then
-build the agent with 3 tools by prompting in Antigravity (M1).
-Do NOT start building yet — this context is background only.</div>
-    </div>
-  </div>
-
 </div><!-- /container -->
 
 <script>
@@ -876,7 +860,7 @@ Do NOT start building yet — this context is background only.</div>
   function copyBlock(id) {
     const el = document.getElementById(id);
     // Strip the label span text and get just the content
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;

@@ -362,6 +362,19 @@
     font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .step-expected {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: .75rem;
+  }
+  .step-expected h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: .5rem;
+  }
 
   /* SVG wrap */
   .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
@@ -521,7 +534,6 @@
     <button class="tab-btn active" data-tab="steps" role="tab">Step-by-Step</button>
     <button class="tab-btn" data-tab="artifacts" role="tab">Platform Artifacts</button>
     <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- TAB 1: STEP-BY-STEP -->
@@ -539,67 +551,70 @@
     <div class="step">
       <div class="step-num">1</div>
       <span class="step-time">9 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
-      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
       <h3>Deploy to Agent Runtime</h3>
-      <p>Type this prompt into Antigravity:</p>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Deploy this agent to Agent Runtime and give me an endpoint I can query."</div>
-      <p><strong>Under the Hood:</strong> The <code>agents-cli</code> <strong>deploy</strong> skill:</p>
-      <ul>
-        <li>Packages the ADK app (agent code, tools, data, dependencies)</li>
-        <li>Creates a managed <strong>Agent Runtime instance</strong></li>
-        <li>Provisions a live endpoint you can query over HTTPS</li>
-        <li>Uses Terraform / Cloud Build under the covers</li>
-      </ul>
-      <p><strong>Platform Reveal:</strong> Open the <strong>Agent Platform console</strong>:</p>
-      <ul>
-        <li>Find your deployed agent in the list</li>
-        <li>Open the <strong>Runtime instance</strong> &mdash; see the endpoint URL, health status, and version</li>
-        <li>Send a query to the live endpoint and see it answered in the cloud</li>
-      </ul>
-      <p><strong>So-What:</strong> Serverless scale for a demand spike &mdash; zero to thousands of concurrent users
-      without you managing infrastructure. Your M1 code deploys without changes.</p>
+      <p>Your agent is working locally. Now let's make it a managed cloud service with an HTTPS
+      endpoint, auto-scaling, and health monitoring. The <code>agents-cli deploy</code> skill packages
+      your ADK app and creates an Agent Runtime instance.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
+        <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Deploy this agent to Agent Runtime and give me an endpoint I can
+query. Package the agent code, tools, and data together.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY runs <code>agents-cli deploy</code> and creates:</p>
+        <ul>
+          <li>A managed <strong>Agent Runtime instance</strong> with an HTTPS endpoint</li>
+          <li>Health status showing "HEALTHY" in the Agent Platform console</li>
+          <li>The same crisis query returns a correct answer from the cloud endpoint</li>
+        </ul>
+        <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
+        of concurrent users without managing infrastructure. Your M1 code deployed without changes.
+        Open the <strong>Agent Platform console</strong> to see your deployed agent.</p>
+      </div>
     </div>
 
     <!-- Step 2: Sessions + Memory -->
     <div class="step">
       <div class="step-num">2</div>
       <span class="step-time">9 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
       <h3>Remember the Commuter &mdash; Sessions + Memory Bank</h3>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Add session state for the current conversation and long-term memory so the agent remembers my home station across visits."</div>
+      <p>Right now, each query is stateless. We need two kinds of memory: <strong>Sessions</strong>
+      (short-term, within a conversation) so "What about the next one?" makes sense, and
+      <strong>Memory Bank</strong> (long-term, cross-session) so the agent remembers your home station next week.</p>
 
-      <div class="card" style="margin-top:1rem;">
-        <h3>Sessions (Short-term)</h3>
-        <p>Keep the thread of one disruption conversation coherent across turns. The agent remembers
-        what you already asked within a session &mdash; no repetition needed.</p>
-        <p><strong>Example:</strong> "What about the 14:05?" makes sense because the agent remembers you
-        were asking about St Pancras to Paris.</p>
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
+        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Add session state for the current conversation and long-term memory
+so the agent remembers my home station across visits. Use ADK's
+session service for short-term state and Memory Bank for cross-session
+personalization.</div>
       </div>
 
-      <div class="card">
-        <h3>Memory Bank (Long-term, Cross-session)</h3>
-        <p>Remember the commuter's <strong>home station</strong> and <strong>frequent routes</strong> so next time
-        it personalizes automatically.</p>
-        <p><strong>Example:</strong> In a <em>new</em> session next week: "Your usual 18:02 to Brussels is on time today."</p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY configures two state layers:</p>
+        <ul>
+          <li><strong>Sessions</strong> &mdash; multi-turn coherence within a conversation. "What about the 14:05?" works because the agent remembers you were asking about St Pancras to Paris.</li>
+          <li><strong>Memory Bank</strong> &mdash; cross-session recall. Set your home station, start a new session, and the agent greets you with "Your usual 18:02 to Brussels is on time today."</li>
+        </ul>
+        <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
+        not app code you maintain. See the <strong>Platform Artifacts</strong> tab for details on each.</p>
       </div>
-
-      <p><strong>Platform Reveal:</strong> Show a memory being written, then start a <em>new</em> session that recalls it.
-      The agent greets you with context it remembered.</p>
-      <p><strong>So-What:</strong> Personalization and continuity are <strong>managed services</strong>, not app code you maintain.</p>
     </div>
 
     <!-- Step 3: Sandbox -->
     <div class="step">
       <div class="step-num">3</div>
       <span class="step-time">5 min</span>
-      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
-      <span class="beat-badge beat-4">Beat 4 &middot; So-What</span>
       <h3>Safe Math &mdash; Code Execution Sandbox</h3>
       <p>The reroute computation and any model-generated Python run inside an <strong>isolated,
-      secure sandbox</strong> &mdash; not on the host runtime.</p>
+      secure sandbox</strong> &mdash; not on the host runtime. This is already configured as part of
+      Agent Runtime.</p>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">
         <div class="callout-title">Why this matters for platform owners</div>
@@ -608,8 +623,12 @@
         A compromised prompt can't exfiltrate data or harm the host.</p>
       </div>
 
-      <p><strong>Under the Hood:</strong> The Code Execution sandbox is a managed service &mdash; ephemeral containers
-      spun up per execution, destroyed after. No persistent state.</p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>The Code Execution sandbox is active as part of Agent Runtime. Tool computations
+        (like <code>compute_reroute</code>'s BFS pathfinding) run in ephemeral containers that are
+        destroyed after each execution &mdash; no persistent state, no host access.</p>
+      </div>
     </div>
 
     <!-- Done-when -->
@@ -779,120 +798,6 @@
     </div>
   </div>
 
-  <!-- TAB 4: AGENT CONTEXT -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>Structured context blocks for your coding agent. Copy a block and paste it into
-      Antigravity's context, or point the agent at this file.</p>
-    </div>
-
-    <!-- Block 1: M2 task -->
-    <div class="card agent-section">
-      <h3>M2 Task Description</h3>
-      <p>What the coding agent needs to accomplish in this module.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-task')">Copy</button>
-      <div class="agent-ctx" id="ctx-task"><span class="agent-ctx-label">Agent Context &middot; M2 Task</span>
-## Module 2: SCALE &mdash; Task Description
-
-### Goal
-Deploy the working agent from M1 to Agent Runtime, add session
-state and long-term memory, and configure the code execution sandbox.
-
-### Steps
-1. Deploy to Agent Runtime using agents-cli deploy skill
-   - Package the ADK app (agent, tools, data, dependencies)
-   - Create a managed Runtime instance with an HTTPS endpoint
-2. Add Sessions (short-term) for conversation continuity
-   - Multi-turn coherence within a single disruption conversation
-3. Add Memory Bank (long-term) for cross-session personalization
-   - Store the commuter's home station, recall it in new sessions
-4. Verify the Code Execution sandbox is active
-   - Tool computations run in isolated, ephemeral containers
-
-### Success criteria
-- Deployed endpoint answers the crisis question correctly
-- Session state maintains context across conversation turns
-- Memory Bank stores and recalls the commuter's home station
-- A new session greets the user with their remembered context</div>
-    </div>
-
-    <!-- Block 2: Antigravity prompts -->
-    <div class="card agent-section">
-      <h3>Antigravity Prompts (Copy &amp; Paste)</h3>
-      <p>The exact prompts to use in Antigravity for each step.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
-      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; Prompts</span>
-## Antigravity prompts for Module 2
-
-### Prompt 1 &mdash; Deploy (9 min)
-"Deploy this agent to Agent Runtime and give me an endpoint I can
-query. Package the agent code, tools, and data together."
-
-### Prompt 2 &mdash; Sessions + Memory (9 min)
-"Add session state for the current conversation and long-term memory
-so the agent remembers my home station across visits. Use ADK's
-session service for short-term state and Memory Bank for cross-session
-personalization."
-
-### Prompt 3 &mdash; Test (5 min)
-"Query the deployed endpoint with: 'My 13:31 St Pancras&ndash;Paris
-service is affected &mdash; how do I still get to Paris?'
-Then set my home station to 'London St Pancras' in memory.
-Start a new session and verify the agent remembers it."</div>
-    </div>
-
-    <!-- Block 3: Combined -->
-    <div class="card agent-section">
-      <h3>Combined Context (All-in-One for M2)</h3>
-      <p>A single block with everything the coding agent needs for Module 2.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M2 Combined</span>
-# Module 2: SCALE &mdash; Full Agent Context
-
-## Goal
-Deploy the M1 agent to Agent Runtime. Add state management
-(Sessions + Memory Bank) and secure compute (Code Execution sandbox).
-
-## Platform artifacts to create
-1. Agent Runtime instance &mdash; managed HTTPS endpoint, auto-scaling
-2. Sessions &mdash; short-term conversation state (multi-turn coherence)
-3. Memory Bank &mdash; long-term cross-session memory (home station, prefs)
-4. Code Execution sandbox &mdash; isolated compute for tool code
-
-## Deploy command
-Use agents-cli deploy skill. The same ADK project from M1 deploys
-without modification. The skill packages agent + tools + data.
-
-## Sessions (ADK session service)
-- Maintains turn history within a conversation
-- User asks "What about the next one?" &mdash; agent knows the context
-- Scoped by session_id, managed by the platform
-
-## Memory Bank
-- Key-value store scoped by user_id
-- Write: agent.memory.set("home_station", "London St Pancras")
-- Read: recalled at session start for personalization
-- Example: "Your usual 18:02 to Brussels is on time today."
-
-## Code Execution sandbox
-- Isolated containers for tool computations
-- Resource limits: CPU, memory, time
-- Network isolation: no egress to host or external services
-- Ephemeral: destroyed after each execution
-
-## Test
-1. Query deployed endpoint with the M1 crisis question
-2. Set home station in memory
-3. Start new session &mdash; verify agent recalls home station
-4. Verify multi-turn coherence: ask follow-up without repeating context
-
-## Success = deployed, stateful, personalized, sandboxed agent</div>
-    </div>
-  </div>
-
 </div><!-- /container -->
 
 <script>
@@ -907,7 +812,7 @@ without modification. The skill packages agent + tools + data.
 
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;

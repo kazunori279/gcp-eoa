@@ -353,6 +353,19 @@
     font-family: var(--font);
   }
   .copy-btn:hover { background: #444; color: #ddd; }
+  .step-expected {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: .75rem;
+  }
+  .step-expected h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: .5rem;
+  }
 
   /* Before/after */
   .before-after {
@@ -496,7 +509,6 @@
     <button class="tab-btn" data-tab="crisis" role="tab">Crisis Briefing</button>
     <button class="tab-btn" data-tab="data" role="tab">Data Orientation</button>
     <button class="tab-btn" data-tab="before" role="tab">Before &rarr; After</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────
@@ -543,6 +555,11 @@
         </tbody>
       </table>
       <p style="margin-top:.5rem;">The mantra: <strong>"Describe the outcome; let the skills do the wiring."</strong></p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
+        by the coding agent. Your cockpit is ready.</p>
+      </div>
     </div>
 
     <!-- Step 3 -->
@@ -568,6 +585,21 @@ mkdir -p data/gtfs
         <li><code>disruptions.json</code> &mdash; which services are cancelled/delayed and why</li>
       </ul>
       <p>Switch to the <strong>Data Orientation</strong> tab for the full breakdown.</p>
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>Your workspace has this data layout:</p>
+        <ul>
+          <li><code>data/gtfs/stops.txt</code> &mdash; 17 stations with coordinates</li>
+          <li><code>data/gtfs/stop_times.txt</code> &mdash; departure/arrival per trip per stop</li>
+          <li><code>data/gtfs/trips.txt</code> &mdash; trip definitions with route references</li>
+          <li><code>data/gtfs/routes.txt</code> &mdash; route metadata (Eurostar, Thalys, etc.)</li>
+          <li><code>data/gtfs/calendar.txt</code> &mdash; service day patterns</li>
+          <li><code>data/disruptions.json</code> &mdash; simulated signal failure at St Pancras</li>
+        </ul>
+        <p><strong>Key joins you'll use in M1:</strong> <code>stops.stop_id &rarr; stop_times.stop_id</code>,
+        <code>stop_times.trip_id &rarr; trips.trip_id</code>, <code>trips.route_id &rarr; routes.route_id</code>,
+        <code>disruptions.trip_id &rarr; trips.trip_id</code>.</p>
+      </div>
     </div>
 
     <!-- Step 4 -->
@@ -960,240 +992,6 @@ mkdir -p data/gtfs
     </div>
   </div>
 
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 5: AGENT CONTEXT
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>Structured context blocks for your coding agent (Antigravity or any LLM-powered IDE).
-      Copy a block and paste it into the agent's context, or point the agent at this file.
-      Each block is self-contained and designed for machine consumption.</p>
-    </div>
-
-    <!-- Block 1: Post-M0 state -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4CB;</span> Post-M0 State</h3>
-      <p>What the coding agent should know about the workspace after Module 0 is complete.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-state')">Copy</button>
-      <div class="agent-ctx" id="ctx-state"><span class="agent-ctx-label">Agent Context &middot; State After M0</span>
-## Current state: Module 0 complete, ready for Module 1 (BUILD)
-
-### What has been done
-- Antigravity (agentic IDE) is open and ready
-- agents-cli is installed with skills: scaffold, deploy, eval, optimize, publish, observe
-- Static data is downloaded and in place (see workspace layout below)
-- Agent Platform console and Gemini Enterprise are open but EMPTY
-- No agent code exists yet — that's Module 1
-
-### What has NOT been done yet
-- No ADK project scaffolded
-- No agent code, no tools, no system instruction
-- No deployment, no governance, no evaluation
-- The agent does not exist yet
-
-### Next step: Module 1 (BUILD)
-Scaffold an ADK agent project and implement three tools:
-1. get_scheduled_departures — query GTFS for station departures
-2. check_disruptions — read disruptions.json for affected services
-3. compute_reroute — find alternative route avoiding disruptions</div>
-    </div>
-
-    <!-- Block 2: Workspace layout -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4C1;</span> Workspace Layout</h3>
-      <p>The file structure after M0 setup (data downloaded, no agent code yet).</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-workspace')">Copy</button>
-      <div class="agent-ctx" id="ctx-workspace"><span class="agent-ctx-label">Agent Context &middot; Workspace</span>
-## Workspace layout after M0
-
-workshop-project/
-├── data/
-│   ├── gtfs/                    # Static GTFS bundle (downloaded)
-│   │   ├── stops.txt            # 17 stations: St Pancras, Paris GdN, Lille,
-│   │   │                        #   Calais, Brussels, Amsterdam, Rotterdam,
-│   │   │                        #   Antwerp, Cologne, Frankfurt, + others
-│   │   ├── stop_times.txt       # Departure/arrival per trip per stop
-│   │   ├── trips.txt            # trip_id → route_id, service_id
-│   │   ├── routes.txt           # route_id → name (Eurostar, Thalys, etc.)
-│   │   └── calendar.txt         # service_id → day-of-week patterns
-│   └── disruptions.json         # Simulated signal failure at St Pancras
-│                                #   Fields: affected_trips, delay_minutes,
-│                                #   status, affected_stops, cause, time_window
-└── (no agent code yet — created in M1)</div>
-    </div>
-
-    <!-- Block 3: Data schema -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4CA;</span> Data Schema Reference</h3>
-      <p>Column-level detail for each data file. Essential for implementing tools.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-schema')">Copy</button>
-      <div class="agent-ctx" id="ctx-schema"><span class="agent-ctx-label">Agent Context &middot; Data Schema</span>
-## Data schema reference
-
-### GTFS files (CSV, in data/gtfs/)
-
-stops.txt:
-  stop_id        — unique station identifier
-  stop_name      — human-readable name (e.g., "London St Pancras")
-  stop_lat       — latitude
-  stop_lon       — longitude
-
-stop_times.txt:
-  trip_id        — FK to trips.txt
-  stop_id        — FK to stops.txt
-  arrival_time   — HH:MM:SS
-  departure_time — HH:MM:SS
-  stop_sequence  — integer order within the trip
-
-trips.txt:
-  trip_id        — unique trip identifier
-  route_id       — FK to routes.txt
-  service_id     — FK to calendar.txt
-  trip_headsign  — destination display name
-
-routes.txt:
-  route_id       — unique route identifier
-  route_short_name — e.g., "ES" (Eurostar)
-  route_long_name  — e.g., "Eurostar London-Paris"
-
-calendar.txt:
-  service_id     — unique service pattern identifier
-  monday..sunday — 0 or 1 (runs on this day?)
-  start_date     — YYYYMMDD
-  end_date       — YYYYMMDD
-
-### Disruption file (JSON, at data/disruptions.json)
-
-{
-  "disruption_id": "string",
-  "cause": "signal_failure",
-  "location": "London St Pancras",
-  "time_window": {
-    "start": "ISO datetime",
-    "end": "ISO datetime"
-  },
-  "affected_trips": [
-    {
-      "trip_id": "string — FK to trips.txt",
-      "status": "cancelled | delayed",
-      "delay_minutes": "integer (0 if cancelled)",
-      "affected_stops": ["stop_id", ...]
-    }
-  ]
-}
-
-### Key joins for the reconciliation pattern
-- stop_times.stop_id → stops.stop_id (which station)
-- stop_times.trip_id → trips.trip_id (which trip)
-- trips.route_id → routes.route_id (which route/operator)
-- trips.service_id → calendar.service_id (which days)
-- disruptions.affected_trips[].trip_id → trips.trip_id (is it disrupted?)</div>
-    </div>
-
-    <!-- Block 4: Environment -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x2699;&#xFE0F;</span> Environment &amp; Stack</h3>
-      <p>Technical environment details for the coding agent.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-env')">Copy</button>
-      <div class="agent-ctx" id="ctx-env"><span class="agent-ctx-label">Agent Context &middot; Environment</span>
-## Environment and stack
-
-- Python: 3.11+
-- Package manager: uv (not pip). Use pyproject.toml + `uv sync` / `uv run`
-- Model: gemini-3.5-flash (GA-stable, fast, strong tool-calling)
-- Framework: Google ADK (Agent Development Kit)
-- CLI: agents-cli with skills (installed via `uvx google-agents-cli setup`)
-  Skills: scaffold, deploy, eval, optimize, publish, observe
-- IDE: Antigravity (agentic IDE — you prompt, it builds)
-- Data: ALL local static files. No live API calls. No external dependencies.
-- GTFS data is read-only — the agent never modifies it
-- Disruption data is read-only — simulated, not live</div>
-    </div>
-
-    <!-- Block 5: M1 preview -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F3AC;</span> What Comes Next: M1 BUILD Prompts</h3>
-      <p>The prompts you'll use in Module 1 to scaffold and build the agent.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-m1preview')">Copy</button>
-      <div class="agent-ctx" id="ctx-m1preview"><span class="agent-ctx-label">Agent Context &middot; M1 Preview</span>
-## Module 1 (BUILD) — prompts preview
-
-### Step 1: Scaffold the project
-"Scaffold a new ADK agent project for a transit assistant that will
-answer commuter questions during a service disruption. Use Python,
-gemini-3.5-flash as the model, and uv for dependency management."
-
-### Step 2: Add the three tools
-"Add three tools to the agent:
-1. get_scheduled_departures — queries the static GTFS data in data/gtfs/
-   to list departures from a given station within a time window.
-2. check_disruptions — reads data/disruptions.json and returns affected
-   services, delays, and cancellations.
-3. compute_reroute — given origin, destination, and current disruptions,
-   finds an alternative route across the station network.
-Write clear docstrings and type hints so the model can call them
-correctly. The critical pattern is reconciliation: joining schedule
-data with disruption data on trip_id and stop_id."
-
-### Step 3: Write system instruction
-"Write the system instruction: stay calm and factual, always reconcile
-schedule against disruptions before answering, never invent a train,
-proactively compute reroutes, and end with one clear recommended action."
-
-### Step 4: Test locally
-"Run the agent in the ADK local playground. Test with this query:
-'My 13:31 St Pancras to Paris service is affected — how do I still
-get to Paris?'"</div>
-    </div>
-
-    <!-- Block 6: Combined -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4E6;</span> Combined Context (All-in-One for M0)</h3>
-      <p>A single block with everything the coding agent needs after M0. Paste once to onboard.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M0 Combined</span>
-# Module 0 Complete — Ready for Module 1 (BUILD)
-
-## Mission
-Build an ADK agent that answers commuter questions during a signal
-failure at London St Pancras. It reconciles a static GTFS schedule
-("what should happen") against a simulated disruption feed ("what is
-happening") and returns verified delays and concrete reroutes across
-the 17-station cross-border rail network (UK/FR/BE/NL/DE).
-
-## Stack
-- Framework: Google ADK | Model: gemini-3.5-flash | Language: Python 3.11+
-- Package manager: uv | CLI: agents-cli (scaffold/deploy/eval/optimize/publish)
-- Data: local static files only, no live APIs
-
-## Workspace (after M0)
-data/gtfs/stops.txt            — 17 stations with coordinates
-data/gtfs/stop_times.txt       — departure/arrival per trip per stop
-data/gtfs/trips.txt            — trip_id → route_id, service_id
-data/gtfs/routes.txt           — route metadata (Eurostar, Thalys, etc.)
-data/gtfs/calendar.txt         — service day patterns
-data/disruptions.json          — simulated signal failure: affected trips,
-                                 delays, cancellations, cause, time window
-
-## Key joins
-stop_times.stop_id → stops.stop_id
-stop_times.trip_id → trips.trip_id → routes.route_id
-trips.service_id → calendar.service_id
-disruptions.affected_trips[].trip_id → trips.trip_id
-
-## Preview of Module 1 (BUILD)
-In the next module you will scaffold an ADK agent, implement 3 tools
-(get_scheduled_departures, check_disruptions, compute_reroute), write
-a system instruction, and test locally.
-
-Do NOT start building yet — this context is a workspace summary only.
-Wait for the Module 1 instructions.</div>
-    </div>
-  </div>
-
 </div><!-- /container -->
 
 <script>
@@ -1210,7 +1008,7 @@ Wait for the Module 1 instructions.</div>
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;

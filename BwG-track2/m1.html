@@ -364,6 +364,21 @@
   }
   .copy-btn:hover { background: #444; color: #ddd; }
 
+  /* Expected result box inside steps */
+  .step-expected {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: .75rem;
+  }
+  .step-expected h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: .5rem;
+  }
+
   /* SVG wrap */
   .map-wrap { text-align: center; margin: 1rem 0; overflow-x: auto; }
   .map-wrap svg { max-width: 100%; height: auto; }
@@ -537,7 +552,6 @@
     <button class="tab-btn" data-tab="tools" role="tab">The 3 Tools</button>
     <button class="tab-btn" data-tab="beats" role="tab">4-Beat Rhythm</button>
     <button class="tab-btn" data-tab="test" role="tab">Test &amp; Trace</button>
-    <button class="tab-btn" data-tab="agent" role="tab">Agent Context</button>
   </div>
 
   <!-- ─────────────────────────────────────────────────────────────
@@ -550,37 +564,75 @@
     <div class="step">
       <div class="step-num">1</div>
       <span class="step-time">7 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
-      <span class="beat-badge beat-2">Beat 2 &middot; Under the Hood</span>
       <h3>Scaffold the Project</h3>
-      <p>Type this prompt into Antigravity:</p>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Scaffold a new ADK agent project for a transit assistant that will answer commuter questions during a service disruption."</div>
-      <p><strong>Under the Hood:</strong> The <code>agents-cli</code> <strong>scaffold</strong> skill creates:</p>
-      <ul>
-        <li>ADK project structure with <code>pyproject.toml</code></li>
-        <li>Agent definition (<code>agent.py</code>)</li>
-        <li>Tools module (<code>tools.py</code>)</li>
-        <li>Environment config (<code>.env</code>)</li>
-      </ul>
-      <p><strong>So-What:</strong> A consistent, deployable project shape from a single sentence &mdash;
-      the same template that later deploys cleanly to Agent Runtime in M2.</p>
+      <p>We need a project structure before we can write any agent code. The ADK scaffold
+      creates a standard layout with <code>pyproject.toml</code>, agent definition, tools module,
+      and environment config &mdash; the same shape that later deploys cleanly to Agent Runtime in M2.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
+        <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Scaffold a new ADK agent project for a transit assistant that will
+answer commuter questions during a service disruption. Use Python,
+gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
+change it), and uv for dependency management.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY creates the project directory with these files:</p>
+        <ul>
+          <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code></li>
+          <li><code>agent/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
+          <li><code>agent/tools.py</code> &mdash; empty tools module (we fill this next)</li>
+          <li><code>agent/__init__.py</code> &mdash; exports the agent</li>
+          <li><code>.env</code> &mdash; environment config</li>
+        </ul>
+        <p><strong>What just happened:</strong> The <code>agents-cli scaffold</code> skill generated a
+        consistent, deployable project shape from a single sentence. This is a real engineering
+        artifact, not a demo &mdash; the exact same structure deploys to cloud in M2.</p>
+      </div>
     </div>
 
     <!-- Step 2: Tools -->
     <div class="step">
       <div class="step-num">2</div>
       <span class="step-time">12 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
       <h3>Give the Agent Its Tools</h3>
-      <p>The agent needs three deterministic capabilities. You describe them; the coding agent writes them:</p>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Add three tools: one to list scheduled departures from a station, one to read the disruption file and flag affected services, and one to compute an alternative route avoiding the disruption. Write clear docstrings and type hints so the model can call them."</div>
-      <p>See the <strong>The 3 Tools</strong> tab for the full specification of each tool.</p>
+      <p>A plain LLM knows timetables but not what's happening <em>right now</em>. Our agent needs
+      three deterministic tools to reconcile the published schedule against the live disruption feed.
+      The magic is the <strong>join</strong> of schedule &times; disruption on <code>trip_id</code> / <code>stop_id</code> &mdash;
+      this is <em>the</em> pattern that makes the agent more than a chatbot.</p>
 
-      <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">Teaching Beat: The Reconciliation Pattern</div>
-        <p>The magic is the <strong>join</strong> of schedule &times; disruption on <code>trip_id</code> / <code>stop_id</code>.
-        This is <em>the</em> pattern that makes the agent more than a chatbot. Without it,
-        the agent knows timetables but not reality.</p>
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
+        <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Add three tools to the agent:
+1. get_scheduled_departures &mdash; queries the static GTFS data in data/gtfs/
+   to list departures from a given station within a time window.
+   Join stops.txt, stop_times.txt, trips.txt, and routes.txt.
+2. check_disruptions &mdash; reads data/disruptions.json and returns affected
+   services, delays, and cancellations. Supports filtering by station
+   or trip_id.
+3. compute_reroute &mdash; given origin, destination, and departure_after,
+   builds a station graph from GTFS connections, removes disrupted
+   services, and finds an alternative path (BFS/shortest-path).
+Write clear docstrings and type hints so the model can call them
+correctly. The critical pattern is reconciliation: joining schedule
+data with disruption data on trip_id and stop_id.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY creates three functions in <code>tools.py</code> with type hints and docstrings:</p>
+        <ul>
+          <li><strong>Tool 1: <code>get_scheduled_departures</code></strong> &mdash; "what SHOULD happen" (GTFS query)</li>
+          <li><strong>Tool 2: <code>check_disruptions</code></strong> &mdash; "what IS happening" (disruption feed)</li>
+          <li><strong>Tool 3: <code>compute_reroute</code></strong> &mdash; "how to get there anyway" (BFS pathfinding)</li>
+        </ul>
+        <p><strong>What just happened:</strong> The agent now has deterministic capabilities.
+        The reconciliation pattern (Tool 1 + Tool 2 joined on <code>trip_id</code>) is the core
+        of what makes this agent useful. See the <strong>The 3 Tools</strong> tab for detailed specs.</p>
       </div>
     </div>
 
@@ -588,28 +640,67 @@
     <div class="step">
       <div class="step-num">3</div>
       <span class="step-time">4 min</span>
-      <span class="beat-badge beat-1">Beat 1 &middot; The Prompt</span>
       <h3>Write the System Instruction</h3>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">antigravity</span>"Write the system instruction: stay calm and factual, always reconcile schedule against disruptions before answering, never invent a train, and end with one clear recommended action."</div>
-      <p><strong>So-What:</strong> The system instruction is <strong>behavior as an engineering asset</strong> &mdash;
-      explicit, reviewable, version-controlled. Not a vibe. This is what governance and
-      optimization will target in later modules.</p>
+      <p>The system instruction defines the agent's behavior as an engineering asset &mdash;
+      explicit, reviewable, version-controlled. This is what governance (M3) and
+      optimization (M4) will target in later modules.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
+        <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Write the system instruction for the agent: stay calm and factual,
+always reconcile schedule against disruptions before answering,
+never invent a train, proactively compute reroutes when services are
+disrupted, and end every response with one clear recommended action.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY updates <code>agent.py</code> with a system instruction that includes these rules:</p>
+        <ol>
+          <li>Always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code> before answering</li>
+          <li>Never invent a train &mdash; only reference trips in the GTFS data</li>
+          <li>Proactively call <code>compute_reroute</code> when services are disrupted</li>
+          <li>Stay calm and factual; end with one clear recommended action</li>
+        </ol>
+        <p><strong>What just happened:</strong> The system instruction is not a vibe &mdash; it's a
+        specification. In M3 you'll see how governance enforces it; in M4 you'll
+        measure how well the agent follows it.</p>
+      </div>
     </div>
 
     <!-- Step 4: Run locally -->
     <div class="step">
       <div class="step-num">4</div>
       <span class="step-time">5 min</span>
-      <span class="beat-badge beat-3">Beat 3 &middot; Platform Reveal</span>
       <h3>Run It Locally &mdash; The Playground</h3>
-      <p>Launch the ADK local web playground:</p>
-      <div class="prompt-block"><span class="prompt-label">shell</span>adk web</div>
-      <p>Try the crisis question:</p>
-      <div class="prompt-block prompt-antigravity"><span class="prompt-label">playground</span>"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still get to Paris?"</div>
-      <p><strong>Platform Reveal:</strong> Open the <strong>reasoning trace</strong> &mdash; see the tool calls
-      and the order the agent chose. You can inspect <em>why</em> the agent did what it did.</p>
-      <p><strong>So-What:</strong> Traceability is the foundation for governance (M3) and optimization (M4).</p>
-      <p>See the <strong>Test &amp; Trace</strong> tab for what to look for in the trace.</p>
+      <p>Time to see the agent in action. Launch the ADK local web playground and
+      send the crisis question. Watch the reasoning trace to see <em>why</em> the agent
+      does what it does.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
+        <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Run the agent in the ADK local playground (adk web). Test with:
+"My 13:31 St Pancras&ndash;Paris service is affected &mdash; how do I still
+get to Paris?"
+Verify the reasoning trace shows all 3 tools being called.</div>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>The agent answers the crisis question by calling all 3 tools in sequence:</p>
+        <ol>
+          <li><code>get_scheduled_departures("St Pancras", "13:00")</code> &mdash; finds the 13:31 service</li>
+          <li><code>check_disruptions(station_name="St Pancras")</code> &mdash; confirms it's disrupted</li>
+          <li><code>compute_reroute("St Pancras", "Paris", "13:31")</code> &mdash; finds an alternative</li>
+        </ol>
+        <p>The response ends with a concrete recommendation: a specific train, with times,
+        stations, and number of changes.</p>
+        <p><strong>What just happened:</strong> The reasoning trace proves the agent is reconciling
+        data, not guessing. This traceability is the foundation for governance (M3) and
+        optimization (M4). See the <strong>Test &amp; Trace</strong> tab for what to look for.</p>
+      </div>
     </div>
 
     <!-- Backup -->
@@ -904,279 +995,6 @@
     </div>
   </div>
 
-  <!-- ─────────────────────────────────────────────────────────────
-       TAB 5: AGENT CONTEXT
-       ───────────────────────────────────────────────────────────── -->
-  <div id="tab-agent" class="tab-panel">
-    <h2>Agent Context &mdash; Feed This to Your Coding Agent</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">What is this tab?</div>
-      <p>Structured context blocks for your coding agent. Copy a block and paste it into
-      Antigravity's context, or point the agent at this file.</p>
-    </div>
-
-    <!-- Block 1: M1 task -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F3AF;</span> M1 Task Description</h3>
-      <p>What the coding agent needs to accomplish in this module.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-task')">Copy</button>
-      <div class="agent-ctx" id="ctx-task"><span class="agent-ctx-label">Agent Context &middot; M1 Task</span>
-## Module 1: BUILD — Task Description
-
-### Goal
-Build a working, multi-tool ADK transit-crisis agent that runs locally
-in the ADK playground. The agent reconciles a GTFS schedule against a
-disruption feed and recommends concrete reroutes.
-
-### Steps
-1. Scaffold a new ADK agent project (use agents-cli scaffold skill)
-2. Implement 3 tools in tools.py (see tool specs below)
-3. Write the system instruction in agent.py
-4. Test in ADK local playground with: "My 13:31 St Pancras–Paris
-   service is affected — how do I still get to Paris?"
-
-### Success criteria
-- Agent calls all 3 tools when answering a disruption question
-- Agent returns a concrete reroute with specific times and stations
-- Agent never invents a train — only references trips in the GTFS data
-- Reasoning trace shows the tool call sequence clearly</div>
-    </div>
-
-    <!-- Block 2: Tool implementations -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F527;</span> Tool Specifications</h3>
-      <p>Detailed specs for the 3 tools the coding agent should implement.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-tools')">Copy</button>
-      <div class="agent-ctx" id="ctx-tools"><span class="agent-ctx-label">Agent Context &middot; Tool Specs</span>
-## Tool Specifications for tools.py
-
-All tools should use ADK's FunctionTool pattern. Write clear docstrings
-and type hints — the model uses these to decide when/how to call tools.
-
-### Tool 1: get_scheduled_departures
-Purpose: Query "what SHOULD be running" from static GTFS data.
-Signature:
-  def get_scheduled_departures(
-      station_name: str,
-      time_window_start: str,
-      time_window_end: str = None
-  ) -> list[dict]:
-Behavior:
-  1. Look up station in data/gtfs/stops.txt by stop_name
-  2. Find departures in data/gtfs/stop_times.txt matching stop_id
-     within the time window
-  3. Join with data/gtfs/trips.txt on trip_id for route info
-  4. Join with data/gtfs/routes.txt on route_id for route name
-  5. Return list of dicts: {trip_id, route_name, destination,
-     departure_time, stop_sequence}
-Key joins: stops.stop_id → stop_times.stop_id,
-           stop_times.trip_id → trips.trip_id,
-           trips.route_id → routes.route_id
-
-### Tool 2: check_disruptions
-Purpose: Read "what IS happening" from the disruption feed.
-Signature:
-  def check_disruptions(
-      station_name: str = None,
-      trip_id: str = None
-  ) -> list[dict]:
-Behavior:
-  1. Read data/disruptions.json
-  2. Filter by station_name or trip_id if provided
-  3. Return list of dicts: {trip_id, affected_stops, delay_minutes,
-     status ("cancelled"|"delayed"), cause, time_window}
-
-### Tool 3: compute_reroute
-Purpose: Find alternative route avoiding disrupted services.
-Signature:
-  def compute_reroute(
-      origin: str,
-      destination: str,
-      departure_after: str
-  ) -> dict:
-Behavior:
-  1. Build a station graph from data/gtfs/stop_times.txt connections
-  2. Get current disruptions (call check_disruptions internally
-     or read disruptions.json)
-  3. Remove disrupted trips from available connections
-  4. BFS/shortest-path from origin to destination
-  5. Return: {route: [{departure_time, arrival_time, station_from,
-     station_to, trip_id, route_name}], total_journey_time,
-     num_changes}
-
-### Critical: The Reconciliation Pattern
-The agent MUST call Tool 1 + Tool 2 before answering any disruption
-question. The join of schedule × disruption on trip_id/stop_id is
-the core pattern. Tool 3 is used when a reroute is needed.
-The system instruction must enforce this sequence.</div>
-    </div>
-
-    <!-- Block 3: System instruction -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4DD;</span> System Instruction</h3>
-      <p>The system instruction to write for the agent.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-instruction')">Copy</button>
-      <div class="agent-ctx" id="ctx-instruction"><span class="agent-ctx-label">Agent Context &middot; System Instruction</span>
-## System instruction for agent.py
-
-You are a transit assistant for cross-border rail services departing
-from London St Pancras. A signal failure is disrupting services.
-
-Rules:
-1. ALWAYS reconcile the published schedule against the disruption feed
-   before answering. Call get_scheduled_departures AND check_disruptions
-   for every query — never answer from memory alone.
-2. NEVER invent a train service. Only reference trips that exist in the
-   GTFS data. If no data is available, say so.
-3. When a service is disrupted, proactively call compute_reroute to
-   offer a concrete alternative. Include departure time, route, and
-   number of changes.
-4. Stay calm and factual. Travelers are stressed — be concise, clear,
-   and reassuring without overpromising.
-5. End every response with ONE clear recommended action
-   (e.g., "Take the 14:05 via Brussels Midi, arriving Paris 17:32").
-6. If the disruption feed is unavailable or returns an error, tell the
-   user you cannot confirm live status and recommend they check
-   departure boards.</div>
-    </div>
-
-    <!-- Block 4: Project structure -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4C1;</span> Expected Project Structure</h3>
-      <p>What the workspace should look like after M1 is complete.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-structure')">Copy</button>
-      <div class="agent-ctx" id="ctx-structure"><span class="agent-ctx-label">Agent Context &middot; Project Structure</span>
-## Expected project structure after M1
-
-workshop-project/
-├── data/
-│   ├── gtfs/
-│   │   ├── stops.txt
-│   │   ├── stop_times.txt
-│   │   ├── trips.txt
-│   │   ├── routes.txt
-│   │   └── calendar.txt
-│   └── disruptions.json
-├── agent/
-│   ├── __init__.py          # Exports the agent
-│   ├── agent.py             # Agent definition:
-│   │                        #   - model = "gemini-3.5-flash"
-│   │                        #   - instruction = system prompt
-│   │                        #   - tools = [get_scheduled_departures,
-│   │                        #              check_disruptions,
-│   │                        #              compute_reroute]
-│   └── tools.py             # Three FunctionTool implementations
-│                            #   with docstrings and type hints
-├── pyproject.toml           # Dependencies: google-adk, etc.
-├── .env                     # GOOGLE_CLOUD_PROJECT, GOOGLE_GENAI_USE_VERTEXAI
-└── README.md
-
-## Key ADK patterns used
-- Agent class with model, instruction, tools
-- FunctionTool: each Python function with docstrings becomes a tool
-- Model: gemini-3.5-flash
-- Local playground: `adk web` for development testing</div>
-    </div>
-
-    <!-- Block 5: Antigravity prompts -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F3AC;</span> Antigravity Prompts (Copy &amp; Paste)</h3>
-      <p>The exact prompts to use in Antigravity for each step.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-prompts')">Copy</button>
-      <div class="agent-ctx" id="ctx-prompts"><span class="agent-ctx-label">Agent Context &middot; Prompts</span>
-## Antigravity prompts for Module 1
-
-### Prompt 1 — Scaffold (7 min)
-"Scaffold a new ADK agent project for a transit assistant that will
-answer commuter questions during a service disruption. Use Python,
-gemini-3.5-flash as the model (this is the correct model ID — do not
-change it), and uv for dependency management."
-
-### Prompt 2 — Add tools (12 min)
-"Add three tools to the agent:
-1. get_scheduled_departures — queries the static GTFS data in data/gtfs/
-   to list departures from a given station within a time window.
-   Join stops.txt, stop_times.txt, trips.txt, and routes.txt.
-2. check_disruptions — reads data/disruptions.json and returns affected
-   services, delays, and cancellations. Supports filtering by station
-   or trip_id.
-3. compute_reroute — given origin, destination, and departure_after,
-   builds a station graph from GTFS connections, removes disrupted
-   services, and finds an alternative path (BFS/shortest-path).
-Write clear docstrings and type hints so the model can call them
-correctly. The critical pattern is reconciliation: joining schedule
-data with disruption data on trip_id and stop_id."
-
-### Prompt 3 — System instruction (4 min)
-"Write the system instruction for the agent: stay calm and factual,
-always reconcile schedule against disruptions before answering,
-never invent a train, proactively compute reroutes when services are
-disrupted, and end every response with one clear recommended action."
-
-### Prompt 4 — Test (5 min)
-"Run the agent in the ADK local playground (adk web). Test with:
-'My 13:31 St Pancras–Paris service is affected — how do I still
-get to Paris?'
-Verify the reasoning trace shows all 3 tools being called."</div>
-    </div>
-
-    <!-- Block 6: Combined -->
-    <div class="card agent-section">
-      <h3><span class="icon">&#x1F4E6;</span> Combined Context (All-in-One for M1)</h3>
-      <p>A single block with everything the coding agent needs for Module 1.</p>
-      <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
-      <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Agent Context &middot; M1 Combined</span>
-# Module 1: BUILD — Full Agent Context
-
-## Goal
-Build a multi-tool ADK transit-crisis agent that runs locally.
-Reconciles GTFS schedule × disruption feed → verified reroutes.
-
-## Stack
-- Framework: Google ADK | Model: gemini-3.5-flash | Python 3.11+ | uv
-- Scaffold with: agents-cli scaffold skill
-- Note: gemini-3.5-flash is the correct model ID — do not change it.
-
-## Data (already in place from M0)
-- data/gtfs/ — stops.txt, stop_times.txt, trips.txt, routes.txt, calendar.txt
-- data/disruptions.json — simulated signal failure at St Pancras
-
-## 3 Tools to implement in tools.py
-
-### 1. get_scheduled_departures(station_name, time_start, time_end?)
-Query GTFS for departures. Join: stops → stop_times → trips → routes.
-Return: [{trip_id, route_name, destination, departure_time}]
-
-### 2. check_disruptions(station_name?, trip_id?)
-Read disruptions.json. Filter by station or trip.
-Return: [{trip_id, affected_stops, delay_minutes, status, cause}]
-
-### 3. compute_reroute(origin, destination, departure_after)
-Build station graph from GTFS, remove disrupted trips, BFS.
-Return: {route: [{from, to, depart, arrive, trip_id}],
-         total_time, num_changes}
-
-## Core pattern: Reconciliation
-Agent MUST call Tool 1 + Tool 2 before answering. JOIN on trip_id.
-Tool 3 when reroute needed.
-
-## System instruction rules
-1. Always reconcile schedule vs disruptions before answering
-2. Never invent a train — only reference trips in the GTFS data
-3. Proactively compute reroutes when services are disrupted
-4. Stay calm and factual; end with one clear recommended action
-5. If disruption feed unavailable, say so and recommend boards
-
-## Test
-Query: "My 13:31 St Pancras–Paris service is affected — how do I
-still get to Paris?"
-Expected trace: Tool 1 → Tool 2 → Tool 3 → concrete reroute answer.
-
-## Success = agent calls all 3 tools and recommends a specific
-alternative with times, stations, and number of changes.</div>
-    </div>
-  </div>
 
 </div><!-- /container -->
 
@@ -1194,7 +1012,7 @@ alternative with times, stations, and number of changes.</div>
   // Copy blocks
   function copyBlock(id) {
     const el = document.getElementById(id);
-    const text = el.innerText.replace(/^Agent Context · [A-Za-z0-9 ]+\n/, '').trim();
+    const text = el.innerText.replace(/^(Agent Context · [A-Za-z0-9 ]+|Paste into AGY)\n/, '').trim();
     navigator.clipboard.writeText(text).then(() => {
       const btn = el.parentElement.querySelector('.copy-btn');
       const orig = btn.textContent;
