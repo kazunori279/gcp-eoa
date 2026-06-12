@@ -661,11 +661,12 @@ status polling fails, just tell me and I will check the console.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Fallback &mdash; check the console if CLI status polling fails</div>
-        <p>Deployment takes 5&ndash;10 minutes. If <code>agents-cli deploy --status</code> hits
-        transient auth errors, open the
+        <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
+        <p>This is an intermittent Cloud Shell issue. Try running the deploy again in your terminal:</p>
+        <div class="prompt-block" id="step1-retry"><button class="copy-btn" onclick="copyBlock('step1-retry')">Copy</button><span class="prompt-label">terminal</span>agents-cli deploy --no-confirm-project</div>
+        <p>If it still fails, open the
         <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong>
-        to verify deployment status visually. Don't let AGY spin on retries.</p>
+        to check whether the deployment actually went through. Don't let AGY spin on retries.</p>
       </div>
 
       <div class="step-expected">
