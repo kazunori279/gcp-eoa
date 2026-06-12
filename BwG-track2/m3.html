@@ -322,21 +322,21 @@
   </div>
 
   <div class="govern-card">
-    <h4><span class="gov-num">1</span> Agent Registry</h4>
+    <h4><span class="gov-num">1</span> <a href="https://docs.cloud.google.com/agent-registry/overview" target="_blank">Agent Registry</a></h4>
     <p><strong>Threat:</strong> Agent sprawl &mdash; nobody knows which agents exist, what tools they call, or what version is running.</p>
     <p><strong>Protection:</strong> Every agent is registered with its name, version, tool catalog, and A2A metadata.
     Teams discover agents through the catalog. Tool schemas are versioned centrally.</p>
   </div>
 
   <div class="govern-card" style="border-color:#1a73e8;">
-    <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> Agent Identity (IAM)</h4>
+    <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">Agent Identity</a> (IAM)</h4>
     <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
     <p><strong>Protection:</strong> Every agent gets an IAM identity with mutual TLS and DPoP attestation.
     Least-privilege grants scope what the agent can access. A stolen token is useless without the attested context.</p>
   </div>
 
   <div class="govern-card" style="border-color:#dc3545;">
-    <h4 style="color:#dc3545;"><span class="gov-num" style="background:#dc3545;">3</span> Agent Gateway + Model Armor</h4>
+    <h4 style="color:#dc3545;"><span class="gov-num" style="background:#dc3545;">3</span> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview" target="_blank">Agent Gateway</a> + <a href="https://docs.cloud.google.com/model-armor/overview" target="_blank">Model Armor</a></h4>
     <p><strong>Threat:</strong> Prompt injection, jailbreaks, PII leakage, toxicity.</p>
     <p><strong>Protection:</strong> All traffic flows through the Gateway. Model Armor screens requests and responses
     at the network layer &mdash; before the agent's reasoning loop even fires. One policy protects all agents.</p>

@@ -602,7 +602,7 @@
 
     <div class="card">
       <h3><span class="icon">&#x1F3AF;</span> The Deliverable</h3>
-      <p>By the end of the workshop, a non-technical ops manager opens <strong>Gemini Enterprise</strong> and types:</p>
+      <p>By the end of the workshop, a non-technical ops manager opens <strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a></strong> and types:</p>
       <div class="prompt-block" id="cmd-gemini-prompt"><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
       <p>And gets a <strong>concrete, verified answer</strong> with a specific reroute, departure time, and estimated arrival.
       The agent you build in M1 will be deployed (M2), governed (M3), optimized (M4), and published (M5) to make this work.</p>
@@ -815,13 +815,13 @@ Do NOT start building yet — this context is background only.</div>
       <div class="step-num">2</div>
       <span class="step-time">3 min</span>
       <h3>Verify Your Cockpit</h3>
-      <p>Confirm that <code>agents-cli</code> and its skills are installed:</p>
+      <p>Confirm that <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a></code> and its skills are installed:</p>
       <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">shell</span>! uvx google-agents-cli setup</div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
       <table class="data">
         <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
         <tbody>
-          <tr><td><code>scaffold</code></td><td>Ask: <em>"Can you scaffold an ADK project?"</em></td></tr>
+          <tr><td><code>scaffold</code></td><td>Ask: <em>"Can you scaffold an <a href="https://google.github.io/adk-docs/" target="_blank">ADK</a> project?"</em></td></tr>
           <tr><td><code>deploy</code></td><td>Ask: <em>"Can you deploy to Agent Runtime?"</em></td></tr>
           <tr><td><code>eval</code></td><td>Ask: <em>"Can you run evaluations?"</em></td></tr>
           <tr><td><code>publish</code></td><td>Ask: <em>"Can you publish to Gemini Enterprise?"</em></td></tr>
@@ -840,13 +840,14 @@ Do NOT start building yet — this context is background only.</div>
       <div class="step-num">3</div>
       <span class="step-time">3 min</span>
       <h3>Download the Data</h3>
-      <p>Download the <strong>Eurostar GTFS bundle</strong> (official public feed from
+      <p>Download the <strong>Eurostar <a href="https://gtfs.org/" target="_blank">GTFS</a> bundle</strong> (official public feed from
       <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
       and extract it into your project's <code>data/gtfs/</code> directory:</p>
       <div class="prompt-block" id="cmd-download-gtfs"><button class="copy-btn" onclick="copyBlock('cmd-download-gtfs')">Copy</button><span class="prompt-label">shell</span>! mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/</div>
       <p>You should see: <code>stops.txt</code>, <code>stop_times.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>calendar.txt</code>.</p>
-      <p>Also grab the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
-      you'll layer on top of the schedule. Place it at <code>data/disruptions.json</code>.</p>
+      <p>Also download the <strong>disruption file</strong> (<code>disruptions.json</code>) &mdash; the simulated signal failure
+      you'll layer on top of the schedule:</p>
+      <div class="prompt-block" id="cmd-copy-disruptions"><button class="copy-btn" onclick="copyBlock('cmd-copy-disruptions')">Copy</button><span class="prompt-label">shell</span>! curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
         <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>
@@ -879,8 +880,8 @@ Do NOT start building yet — this context is background only.</div>
       <h3>Open the "Before" Shot</h3>
       <p>Open two browser tabs now, while they're still <strong>empty</strong> &mdash; this is your "before" picture:</p>
       <ol>
-        <li><strong>Agent Platform console</strong> &mdash; no agents deployed yet, no registry entries, no policies.</li>
-        <li><strong>Gemini Enterprise app</strong> &mdash; no custom agents published yet.</li>
+        <li><strong><a href="https://console.cloud.google.com/gen-app-builder" target="_blank">Agent Platform console</a></strong> &mdash; no agents deployed yet, no registry entries, no policies.</li>
+        <li><strong><a href="https://cloud.google.com/products/gemini-enterprise-agent-platform" target="_blank">Gemini Enterprise</a> app</strong> &mdash; no custom agents published yet.</li>
       </ol>
       <p>By the end of the workshop, both will be populated with the agent you built.
       See the <strong>Before &rarr; After</strong> section below for the full comparison.</p>
