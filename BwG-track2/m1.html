@@ -771,8 +771,9 @@ disrupted, and end every response with one clear recommended action.</div>
       <div class="step-num">4</div>
       <span class="step-time">5 min</span>
       <h3>Run It Locally &mdash; The Playground</h3>
-      <p>Time to see the agent in action. Launch the ADK local web playground, grab the
-      link, and try several crisis questions yourself. Watch the reasoning trace to see
+      <p>Time to see the agent in action. Launch the <a href="https://google.github.io/agents-cli/cli/#playground" target="_blank">agents-cli playground</a>
+      &mdash; this invokes the <a href="https://github.com/google/adk-web" target="_blank">adk web</a> dev UI under the hood &mdash;
+      grab the link, and try several crisis questions yourself. Watch the reasoning trace to see
       <em>why</em> the agent does what it does &mdash; and have the coding agent keep an eye
       on the running server, catching and fixing any errors as you test.</p>
 
@@ -796,7 +797,7 @@ server that's running in the background and catch errors and fix them.</div>
 
         <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Reconciliation &amp; Proactive Reroute (cancelled service)</strong></p>
         <p>The headline flow: reconcile the static schedule against the live disruption feed, then proactively compute an alternative.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt</span>I'm booked on the 16:31 St Pancras to Paris service today. Is it still running, and if not, how do I still get to Paris?</div>
+        <div class="prompt-block" id="step4-scenario1"><button class="copy-btn" onclick="copyBlock('step4-scenario1')">Copy</button><span class="prompt-label">prompt</span>I'm booked on the 16:31 St Pancras to Paris service today. Is it still running, and if not, how do I still get to Paris?</div>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Calls <code>get_scheduled_departures(station_name='St Pancras', start_time='16:00', end_time='17:00', date_str='2026-07-15')</code> to resolve the 16:31 Paris departure.</li>
@@ -807,7 +808,7 @@ server that's running in the background and catch errors and fix them.</div>
 
         <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Status of a Delayed Service</strong></p>
         <p>Checks that the agent reports a precise delay rather than a blanket "cancelled".</p>
-        <div class="prompt-block"><span class="prompt-label">prompt</span>What's the status of the 18:04 Eurostar from St Pancras to Brussels?</div>
+        <div class="prompt-block" id="step4-scenario2"><button class="copy-btn" onclick="copyBlock('step4-scenario2')">Copy</button><span class="prompt-label">prompt</span>What's the status of the 18:04 Eurostar from St Pancras to Brussels?</div>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Calls <code>get_scheduled_departures</code> around 18:00 to find the Brussels service.</li>
@@ -817,7 +818,7 @@ server that's running in the background and catch errors and fix them.</div>
 
         <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; A Service That Is <em>Not</em> Affected (no false positives)</strong></p>
         <p>Confirms the agent doesn't invent a disruption for a train outside the affected window.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt</span>Will my 13:31 St Pancras to Paris train run today?</div>
+        <div class="prompt-block" id="step4-scenario3"><button class="copy-btn" onclick="copyBlock('step4-scenario3')">Copy</button><span class="prompt-label">prompt</span>Will my 13:31 St Pancras to Paris train run today?</div>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Calls <code>get_scheduled_departures</code> and finds the 13:31 departure.</li>
