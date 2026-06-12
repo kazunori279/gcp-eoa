@@ -363,23 +363,22 @@
     <div class="card agent-section">
       <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
       <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Generate 20 commuter scenarios during a St Pancras signal failure
+Generate 10 commuter scenarios during a St Pancras signal failure
 and run them in parallel against my agent, including a case where
 the disruption feed is unavailable.</div>
     </div>
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY writes a Python script that generates 20 scenarios and runs them concurrently (async semaphore of 5).
-      Completes in <strong>~1.5 minutes</strong>. Saves a dataset (<code>st_pancras_20_scenarios.json</code>) and a report (<code>scenarios_run_report.md</code>).</p>
+      <p>AGY writes a Python script that generates 10 scenarios and runs them concurrently (async semaphore of 5).
+      Completes in <strong>~1.5 minutes</strong>. Saves a dataset (<code>st_pancras_10_scenarios.json</code>) and a report (<code>scenarios_run_report.md</code>).</p>
       <ul>
-        <li><strong>12 disrupted departures</strong> &mdash; cancelled/delayed St Pancras services, all 3 tools called</li>
-        <li><strong>4 inbound return legs</strong> &mdash; queries about returning to disrupted St Pancras</li>
-        <li><strong>2 unaffected routes</strong> &mdash; continental routes not impacted by London signal failure</li>
-        <li><strong>1 state &amp; memory</strong> &mdash; uses <code>set_home_station</code> then queries from session state</li>
+        <li><strong>6 disrupted departures</strong> &mdash; cancelled/delayed St Pancras services, all 3 tools called</li>
+        <li><strong>2 inbound return legs</strong> &mdash; queries about returning to disrupted St Pancras</li>
+        <li><strong>1 unaffected route</strong> &mdash; continental route not impacted by London signal failure</li>
         <li><strong>1 offline feed edge case</strong> &mdash; disruptions.json temporarily removed; agent falls back to GTFS schedules and adds a disclaimer to check station departure boards</li>
       </ul>
-      <p>Target: <strong>100% pass rate (20/20)</strong>, every response ends with a recommended action.</p>
+      <p>Target: <strong>100% pass rate (10/10)</strong>, every response ends with a recommended action.</p>
     </div>
   </div>
 
@@ -455,7 +454,7 @@ the biggest cluster.</div>
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
-          <tr><td>4.2 Simulate</td><td>"Generate 20 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent, including a case where the disruption feed is unavailable."</td></tr>
+          <tr><td>4.2 Simulate</td><td>"Generate 10 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent, including a case where the disruption feed is unavailable."</td></tr>
           <tr><td>4.4 Optimize</td><td>"Analyze the failures and optimize my system instruction to fix the biggest cluster."</td></tr>
         </tbody>
       </table>
