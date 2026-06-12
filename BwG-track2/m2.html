@@ -634,9 +634,15 @@
 
       <div class="callout callout-danger" style="margin-top:.75rem;">
         <div class="callout-title">Pre-flight &mdash; verify auth before deploying</div>
-        <p>Auth failures mid-deploy are hard to recover from. Run this first:</p>
-        <div class="prompt-block" id="step1-auth"><button class="copy-btn" onclick="copyBlock('step1-auth')">Copy</button><span class="prompt-label">shell</span>! gcloud auth print-access-token > /dev/null && echo "Auth OK"</div>
-        <p>If it fails, run <code>! gcloud auth login</code> and re-authenticate before continuing.</p>
+        <p>Auth failures mid-deploy are hard to recover from. Run this in your terminal (not through AGY):</p>
+        <div class="prompt-block" id="step1-auth"><button class="copy-btn" onclick="copyBlock('step1-auth')">Copy</button><span class="prompt-label">terminal</span>gcloud auth print-access-token > /dev/null && echo "Auth OK"</div>
+        <ul>
+          <li><strong>If it prints "Auth OK"</strong> &mdash; you're good, proceed to the AGY prompt below.</li>
+          <li><strong>If it fails in a lab / Qwiklabs environment</strong> &mdash; this is expected.
+          The lab's service account is pre-configured and <code>agents-cli deploy</code> will still work.
+          Skip this check and proceed. <strong>Do not let AGY try to fix auth</strong> &mdash; it will spiral.</li>
+          <li><strong>If it fails outside a lab</strong> &mdash; run <code>gcloud auth login</code> and re-authenticate before continuing.</li>
+        </ul>
       </div>
 
       <div class="card agent-section">
@@ -653,9 +659,8 @@ After deploy completes (~5-10 min), verify the endpoint works by
 running: agents-cli run --url <endpoint> --mode adk
 with a test question about the 13:31 St Pancras to Paris train.
 
-If agents-cli deploy --status fails with auth errors, check the
-Agent Platform console instead:
-https://console.cloud.google.com/agent-platform/runtimes</div>
+Do NOT attempt to fix or debug gcloud auth issues. If deploy
+status polling fails, just tell me and I will check the console.</div>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
