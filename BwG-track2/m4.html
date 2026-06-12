@@ -388,7 +388,18 @@ the disruption feed is unavailable.</div>
     <span class="step-time">5 min</span>
     <span class="beat-badge beat-3">What You Can See in the Console</span>
     <h3>Score It &mdash; Multi-turn AutoRaters</h3>
-    <p>Track the metrics that actually matter:</p>
+
+    <p>Next, AGY runs <code>agents-cli eval run</code> to score each scenario with LLM-as-judge grading.
+    This takes <strong>~5 minutes</strong> (sequential inference). While it runs:</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">While you wait &mdash; watch the eval logs</div>
+      <p>Open a second terminal tab and run:</p>
+    </div>
+    <div class="prompt-block">ls -lt artifacts/traces/          # watch traces appear as each scenario completes
+tail -f .google-agents-cli/*.log   # live eval runner output</div>
+
+    <p>These are the metrics the AutoRater scores against:</p>
     <table class="data">
       <thead><tr><th>Metric</th><th>What it measures</th><th>How</th></tr></thead>
       <tbody>
@@ -398,7 +409,7 @@ the disruption feed is unavailable.</div>
         <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear action?</td><td>AutoRater checks for a specific recommendation at the end</td></tr>
       </tbody>
     </table>
-    <p><strong>Platform Reveal:</strong> Open the <strong>evaluation dashboard</strong> &mdash; see scores across all 100 scenarios.
+    <p><strong>Platform Reveal:</strong> Open the <strong>evaluation dashboard</strong> &mdash; see scores across all 10 scenarios.
     Click a failed run to see its <strong>reasoning trace</strong> and understand why it failed.</p>
   </div>
 
