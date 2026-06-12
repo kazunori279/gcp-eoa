@@ -632,11 +632,30 @@
       endpoint, auto-scaling, and health monitoring. The <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> deploy</code> skill packages
       your ADK app and creates an Agent Runtime instance.</p>
 
+      <div class="callout callout-danger" style="margin-top:.75rem;">
+        <div class="callout-title">Pre-flight &mdash; verify auth before deploying</div>
+        <p>Auth failures mid-deploy are hard to recover from. Run this first:</p>
+        <div class="prompt-block" id="step1-auth"><button class="copy-btn" onclick="copyBlock('step1-auth')">Copy</button><span class="prompt-label">shell</span>! gcloud auth print-access-token > /dev/null && echo "Auth OK"</div>
+        <p>If it fails, run <code>! gcloud auth login</code> and re-authenticate before continuing.</p>
+      </div>
+
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Deploy this agent to Agent Runtime and give me an endpoint I can
-query. Package the agent code, tools, and data together.</div>
+Deploy this agent to Agent Runtime. Before deploying:
+1. Copy the data/ directory into app/ so it ships with the bundle
+2. Update agent.py to resolve data paths relative to the file
+   location using pathlib.Path(__file__).parent (so it works both
+   locally and inside the Agent Runtime container)
+3. Run agents-cli deploy to create the Agent Runtime instance
+
+After deploy completes (~5-10 min), verify the endpoint works by
+running: agents-cli run --url <endpoint> --mode adk
+with a test question about the 13:31 St Pancras to Paris train.
+
+If agents-cli deploy --status fails with auth errors, check the
+Agent Platform console instead:
+https://console.cloud.google.com/agent-platform/runtimes</div>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
@@ -646,9 +665,17 @@ query. Package the agent code, tools, and data together.</div>
         <p>Select <strong>option 1 &mdash; "Proceed with the deployment"</strong> to continue.</p>
       </div>
 
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">Fallback &mdash; check the console if CLI status polling fails</div>
+        <p>Deployment takes 5&ndash;10 minutes. If <code>agents-cli deploy --status</code> hits
+        transient auth errors, open the
+        <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong>
+        to verify deployment status visually. Don't let AGY spin on retries.</p>
+      </div>
+
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY runs <code>agents-cli deploy</code> and polls the status every 60 seconds (deployment takes ~5&ndash;6 minutes).
+        <p>AGY runs <code>agents-cli deploy</code> and polls the status every 60 seconds (deployment takes ~5&ndash;10 minutes).
         Once complete, AGY verifies the endpoint by running <code>agents-cli run --url &lt;endpoint&gt; --mode adk</code> with the crisis query.</p>
         <ul>
           <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint</li>
@@ -658,7 +685,7 @@ query. Package the agent code, tools, and data together.</div>
         </ul>
         <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
         of concurrent users without managing infrastructure. Your M1 code deployed without changes.
-        Open the <strong>Agent Platform console</strong> to see your deployed agent.</p>
+        Open the <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong> to see your deployed agent.</p>
       </div>
     </div>
 
