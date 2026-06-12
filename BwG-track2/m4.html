@@ -409,8 +409,18 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
         <tr><td><strong>Action Clarity</strong></td><td>Does the response end with one clear action?</td><td>AutoRater checks for a specific recommendation at the end</td></tr>
       </tbody>
     </table>
-    <p><strong>Platform Reveal:</strong> Open the <strong>evaluation dashboard</strong> &mdash; see scores across all 10 scenarios.
-    Click a failed run to see its <strong>reasoning trace</strong> and understand why it failed.</p>
+    <div class="step-expected">
+      <h4>Expected Result</h4>
+      <p><code>agents-cli eval run</code> scores all 10 scenarios with LLM-as-judge grading.
+      Results are saved as JSON and an <strong>interactive HTML report</strong> in <code>artifacts/</code>.</p>
+      <ul>
+        <li><strong>Mean quality score: 5.0 / 5.0</strong> across all 10 cases</li>
+        <li>Offline feed resilience: agent falls back to static timetable + passenger warning</li>
+        <li>Personalization: session state correctly recalls home station</li>
+        <li>Arrival projections properly grounded &mdash; agent omits times not returned by tools</li>
+      </ul>
+      <p><strong>Platform Reveal:</strong> Open the generated <code>results_*.html</code> file to browse scores and reasoning traces per scenario.</p>
+    </div>
   </div>
 
   <!-- Step 4: Fix -->
@@ -418,10 +428,9 @@ tail -f .google-agents-cli/*.log   # live eval runner output</div>
     <div class="step-num">4</div>
     <span class="step-time">6 min</span>
     <h3>Find the Weak Spots &amp; Fix Them</h3>
-    <p>The system groups failures by common cause into <strong>loss clusters</strong>.
-    Example: "fails when origin IS the disrupted station" or "fails when the
-    commuter asks a vague question." We'll auto-optimize the system instruction
-    to fix the biggest cluster.</p>
+    <p>Even with a perfect score, AGY can analyze the eval traces to find grounding improvements
+    and harden the system instruction. If any scenarios scored below 5.0, AGY groups failures
+    by common cause into <strong>loss clusters</strong> and optimizes the instruction to fix them.</p>
 
     <div class="card agent-section">
       <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
@@ -430,18 +439,20 @@ Analyze the failures and optimize my system instruction to fix
 the biggest cluster.</div>
     </div>
 
+    <div class="callout callout-warning" style="margin-top:.75rem;">
+      <div class="callout-title">AGY will ask to redeploy</div>
+      <p>After optimizing the system instruction, AGY will ask if you want to deploy the updated agent.
+      Select <strong>"Proceed with the deployment"</strong> to push the improved instruction to your live endpoint.</p>
+    </div>
+
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY runs <code>adk optimize</code> / Optimizer service and:</p>
-      <ol>
-        <li>Identifies the largest loss cluster (e.g., "fails when origin IS the disrupted station")</li>
-        <li>Generates a refined system instruction targeting that failure mode</li>
-        <li>Re-runs the failed scenarios to verify improvement</li>
-        <li>Shows before/after scores</li>
-      </ol>
+      <p>AGY analyzes the eval traces and tightens the system instruction &mdash; for example,
+      adding a strict grounding rule that prevents the agent from guessing arrival times
+      not explicitly returned by <code>compute_reroute</code>. It then redeploys and re-runs the
+      eval to confirm the improvement.</p>
       <p><strong>What just happened:</strong> Quality improvement is <strong>empirical and automatable</strong>,
-      not guesswork. One refined instruction, targeting the top failure cluster, raises
-      quality across the board.</p>
+      not guesswork. The eval &rarr; analyze &rarr; fix &rarr; re-eval loop is the quality flywheel.</p>
     </div>
   </div>
 
@@ -449,7 +460,7 @@ the biggest cluster.</div>
   <div class="done-when">
     <h3>Mentor Checkpoint &mdash; Done When:</h3>
     <ul class="checklist">
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>100 simulated scenarios have been run against your agent</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 simulated scenarios have been run against your agent</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Evaluation dashboard shows scores for all metrics</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You've identified at least one loss cluster</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>System instruction has been optimized with a before/after score improvement</div></li>
