@@ -631,13 +631,22 @@ Deploy this agent to Agent Runtime and give me an endpoint I can
 query. Package the agent code, tools, and data together.</div>
       </div>
 
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">AGY will ask for confirmation</div>
+        <p>After bundling the data and running the test suite, AGY will ask:<br>
+        <em>"Are you ready to proceed with deploying the Transit-Crisis Agent to Agent Runtime?"</em></p>
+        <p>Select <strong>option 1 &mdash; "Proceed with the deployment"</strong> to continue.</p>
+      </div>
+
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY runs <code>agents-cli deploy</code> and creates:</p>
+        <p>AGY runs <code>agents-cli deploy</code> and polls the status every 60 seconds (deployment takes ~5&ndash;6 minutes).
+        Once complete, AGY verifies the endpoint by running <code>agents-cli run --url &lt;endpoint&gt; --mode adk</code> with the crisis query.</p>
         <ul>
-          <li>A managed <strong>Agent Runtime instance</strong> with an HTTPS endpoint</li>
-          <li>Health status showing "HEALTHY" in the Agent Platform console</li>
-          <li>The same crisis query returns a correct answer from the cloud endpoint</li>
+          <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint</li>
+          <li>AGY creates a <code>deployment_results.md</code> with the endpoint URL and a link to the <strong>Agent Engine Console Playground</strong></li>
+          <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00</li>
+          <li>AGY identifies later affected departures (cancelled 15:31 and 16:31) and suggests the delayed 17:31 (departing 18:16) as the earliest alternative</li>
         </ul>
         <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
         of concurrent users without managing infrastructure. Your M1 code deployed without changes.
@@ -665,13 +674,19 @@ personalization.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY configures two state layers:</p>
+        <p>AGY adds three things to <code>agent.py</code>, runs the test suite, and redeploys (~5 min):</p>
         <ul>
-          <li><strong>Sessions</strong> &mdash; multi-turn coherence within a conversation. "What about the 14:05?" works because the agent remembers you were asking about St Pancras to Paris.</li>
-          <li><strong>Memory Bank</strong> &mdash; cross-session recall. Set your home station, start a new session, and the agent greets you with "Your usual 18:02 to Brussels is on time today."</li>
+          <li><strong>Session state tools</strong> &mdash; <code>set_home_station</code> and <code>get_home_station</code> read/write <code>tool_context.state</code>, with an <code>init_state</code> before-agent callback</li>
+          <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
+          <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
+        <p>AGY then verifies with two queries using the same <code>--session-id</code>:</p>
+        <ol>
+          <li><em>"Set my home station to Paris"</em> &rarr; agent persists Paris Nord in session state</li>
+          <li><em>"Are there any departures from my home station?"</em> &rarr; agent retrieves Paris Nord from state <strong>without you specifying it again</strong>, queries GTFS departures, and warns about evening signal failures on return trips to London</li>
+        </ol>
         <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
-        not app code you maintain. See the <strong>Platform Artifacts</strong> section above for details on each.</p>
+        not app code you maintain.</p>
       </div>
     </div>
 
@@ -684,6 +699,9 @@ personalization.</div>
       secure sandbox</strong> &mdash; not on the host runtime. This is already configured as part of
       Agent Runtime.</p>
 
+      <p>Open the <strong>Agent Engine Console Playground</strong> link from AGY's <code>deployment_results.md</code>
+      and try the crisis query directly in the browser. This is the same endpoint your users will hit.</p>
+
       <div class="callout callout-danger" style="margin-top:.75rem;">
         <div class="callout-title">Why this matters for platform owners</div>
         <p>Non-deterministic or model-generated code can't touch your environment.
@@ -693,9 +711,10 @@ personalization.</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>The Code Execution sandbox is active as part of Agent Runtime. Tool computations
-        (like <code>compute_reroute</code>'s BFS pathfinding) run in ephemeral containers that are
-        destroyed after each execution &mdash; no persistent state, no host access.</p>
+        <p>In the Playground, ask: <em>"My 15:31 St Pancras&ndash;Paris is cancelled &mdash; how do I get to Paris?"</em>
+        and confirm the agent calls all three tools and returns a reroute recommendation.
+        The Code Execution sandbox runs tool computations (like pathfinding) in ephemeral containers &mdash;
+        no persistent state, no host access.</p>
       </div>
     </div>
 
