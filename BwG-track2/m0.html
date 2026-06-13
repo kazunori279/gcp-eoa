@@ -792,25 +792,37 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
      }
    }
 
-3) Then tell me to restart the CLI by running "agy" so the new tools load.
-   If it still won't connect, check ADC (gcloud auth application-default
-   print-access-token returns a token) and tell me what you see.</div>
+3) Pre-allow the tool so calls don't default to "Ask" (an un-answerable Ask
+   in a background/subagent context shows up as "server not allowed in this
+   context"). Merge (don't overwrite) this into
+   ~/.gemini/antigravity-cli/settings.json:
+   {
+     "permissions": {
+       "allow": ["mcp(google-developer-knowledge/*)"]
+     }
+   }
+
+4) Then tell me to restart the CLI by running "agy" so the new tools and
+   permission take effect. If it still won't connect, check ADC (gcloud auth
+   application-default print-access-token returns a token) and tell me what
+   you see.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Then restart &mdash; run <code>agy</code></div>
-        <p>Once AGY has written the config, quit and <strong>run <code>agy</code></strong> to start a fresh
-        session so the new MCP tools load. Then type <code>/mcp</code> to confirm
+        <p>Once AGY has written the config and the allow rule, quit and <strong>run <code>agy</code></strong> to
+        start a fresh session so they take effect. Then type <code>/mcp</code> to confirm
         <code>google-developer-knowledge</code> is connected and lists its tools, and continue with Step 2.</p>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into the AGY CLI's
-        MCP config (<code>~/.gemini/antigravity-cli/mcp_config.json</code>), authenticating with your gcloud login
-        (ADC) &mdash; no API key. After you restart AGY in a fresh session and check <code>/mcp</code>, it shows as a
-        connected MCP server with its tools listed, and from here on AGY grounds Google Cloud questions in the docs
-        instead of guessing (you'll see it lean on this in M2 and M3).</p>
+        <p>AGY enables the API, writes the <code>google-developer-knowledge</code> server into the AGY CLI's
+        MCP config (<code>~/.gemini/antigravity-cli/mcp_config.json</code>) authenticating with your gcloud login
+        (ADC, no API key), and adds an <code>mcp(google-developer-knowledge/*)</code> allow rule to
+        <code>settings.json</code> so calls aren't blocked by an "Ask" prompt. After you restart AGY in a fresh
+        session and check <code>/mcp</code>, it shows as a connected MCP server with its tools listed, and from here
+        on AGY grounds Google Cloud questions in the docs instead of guessing (you'll see it lean on this in M2&ndash;M5).</p>
         <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
         <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Use the google-developer-knowledge MCP to explain what is Gemini Enterprise Agent Platform</div>
       </div>
@@ -823,7 +835,10 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
         <code>! gcloud auth application-default print-access-token</code> returns a token; (2) if the server isn't
         listed at all, the config path varies by Antigravity version &mdash; try
         <code>~/.gemini/antigravity/mcp_config.json</code> or <code>~/.gemini/config/mcp_config.json</code> instead;
-        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.</p>
+        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.
+        (3) If a call fails with <strong>"server &hellip; not allowed in this context"</strong>, the
+        <code>mcp(google-developer-knowledge/*)</code> allow rule is missing from
+        <code>~/.gemini/antigravity-cli/settings.json</code> &mdash; add it and restart.</p>
       </div>
     </div>
 
