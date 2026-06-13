@@ -560,7 +560,7 @@ the tools yet; I'll describe them in the next step.</div>
         <ul>
           <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code>, managed by <code>uv</code></li>
           <li><code>app/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
-          <li><code>app/tools.py</code> &mdash; starter tools module (we replace this next)</li>
+          <li><code>app/tools.py</code> &mdash; starter tools module (we add the real tools next &mdash; here or inline in <code>app/agent.py</code>)</li>
           <li>GCP project ID resolved via <code>gcloud config</code> fallback</li>
           <li><strong><code>data/</code> at the project root</strong> &mdash; your M0 GTFS bundle and <code>disruptions.json</code> moved in, so the tools can read it</li>
           <li>Smoke test passes: <code>agents-cli run "What is the weather in SF?"</code></li>
@@ -723,7 +723,7 @@ modify the eval datasets or run evals (that comes later in M4).</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY writes the three tools into <code>app/tools.py</code>, wires them into the agent, runs linting:</p>
+        <p>AGY writes the three tools into the tools module (<code>app/tools.py</code>, or inline in <code>app/agent.py</code>), wires them into the agent, runs linting:</p>
         <ul>
           <li><strong><code>get_scheduled_departures</code></strong> &mdash; joins <code>stops.txt</code>, <code>calendar_dates.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>stop_times.txt</code>; normalizes departures with times and route names</li>
           <li><strong><code>check_disruptions</code></strong> &mdash; parses <code>disruptions.json</code>; filters by <code>station_query</code> (fuzzy) or <code>trip_id</code> (exact)</li>
