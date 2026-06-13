@@ -752,7 +752,7 @@
   <!-- ─────────────────────────────────────────────────────────────
        SETUP IN 4 STEPS
        ───────────────────────────────────────────────────────────── -->
-    <h2>Setup in 4 Steps</h2>
+    <h2>Setup in 5 Steps</h2>
 
     <!-- Step 1 -->
     <div class="step">
@@ -847,9 +847,50 @@ Do NOT start building yet — this context is background only.</div>
       </div>
     </div>
 
-    <!-- Step 3 -->
+    <!-- Step 3: Developer Knowledge MCP -->
     <div class="step">
       <div class="step-num">3</div>
+      <span class="step-time">3 min</span>
+      <h3>Install the Developer Knowledge MCP</h3>
+      <p>Give your coding agent <strong>grounded, current knowledge of Google Cloud products</strong> &mdash;
+      Agent Runtime, Memory Bank, Agent Registry, Identity, Model Armor. The
+      <a href="https://codelabs.developers.google.com/developer-knowledge-mcp-antigravity" target="_blank">Developer Knowledge MCP</a>
+      lets AGY look up official docs instead of guessing commands &mdash; which keeps the later modules
+      (especially M2 and M3) out of trial-and-error spirals. <code>agents-cli</code> already covers its own
+      skills, so this fills in the rest of the Google Cloud surface.</p>
+
+      <p><strong>a)</strong> Enable the API:</p>
+      <div class="prompt-block" id="cmd-dk-enable"><button class="copy-btn" onclick="copyBlock('cmd-dk-enable')">Copy</button><span class="prompt-label">shell</span>! gcloud services enable developerknowledge.googleapis.com</div>
+
+      <p><strong>b)</strong> Create an API key: in the Console, <strong>APIs &amp; Services &rarr; Credentials &rarr;
+      Create credentials &rarr; API key</strong> (optionally restrict it to the Developer Knowledge API). Copy the
+      key &mdash; that's <code>YOUR_API_KEY</code> below.</p>
+
+      <p><strong>c)</strong> Add the MCP server in Antigravity &mdash; <strong>Settings &rarr; Customizations &rarr;
+      MCP Servers</strong> (or edit <code>~/.gemini/mcp_config.json</code>):</p>
+      <div class="prompt-block" id="cmd-dk-mcp"><button class="copy-btn" onclick="copyBlock('cmd-dk-mcp')">Copy</button><span class="prompt-label">mcp_config.json</span>{
+  "mcpServers": {
+    "google-developer-knowledge": {
+      "serverUrl": "https://developerknowledge.googleapis.com/mcp",
+      "headers": { "X-Goog-Api-Key": "YOUR_API_KEY" }
+    }
+  }
+}</div>
+
+      <p><strong>d)</strong> Refresh: <strong>Settings &rarr; Customizations &rarr; Refresh</strong> under Installed
+      MCP Servers (CLI: run <code>agy</code>, then <code>/mcp</code>).</p>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p><code>google-developer-knowledge</code> shows as an installed MCP server. From here on, when AGY is
+        unsure of a Google Cloud command or whether a feature is on by default, it grounds in the docs instead
+        of guessing &mdash; you'll see it lean on this in M2 and M3.</p>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
       <span class="step-time">3 min</span>
       <h3>Download the Data</h3>
       <p>Download the <strong>Eurostar <a href="https://gtfs.org/" target="_blank">GTFS</a> bundle</strong> (official public feed from
@@ -1012,9 +1053,9 @@ Do NOT start building yet — this context is background only.</div>
       </div>
     </div>
 
-    <!-- Step 4 -->
+    <!-- Step 5 -->
     <div class="step">
-      <div class="step-num">4</div>
+      <div class="step-num">5</div>
       <span class="step-time">2 min</span>
       <h3>Open the "Before" Shot</h3>
       <p>Open two browser tabs now &mdash; this is your "before" picture:</p>
@@ -1148,6 +1189,7 @@ Do NOT start building yet — this context is background only.</div>
       <ul class="checklist">
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Antigravity is open and responsive</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div><code>agents-cli</code> skills are installed and recognized</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Developer Knowledge MCP (<code>google-developer-knowledge</code>) is installed</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Scenario context pasted into Antigravity</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>GTFS data is downloaded into <code>data/gtfs/</code></div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Disruption file is at <code>data/disruptions.json</code></div></li>
