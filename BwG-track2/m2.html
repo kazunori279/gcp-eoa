@@ -725,7 +725,7 @@ feature in the next step and redeploy just once, to save time.</div>
         <h4>Expected Result</h4>
         <p>AGY adds three things to <code>agent.py</code> and runs the test suite (no redeploy yet &mdash; that happens once in Step 3):</p>
         <ul>
-          <li><strong>Session state tools</strong> &mdash; <code>set_home_station</code> and <code>get_home_station</code> read/write <code>tool_context.state</code>, with an <code>init_state</code> before-agent callback</li>
+          <li><strong>Session state</strong> &mdash; a <code>set_home_station</code> tool writes <code>tool_context.state</code>, with an <code>init_state</code> before-agent callback; the home station is read back from injected session state (so recall needs no tool call)</li>
           <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
           <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
