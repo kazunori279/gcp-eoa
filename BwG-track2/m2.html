@@ -738,6 +738,22 @@ feature in the next step and redeploy just once, to save time.</div>
           <li>It queries <code>check_disruptions(station_name='Paris Gare du Nord')</code>.</li>
           <li>It lists the active disruptions on Paris-bound Eurostar services from the St Pancras throat signal failure (e.g., the cancelled 15:31 and 16:31 departures and the delayed 17:31/18:31 services).</li>
         </ol>
+        <p style="margin-top:.5rem;"><strong>Verify it in the console &mdash; this is the ground truth.</strong>
+        Open the <a href="https://console.cloud.google.com/agent-platform/memory-bank" target="_blank">Memory Bank console</a>
+        and confirm a memory was actually written. You should see a row like:</p>
+        <table class="data">
+          <thead><tr><th>Scope</th><th>Resource Name</th><th>Fact</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>app_name: app</code><br><code>user_id: cli-user</code></td>
+              <td>&hellip;/4586226276930420736</td>
+              <td>My home station is Paris Gare du Nord.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>If the agent "remembers" but <strong>no row appears here</strong>, the recall came from
+        conversation history, not Memory Bank &mdash; so make sure you truly started a new session
+        (new session ID, same <code>user_id</code>) before trusting the result.</p>
 
         <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; Personalized Reconciliation &amp; Reroute (memory + the full chain)</strong></p>
         <p>Confirms the deployed agent fuses long-term memory with live reconciliation: it infers "home" from Memory Bank, then reconciles and reroutes.</p>
