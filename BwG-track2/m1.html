@@ -550,7 +550,10 @@
 Scaffold a new ADK agent project for a transit assistant that will
 answer commuter questions during a service disruption. Use Python,
 gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
-change it), and uv for dependency management.</div>
+change it), and uv for dependency management.
+Also move my existing data/ folder (downloaded in M0) into the project
+root so the tools can read it later. Scaffold only &mdash; do not write
+the tools yet; I'll describe them in the next step.</div>
       </div>
 
       <div class="step-expected">
@@ -561,6 +564,7 @@ change it), and uv for dependency management.</div>
           <li><code>app/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
           <li><code>app/tools.py</code> &mdash; starter tools module (we replace this next)</li>
           <li>GCP project ID resolved via <code>gcloud config</code> fallback</li>
+          <li><strong><code>data/</code> at the project root</strong> &mdash; your M0 GTFS bundle and <code>disruptions.json</code> moved in, so the tools can read it</li>
           <li>Smoke test passes: <code>agents-cli run "What is the weather in SF?"</code></li>
         </ul>
         <p><strong>What just happened:</strong> The <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> scaffold</code> skill generated a
