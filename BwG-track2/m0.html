@@ -828,21 +828,7 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">If the server won't connect (or its tools aren't callable)</div>
-        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If
-        <code>/mcp</code> shows it disconnected or absent: (1) set ADC with
-        <code>! gcloud auth application-default login</code> and confirm
-        <code>! gcloud auth application-default print-access-token</code> returns a token; (2) if the server isn't
-        listed at all, the config path varies by Antigravity version &mdash; try
-        <code>~/.gemini/antigravity/mcp_config.json</code> or <code>~/.gemini/config/mcp_config.json</code> instead;
-        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.
-        (3) If a call fails with <strong>"server &hellip; not allowed in this context"</strong>, the
-        <code>mcp(google-developer-knowledge/*)</code> allow rule is missing from
-        <code>~/.gemini/antigravity-cli/settings.json</code> &mdash; add it and restart.</p>
-      </div>
-
-      <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">Still blocked? (lab policy) &mdash; use the direct helper</div>
+        <div class="callout-title">If the native MCP is blocked &mdash; use the direct helper</div>
         <p>Some lab projects block remote MCP servers at the runtime level (errors like <em>"server &hellip; not
         allowed in this context"</em> or <em>"tool &hellip; is not enabled"</em>) that the allow rule can't fix.
         If so, grab a tiny helper that queries the same Developer Knowledge docs directly via your gcloud login,
