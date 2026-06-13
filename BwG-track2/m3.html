@@ -338,9 +338,10 @@
   <div class="govern-card" style="border-color:#1a73e8;">
     <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent Identity</a> (IAM) <span class="tag tag-handson">Hands-on</span></h4>
     <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
-    <p><strong>Protection:</strong> Every agent runs under a <strong>least-privilege identity</strong> by default.
-    With <strong>Agent Identity</strong> (opt-in) it gets a SPIFFE-based identity and auto-rotated X.509 cert, and
-    Context-Aware Access enforces mutual TLS + DPoP &mdash; so a stolen token is useless without the attested context.</p>
+    <p><strong>Protection:</strong> Every agent gets a <strong>runtime identity</strong> you can audit and scope to
+    least-privilege. With <strong>Agent Identity</strong> (opt-in) it gets a SPIFFE-based identity and auto-rotated
+    X.509 cert, and Context-Aware Access enforces mutual TLS + DPoP &mdash; so a stolen token is useless without
+    the attested context.</p>
     <p class="doc-cite">Docs: <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent identity</a> &middot; <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">IAM agent identity</a></p>
   </div>
 
@@ -388,9 +389,10 @@
       <span class="tag tag-handson">Hands-on</span>
       <h3>Verify Your Agent Is a Governed Asset &mdash; Registry + Identity</h3>
       <p>You don't have to <em>make</em> your agent governable. The moment you deployed it to Agent Runtime
-      in M2, the platform <strong>registered</strong> it in the Agent Registry and runs it under a
-      <strong>least-privilege identity</strong>. Let's verify that &mdash; one live <code>gcloud</code> check for
-      the engine and its identity, then the console for the Registry entry and its tools.</p>
+      in M2, the platform <strong>registered</strong> it in the Agent Registry and gave it a <strong>runtime
+      identity</strong>. Whether that identity is <em>least-privilege</em> is something you must audit &mdash;
+      deploy tooling often grants a broad starter role set. Let's audit it live: describe the engine and its
+      identity, check exactly which IAM roles it holds, and reason about whether they're justified.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
@@ -419,7 +421,9 @@ leftover *.json files). Then:
    there any owner/editor/admin, token-creation, or network/write/egress? If
    the only roles are the reasoning-engine service agent (+ basic aiplatform/
    viewer), that's least-privilege — correct here because its GTFS data is
-   bundled locally, so it needs none. If you find broad admin roles, say so.
+   bundled locally, so it needs none. If you find broad admin roles (e.g.
+   storage.admin, bigquery.*, secretmanager.*), say so plainly and name the
+   minimal role set this agent actually needs — but do not change anything.
 Do NOT query the Agent Registry or a SPIFFE principal via gcloud, and do NOT
 describe what the console shows — just tell me to open it myself to view the
 Registry entry, its 5 tools, and the agent's identity (Govern → Agent
@@ -428,17 +432,19 @@ Registry).</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY reads <code>deployment_metadata.json</code>, then runs a REST <code>describe</code> on the engine and a <strong>filtered</strong> IAM query, and reports:</p>
+        <p>AGY reads <code>deployment_metadata.json</code>, then runs a REST <code>describe</code> on the engine and a <strong>filtered</strong> IAM query, and reports honestly:</p>
         <ul>
           <li><strong>Engine</strong> &mdash; <code>projects/&hellip;/locations/us-east1/reasoningEngines/&lt;id&gt;</code>, platform-managed (<code>agentFramework=google-adk</code>)</li>
           <li><strong>Runtime identity</strong> &mdash; its <code>effectiveIdentity</code> is the default service agent (e.g. <code>service-&lt;num&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>) &mdash; a service account, not a SPIFFE principal, since Agent Identity is opt-in and off</li>
-          <li><strong>Least-privilege verdict</strong> &mdash; the roles bound to <em>that</em> service account (filtered, not the whole project) should be just the reasoning-engine service agent plus basic <code>aiplatform.user</code>/<code>viewer</code>: no owner/editor/admin, no token-creation, no network/write/egress (its GTFS data is bundled locally, so it needs none)</li>
+          <li><strong>Privilege audit</strong> &mdash; the roles actually bound to that service account. A clean project shows just the reasoning-engine service agent (+ basic <code>aiplatform.user</code>/<code>viewer</code>) = least-privilege. <strong>In this lab you'll likely see broad roles too</strong> &mdash; <code>storage.admin</code>, <code>bigquery.admin</code>/<code>dataOwner</code>, <code>secretmanager.admin</code>, <code>discoveryengine.editor</code> &mdash; from the scaffold's permissive <code>app_sa_roles</code> defaults plus lab setup. AGY should <strong>flag these as excessive</strong>: this agent's GTFS data is bundled locally, so it needs none of them.</li>
+          <li><strong>Governance takeaway</strong> &mdash; least-privilege is <em>not</em> automatic. Registration and an identity come free at deploy; trimming that identity to only what the agent needs is the governance action.</li>
         </ul>
         <p>Then open the console yourself (next callout): the <strong>Agent Registry entry with all 5 tools</strong>
         (<code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>,
         <code>set_home_station</code>, <code>get_home_station</code>) and the agent's identity.</p>
-        <p><strong>What just happened:</strong> the moment you deployed in M2, the platform made this a
-        discoverable, least-privilege corporate asset &mdash; with no extra work.</p>
+        <p><strong>What just happened:</strong> deploying in M2 made this a discoverable, uniquely-identified
+        corporate asset for free &mdash; but you just saw that <strong>least-privilege still has to be audited and
+        enforced</strong>, not assumed.</p>
       </div>
 
       <div class="callout callout-govern" style="margin-top:.75rem;">
@@ -447,7 +453,7 @@ Registry).</div>
         agent's identity &mdash; the console is the source of truth:</p>
         <ul style="margin-bottom:0;">
           <li><strong>Govern &rarr; Agent Registry</strong> &mdash; your agent, its 5 tools, and its identity</li>
-          <li><strong>Govern &rarr; Security</strong> &mdash; "Agents with excessive permissions" shows a clean posture</li>
+          <li><strong>Govern &rarr; Security</strong> &mdash; "Agents with excessive permissions" will likely <strong>flag your agent</strong> for the broad roles above &mdash; the real-world signal to trim them</li>
         </ul>
       </div>
     </div>
@@ -555,7 +561,7 @@ deployment_metadata.json, and confirm exact flags via
       <h3>Mentor Checkpoint &mdash; Done When:</h3>
       <ul class="checklist">
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Verified your agent in the Agent Registry console with its 5 tools and identity</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Confirmed least-privilege &mdash; no excessive permissions on the agent identity</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Audited the agent identity's IAM roles and can name which exceed what it needs (least-privilege means trimming them)</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Created a Model Armor template and watched it block a jailbreak <em>and</em> PII in the terminal</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Can locate Gateway, Policies, and Business Policies in the console and explain each</div></li>
       </ul>
@@ -596,7 +602,7 @@ deployment_metadata.json, and confirm exact flags via
       <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See in the Console</h3>
       <ul>
         <li><strong>Agent Registry</strong> &mdash; your agent listed with its 5 tools and identity</li>
-        <li><strong>Security</strong> &mdash; clean posture; no agents with excessive permissions</li>
+        <li><strong>Security</strong> &mdash; the "excessive permissions" view; expect your agent flagged for the broad scaffold/lab roles to trim</li>
         <li><strong>Model Armor</strong> &mdash; your template and its block events in Cloud Logging</li>
         <li><strong>Gateways / Policies / Business Policies</strong> &mdash; where gateway, access, and semantic governance live</li>
       </ul>
@@ -606,7 +612,7 @@ deployment_metadata.json, and confirm exact flags via
       <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>No agent sprawl</strong> &mdash; every deployed agent is auto-registered and discoverable</li>
-        <li><strong>Least-privilege identity</strong> &mdash; scoped by default; bounded damage even if compromised (Agent Identity adds an attested SPIFFE identity)</li>
+        <li><strong>Auditable identity</strong> &mdash; every agent has an identity you can audit; least-privilege isn't automatic (deploy tooling over-grants), so verify and trim it. Agent Identity adds an attested SPIFFE identity.</li>
         <li><strong>Platform-enforced safety</strong> &mdash; a Model Armor policy you proved blocks attacks and data leaks</li>
         <li><strong>Ready to scale</strong> &mdash; gateway, access policies, and semantic governance wrap every agent org-wide</li>
       </ul>
