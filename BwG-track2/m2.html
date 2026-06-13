@@ -636,8 +636,6 @@
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Deploy this agent to Agent Runtime. Before deploying:
-0. Set the active gcloud account (required in Cloud Shell):
-   ! gcloud config set account $(gcloud auth list --format='value(account)' --filter='status:ACTIVE')
 1. Copy the data/ directory into app/ so it ships with the bundle
 2. Update agent.py to resolve data paths relative to the file
    location using pathlib.Path(__file__).parent (so it works both
@@ -652,13 +650,7 @@ Do NOT attempt to fix or debug gcloud auth issues. If deploy
 status polling fails, just tell me and I will check the console.</div>
       </div>
 
-      <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">Why step 0?</div>
-        <p>Cloud Shell sometimes falls back to the GCE metadata server for credentials instead of
-        using your lab account. When that happens, <code>agents-cli deploy</code> fails with
-        <em>"service account info is missing 'email' field"</em>.
-        Setting the active account explicitly avoids this.</p>
-      </div>
+
 
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
