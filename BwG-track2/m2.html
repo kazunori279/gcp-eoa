@@ -637,9 +637,9 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Deploy this agent to Agent Runtime. Before deploying:
 1. Copy the data/ directory into app/ so it ships with the bundle
-2. Update agent.py to resolve data paths relative to the file
-   location using pathlib.Path(__file__).parent (so it works both
-   locally and inside the Agent Runtime container)
+2. Update the data-path resolution in the code (e.g. tools.py) to be
+   relative to the file location using pathlib.Path(__file__).parent
+   (so it works both locally and inside the Agent Runtime container)
 3. Run agents-cli deploy to create the Agent Runtime instance
 
 After deploy completes (~5-10 min), verify the endpoint works by
@@ -668,9 +668,8 @@ status polling fails, just tell me and I will check the console.</div>
         Once complete, AGY verifies the endpoint by running <code>agents-cli run --url &lt;endpoint&gt; --mode adk</code> with the crisis query.</p>
         <ul>
           <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint</li>
-          <li>AGY creates a <code>deployment_results.md</code> with the endpoint URL and a link to the <strong>Agent Engine Console Playground</strong></li>
-          <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00</li>
-          <li>AGY identifies later affected departures (cancelled 15:31 and 16:31) and suggests the delayed 17:31 (departing 18:16) as the earliest alternative</li>
+          <li>AGY shares the endpoint URL and a link to the <strong>Agent Engine Console Playground</strong> (the deploy step writes these to <code>deployment_metadata.json</code>)</li>
+          <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00, so the agent confirms it's running normally and recommends boarding as scheduled</li>
         </ul>
         <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
         of concurrent users without managing infrastructure. Your M1 code deployed without changes.
@@ -801,7 +800,7 @@ me from the trace that the built-in code execution actually ran
           <li>Returns computed values: average delay <strong>26.25 min</strong> across the 4 delayed trains (45/30/15/15) and a <strong>50% cancellation rate</strong> (4 of 8 affected), then closes with one recommended action.</li>
           <li>Once verified, AGY redeploys to Agent Runtime.</li>
         </ol>
-        <p>Then open the <strong>Agent Engine Console Playground</strong> link from AGY's <code>deployment_results.md</code> and try the same question in the browser &mdash; the same endpoint your users hit.</p>
+        <p>Then open the <strong>Agent Engine Console Playground</strong> link AGY shared and try the same question in the browser &mdash; the same endpoint your users hit.</p>
       </div>
     </div>
 
