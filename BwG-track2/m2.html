@@ -872,6 +872,28 @@ and code execution. After it's live, share the Console Playground link.</div>
         in the Memory Bank console), personalized reroute, and sandbox-computed math &mdash; the same endpoint your
         end users hit.</p>
       </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">If a scenario returns nothing (or errors) &mdash; read the runtime logs</div>
+        <p>A blank reply after some tool calls usually means an exception inside the deployed agent. Have AGY pull
+        the Agent Runtime (Reasoning Engine) logs from Cloud Logging and find the cause:</p>
+        <div class="card agent-section">
+          <button class="copy-btn" onclick="copyBlock('step4-debug')">Copy</button>
+          <div class="agent-ctx" id="step4-debug"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 4 (debug): find why the deployed agent returned nothing.
+
+The deployed agent called some tools then returned an empty response. Read the
+Agent Runtime logs from Cloud Logging and identify the cause &mdash; do NOT
+change code yet, just diagnose and tell me the root cause and the smallest fix.
+
+Read project/region/engine id from deployment_metadata.json, then pull the
+recent stdout + stderr (stderr has the tracebacks):
+  gcloud logging read 'resource.type="aiplatform.googleapis.com/ReasoningEngine" AND resource.labels.reasoning_engine_id="ENGINE_ID" AND (logId("reasoning_engine_stdout") OR logId("reasoning_engine_stderr"))' --project=PROJECT_ID --freshness=1h --order=desc --limit=100
+
+Quote the traceback/error lines around the failing request and tell me the
+root cause.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Done-when -->
