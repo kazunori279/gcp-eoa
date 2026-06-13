@@ -510,10 +510,11 @@
 
   <div class="callout callout-info">
     <div class="callout-title">Heads up &mdash; deployment takes a few minutes</div>
-    <p>Several steps in this module deploy or redeploy your agent to Agent Runtime.
-    Each deployment can take a few minutes &mdash; let it run, no need to babysit it.
-    AGY will tell you automatically once the deployment is live and the endpoint or
-    Console Playground link is ready to test.</p>
+    <p>You deploy <strong>twice</strong> in this module: once in Step 1, and once more in Step 3
+    after all the code changes are in (Steps 2 and 3 share a single redeploy to save time).
+    Each deploy runs server-side and takes a few minutes &mdash; <strong>kick it off and keep
+    reading or exploring the console while it builds</strong>, no need to babysit it.
+    AGY tells you automatically once it's live and the endpoint or Console Playground link is ready.</p>
     <p>A redeploy <strong>updates the same instance in place</strong> (matched by agent name),
     so the endpoint and Console Playground link stay the same. The link only changes if the
     previous instance was deleted &mdash; then the redeploy creates a fresh one. Either way, use the
@@ -657,6 +658,13 @@ status polling fails, just tell me and I will check the console.</div>
 
 
 
+      <div class="callout callout-success" style="margin-top:.75rem;">
+        <div class="callout-title">Don't wait &mdash; overlap the build</div>
+        <p>This first deploy takes ~5&ndash;10 min. Start it, then read the <strong>Platform Artifacts</strong>
+        above and skim Steps 2&ndash;3 while it builds. AGY pings you when the endpoint is live &mdash;
+        no need to watch it.</p>
+      </div>
+
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
         <p>This is an intermittent Cloud Shell issue. Try running the deploy again in your terminal:</p>
@@ -684,7 +692,7 @@ status polling fails, just tell me and I will check the console.</div>
     <!-- Step 2: Sessions + Memory -->
     <div class="step">
       <div class="step-num">2</div>
-      <span class="step-time">9 min</span>
+      <span class="step-time">5 min</span>
       <h3>Remember the Commuter &mdash; Sessions + Memory Bank</h3>
       <p>Right now, each query is stateless. We need two kinds of memory: <strong>Sessions</strong>
       (short-term, within a conversation) so "What about the next one?" makes sense, and
@@ -697,22 +705,22 @@ Add session state for the current conversation and long-term memory
 so the agent remembers my home station across visits. Use ADK's
 session service for short-term state and Memory Bank for cross-session
 personalization.
-After making the code changes, redeploy to Agent Runtime with
-agents-cli deploy. Once the deploy completes, open the deployed
-agent in the Console Playground, share the link, and give me a few
-queries to verify both short-term session state and cross-session
-memory.</div>
+Make the code changes and verify short-term session state locally in
+the playground &mdash; but do NOT redeploy yet. We'll add one more
+feature in the next step and redeploy just once, to save time.</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY adds three things to <code>agent.py</code>, runs the test suite, and redeploys (~5 min):</p>
+        <p>AGY adds three things to <code>agent.py</code> and runs the test suite (no redeploy yet &mdash; that happens once in Step 3):</p>
         <ul>
           <li><strong>Session state tools</strong> &mdash; <code>set_home_station</code> and <code>get_home_station</code> read/write <code>tool_context.state</code>, with an <code>init_state</code> before-agent callback</li>
           <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
           <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
-        <p>AGY then shares a Console Playground link plus test queries. Work through these scenarios:</p>
+        <p>Verify <strong>Scenario 1 (short-term session state) locally in the playground</strong> now.
+        The <strong>Memory Bank scenarios (2 and 3) need the cloud</strong> &mdash; run them against the
+        Console Playground after the single redeploy in Step 3.</p>
 
         <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Short-Term Session State (set the home station)</strong></p>
         <p>Verifies the agent processes <code>set_home_station</code> and stores it in the active session's state.</p>
@@ -750,7 +758,7 @@ memory.</div>
     <!-- Step 3: Sandbox -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">7 min</span>
+      <span class="step-time">9 min</span>
       <h3>Safe Math &mdash; Code Execution Sandbox</h3>
       <p>Give the agent a <strong>code execution sandbox</strong> so it can write and run
       Python on the fly for ad-hoc math the fixed tools don't cover &mdash; safely, without
@@ -768,7 +776,9 @@ infra). Run the math over the data the existing tools return, and
 update the system instruction to mention the sandbox. Then test it
 with agents-cli run using a question that needs this math, and show
 me from the trace that the built-in code execution actually ran
-(not a hardcoded tool). Once verified, redeploy to Agent Runtime.</div>
+(not a hardcoded tool). Once verified, redeploy to Agent Runtime &mdash;
+this one redeploy ships both the session/memory changes from Step 2
+and code execution. After it's live, share the Console Playground link.</div>
       </div>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">
@@ -804,7 +814,7 @@ me from the trace that the built-in code execution actually ran
           <li>Returns computed values: average delay <strong>26.25 min</strong> across the 4 delayed trains (45/30/15/15) and a <strong>50% cancellation rate</strong> (4 of 8 affected), then closes with one recommended action.</li>
           <li>Once verified, AGY redeploys to Agent Runtime.</li>
         </ol>
-        <p>Then open the <strong>Agent Engine Console Playground</strong> link AGY shared and try the same question in the browser &mdash; the same endpoint your users hit.</p>
+        <p>Then open the <strong>Agent Engine Console Playground</strong> link AGY shared and try the same question in the browser &mdash; the same endpoint your users hit. This is also the moment to run the <strong>Memory Bank scenarios from Step 2</strong> (cross-session recall), now that the agent is deployed with both features live.</p>
       </div>
     </div>
 
@@ -832,8 +842,8 @@ me from the trace that the built-in code execution actually ran
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
           <tr><td>2.1 Deploy</td><td>"Deploy this agent to Agent Runtime and give me an endpoint I can query."</td></tr>
-          <tr><td>2.2 Memory</td><td>"Add session state and long-term memory so the agent remembers my home station &mdash; then share a playground link and test queries."</td></tr>
-          <tr><td>2.3 Code Exec</td><td>"Add a code execution sandbox (BuiltInCodeExecutor) for ad-hoc math, test it with agents-cli, then redeploy."</td></tr>
+          <tr><td>2.2 Memory</td><td>"Add session state and long-term memory so the agent remembers my home station &mdash; verify session state locally, don't redeploy yet."</td></tr>
+          <tr><td>2.3 Code Exec</td><td>"Add a code execution sandbox (BuiltInCodeExecutor) for ad-hoc math, test it with agents-cli, then redeploy once &mdash; shipping memory + code exec together."</td></tr>
         </tbody>
       </table>
       <p><strong>Why it matters:</strong> Three prompts take you from a local script to a deployed, stateful,
