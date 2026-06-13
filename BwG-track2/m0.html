@@ -792,21 +792,16 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
      }
    }
 
-3) Then tell me to restart the CLI in a FRESH session (run "agy", not "agy
-   --continue") so the new tools load into the model — a /mcp reload or
-   --continue keeps the current session's toolset and the model can't call
-   the new tools. If it still won't connect, check ADC (gcloud auth
-   application-default print-access-token returns a token) and tell me what
-   you see.</div>
+3) Then tell me to restart the CLI by running "agy" so the new tools load.
+   If it still won't connect, check ADC (gcloud auth application-default
+   print-access-token returns a token) and tell me what you see.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Then restart &mdash; fresh session</div>
-        <p>Once AGY has written the config, <strong>quit and start a fresh <code>agy</code> session</strong>
-        (just <code>agy</code> &mdash; no <code>--continue</code> needed, since this is the first step and there's
-        nothing to preserve yet) so the new MCP tools load into the model from the start. Then type
-        <code>/mcp</code> to confirm <code>google-developer-knowledge</code> is connected and lists its tools,
-        and continue with Step 2.</p>
+        <div class="callout-title">Then restart &mdash; run <code>agy</code></div>
+        <p>Once AGY has written the config, quit and <strong>run <code>agy</code></strong> to start a fresh
+        session so the new MCP tools load. Then type <code>/mcp</code> to confirm
+        <code>google-developer-knowledge</code> is connected and lists its tools, and continue with Step 2.</p>
       </div>
 
       <div class="step-expected">
