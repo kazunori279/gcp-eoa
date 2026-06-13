@@ -925,36 +925,43 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
      }
    }
 
-3) Then tell me to restart the CLI with "agy --continue" to load it (a /mcp
-   reload alone won't pick up a newly added server). If it won't connect,
-   check that ADC is set (gcloud auth application-default print-access-token
-   returns a token) and tell me what you see.</div>
+3) Then tell me to restart the CLI in a FRESH session (run "agy", not "agy
+   --continue") so the new tools load into the model — a /mcp reload or
+   --continue keeps the current session's toolset and the model can't call
+   the new tools. If it still won't connect, check ADC (gcloud auth
+   application-default print-access-token returns a token) and tell me what
+   you see.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Last step is yours &mdash; restart the CLI</div>
-        <p>Once AGY has written the config, restart the AGY CLI with <code>agy --continue</code> (this keeps your
-        current session) so it picks up the new server &mdash; a <code>/mcp</code> reload alone won't load a
-        newly added one. Then type <code>/mcp</code> to confirm <code>google-developer-knowledge</code> is connected.</p>
+        <div class="callout-title">Last step is yours &mdash; restart in a fresh session</div>
+        <p>Once AGY has written the config, <strong>fully restart the AGY CLI in a new session</strong> (run
+        <code>agy</code>, not <code>agy --continue</code>) so the new MCP tools load into the model &mdash; a
+        <code>/mcp</code> reload or <code>--continue</code> keeps the current session's toolset, so the agent
+        can't call the new tools. Your <code>plan.md</code> persists, so you don't lose your place. Then type
+        <code>/mcp</code> to confirm <code>google-developer-knowledge</code> is connected and lists its tools.</p>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into
-        <code>~/.gemini/antigravity-cli/mcp_config.json</code>, authenticating with your gcloud login (ADC) &mdash; no
-        API key. After you restart the CLI (<code>agy --continue</code>) and check <code>/mcp</code>, it shows as a
-        connected MCP server, and from here on AGY grounds Google Cloud questions in the docs instead of guessing
-        (you'll see it lean on this in M2 and M3).</p>
+        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into the AGY CLI's
+        MCP config (<code>~/.gemini/antigravity-cli/mcp_config.json</code>), authenticating with your gcloud login
+        (ADC) &mdash; no API key. After you restart AGY in a fresh session and check <code>/mcp</code>, it shows as a
+        connected MCP server with its tools listed, and from here on AGY grounds Google Cloud questions in the docs
+        instead of guessing (you'll see it lean on this in M2 and M3).</p>
         <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
         <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Use the google-developer-knowledge MCP to investigate what is Antigravity.</div>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">If the server won't connect</div>
-        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If it shows
-        disconnected in <code>/mcp</code>, set ADC with <code>! gcloud auth application-default login</code>, confirm
-        <code>! gcloud auth application-default print-access-token</code> returns a token, then restart with
-        <code>agy --continue</code>.</p>
+        <div class="callout-title">If the server won't connect (or its tools aren't callable)</div>
+        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If
+        <code>/mcp</code> shows it disconnected or absent: (1) set ADC with
+        <code>! gcloud auth application-default login</code> and confirm
+        <code>! gcloud auth application-default print-access-token</code> returns a token; (2) if the server isn't
+        listed at all, the config path varies by Antigravity version &mdash; try
+        <code>~/.gemini/antigravity/mcp_config.json</code> or <code>~/.gemini/config/mcp_config.json</code> instead;
+        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.</p>
       </div>
     </div>
 
