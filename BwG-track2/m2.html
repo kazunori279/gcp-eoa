@@ -514,10 +514,10 @@
     Each deployment can take a few minutes &mdash; let it run, no need to babysit it.
     AGY will tell you automatically once the deployment is live and the endpoint or
     Console Playground link is ready to test.</p>
-    <p>A redeploy normally <strong>updates the same instance in place</strong> (matched by agent name),
-    so the endpoint and Console Playground link usually stay the same. Occasionally a redeploy
-    spins up a fresh instance with a new link &mdash; so always use the <strong>most recent link
-    AGY prints after the latest deploy</strong>, not one you saved earlier.</p>
+    <p>A redeploy <strong>updates the same instance in place</strong> (matched by agent name),
+    so the endpoint and Console Playground link stay the same. The link only changes if the
+    previous instance was deleted &mdash; then the redeploy creates a fresh one. Either way, use the
+    <strong>most recent link AGY prints after the latest deploy</strong>, not one you saved earlier.</p>
   </div>
 
   <!-- PLATFORM ARTIFACTS -->
