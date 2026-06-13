@@ -532,7 +532,7 @@
     <div class="callout callout-warning" style="margin-bottom:1.5rem;">
       <div class="callout-title">Environment Setup &mdash; run once before you start</div>
       <p>Make sure <code>agents-cli</code> is on your PATH and your GCP project is set:</p>
-      <div class="prompt-block" id="cmd-env-setup"><button class="copy-btn" onclick="copyBlock('cmd-env-setup')">Copy</button><span class="prompt-label">shell</span>! export PATH="$HOME/.local/bin:$PATH" && gcloud config set project $(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id) && echo "Project: $(gcloud config get-value project)"</div>
+      <div class="prompt-block" id="cmd-env-setup"><button class="copy-btn" onclick="copyBlock('cmd-env-setup')">Copy</button><span class="prompt-label">shell</span>! export PATH="$HOME/.local/bin:$PATH" && echo "Project: $(gcloud config get-value project)"</div>
     </div>
 
     <!-- Step 1: Scaffold -->
