@@ -248,11 +248,11 @@
   <div class="hero-module">Module 5</div>
   <h1>ENGAGE</h1>
   <p class="hero-sub">Publish your agent to Gemini Enterprise &mdash; the pro-code thing you vibe-built<br>is now a chat anyone in the organization can use.</p>
-  <div class="hero-time">10 minutes &middot; 1:50 &ndash; 2:00 &middot; Guided</div>
+  <div class="hero-time">10 minutes &middot; 1:50 &ndash; 2:00 &middot; 1 prompt + console finish</div>
   <div class="hero-pills">
     <span class="hero-pill">Gemini Enterprise</span>
+    <span class="hero-pill">agents-cli deploy</span>
     <span class="hero-pill">agents-cli publish</span>
-    <span class="hero-pill">Federation</span>
   </div>
 </div>
 
@@ -270,32 +270,50 @@
     <!-- Step 1: Publish -->
     <div class="step">
       <div class="step-num">1</div>
-      <span class="step-time">5 min</span>
-      <h3>Publish to Gemini Enterprise</h3>
-      <p>This is the payoff. The agent you built, scaled, governed, and optimized is about
-      to become a chat that anyone in the organization can use &mdash; no IDE, no code, no API calls.</p>
+      <span class="step-time">6 min</span>
+      <h3>Deploy Fresh &amp; Publish to Gemini Enterprise</h3>
+      <p>This is the payoff. One prompt takes the agent you optimized in M4, <strong>redeploys it fresh</strong>
+      to Agent Runtime, and <strong>attaches it</strong> to your Gemini Enterprise app &mdash; so anyone in the
+      organization can chat with it, no IDE, no code, no API calls.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Publish my agent to our Gemini Enterprise app so business users
-can use it. Ensure VPC-SC compliance and pass end-user identity
-for personalization.</div>
+Take the agent I optimized in M4 and ship it to business users — don't
+change its logic.
+1) Deploy it FRESH to Agent Runtime so the optimized version is live, with
+   agent identity enabled for per-user personalization. Make sure the
+   deployed runtime is compatible with how Gemini Enterprise calls the
+   agent — GE passes a full Google Cloud resource path as the session_id,
+   which ADK's session validation rejects, so handle/normalize that in the
+   runtime wrapper so live portal chats don't fail.
+2) Publish it to our Gemini Enterprise app: list the available apps,
+   register the agent to ours, and give me the console links and a
+   registration_results.md.</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY redeploys with <code>--agent-identity</code> for end-user identity propagation,
-        then runs <code>agents-cli publish gemini-enterprise</code> to register the agent with
-        the <code>explore-ai</code> app. It creates/updates <code>registration_results.md</code> with:</p>
+        <p>AGY runs <code>agents-cli deploy</code> to redeploy the optimized agent fresh (with
+        <code>--agent-identity</code>), then <code>agents-cli publish gemini-enterprise</code> &mdash; discovering
+        your Gemini Enterprise app with <code>--list</code> and registering the agent. It writes
+        <code>registration_results.md</code> with:</p>
         <ul>
-          <li>Agent registered in Gemini Enterprise app (<code>explore-ai</code>)</li>
-          <li><strong>Agent Identity</strong> enabled &mdash; end-user credentials propagated to Memory Bank for per-user personalization</li>
-          <li><strong>VPC-SC compliant</strong> &mdash; all downstream API calls run under the caller's IAM context</li>
-          <li>Links to the <strong>Gemini Enterprise console dashboard</strong> and <strong>Agent Engine Playground</strong></li>
+          <li>Optimized agent <strong>redeployed fresh</strong> to Agent Runtime (new Reasoning Engine revision), <strong>agent identity</strong> enabled for per-user personalization</li>
+          <li><strong>Gemini Enterprise compatibility</strong> &mdash; the runtime normalizes the full-path <code>session_id</code> that GE sends, so live portal chats don't fail with <code>REMOTE_AGENT_FAILURE</code></li>
+          <li>Registered into your Gemini Enterprise app (<strong>"My Gemini Google Search App"</strong>)</li>
+          <li>Links to the <strong>Agent Engine console</strong> and the <strong>Gemini Enterprise console</strong></li>
         </ul>
-        <p><strong>What just happened:</strong> The pro-code agent you built is now registered
-        in Gemini Enterprise &mdash; ready for business users. You'll test it in Step 2.</p>
+        <p><strong>What just happened:</strong> the agent you optimized is live and registered in Gemini
+        Enterprise &mdash; ready for business users. You'll test it in Step 2.</p>
+      </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">If a portal chat fails</div>
+        <p>If a Gemini Enterprise chat returns <code>REMOTE_AGENT_FAILURE</code> or "stream closed cleanly,"
+        that's the known GE&harr;ADK session-id conflict: GE sends a full resource path as the
+        <code>session_id</code> and ADK rejects it. Ask AGY to <strong>normalize the session id in the runtime
+        wrapper and redeploy</strong> &mdash; then retry the chat.</p>
       </div>
     </div>
 
@@ -318,9 +336,9 @@ for personalization.</div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
         <div class="callout-title">Select your agent first</div>
-        <p>In the Gemini Enterprise app, click <strong>"Agents"</strong> in the left navigation,
-        then select <strong>"Transit-Crisis Agent"</strong>. If you see two entries, pick the most recent one.
-        The default chat uses Google Search, not your agent.</p>
+        <p>Open <strong>"My Gemini Google Search App"</strong> in Gemini Enterprise, click <strong>"Agents"</strong>
+        in the left navigation, then select <strong>"Transit-Crisis Agent"</strong>. If you see two entries, pick
+        the most recent one. The default chat uses Google Search, not your agent.</p>
       </div>
 
       <p>Now test it as a business user:</p>
@@ -332,8 +350,8 @@ for personalization.</div>
         <tbody>
           <tr><td><strong>M1 &middot; Build</strong></td><td>Vibe-built agent + 3 tools by prompting</td><td>ADK project, reasoning trace</td></tr>
           <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td>Agent Runtime, Sessions, Memory Bank, Sandbox</td></tr>
-          <tr><td><strong>M3 &middot; Govern</strong></td><td>Registered, identity-bound, policy-enforced</td><td>Registry, Identity, Gateway, Model Armor</td></tr>
-          <tr><td><strong>M4 &middot; Optimize</strong></td><td>10 scenarios, LLM-as-judge scoring, instruction optimization</td><td>Evaluation scores, optimized instruction</td></tr>
+          <tr><td><strong>M3 &middot; Govern</strong></td><td>Verified registry + identity, attack-shielded with Model Armor</td><td>Agent Registry, SPIFFE Identity, Model Armor</td></tr>
+          <tr><td><strong>M4 &middot; Optimize</strong></td><td>Local eval-fix loop: graded eval, one targeted fix, before/after</td><td>Eval scores, before/after compare, pytest</td></tr>
           <tr><td><strong>M5 &middot; Engage</strong></td><td>Published for business users</td><td>Gemini Enterprise agent</td></tr>
         </tbody>
       </table>
@@ -349,8 +367,8 @@ for personalization.</div>
     <div class="done-when">
       <h3>Final Checkpoint &mdash; Workshop Complete When:</h3>
       <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is published to Gemini Enterprise</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You can chat with it as a non-technical user in Gemini Enterprise</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The optimized agent is redeployed fresh and published to Gemini Enterprise</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You can chat with it as a non-technical user in the Gemini Enterprise portal (no <code>REMOTE_AGENT_FAILURE</code>)</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The agent answers the crisis question with a concrete reroute</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Compare the "before" (empty console) to the "after" (full platform)</div></li>
       </ul>
@@ -359,7 +377,7 @@ for personalization.</div>
   <div class="section-divider">
     <h2>The Full BSGO Arc</h2>
 
-    <p>Here's everything you built in 2 hours, from empty console to governed, optimized, federated agent:</p>
+    <p>Here's everything you built in 2 hours, from empty console to a governed, optimized, published agent:</p>
 
     <div class="map-wrap">
       <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" style="max-width:760px;">
@@ -417,7 +435,7 @@ for personalization.</div>
 
         <!-- Labels -->
         <text x="400" y="30" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="800" fill="#333">Build &rarr; Scale &rarr; Govern &rarr; Optimize &rarr; Engage</text>
-        <text x="400" y="50" text-anchor="middle" font-family="system-ui" font-size="10" fill="#666">2 hours from empty console to governed, federated enterprise agent</text>
+        <text x="400" y="50" text-anchor="middle" font-family="system-ui" font-size="10" fill="#666">2 hours from empty console to a governed, optimized, published enterprise agent</text>
 
         <!-- Before/after labels -->
         <text x="60" y="78" text-anchor="middle" font-family="system-ui" font-size="8" font-weight="700" fill="#dc3545">BEFORE: empty</text>
@@ -454,24 +472,24 @@ for personalization.</div>
     <div class="arc-card" style="border-color:#7c3aed;">
       <div class="arc-module" style="color:#7c3aed;">M3 &middot; Govern</div>
       <div>
-        <div class="arc-detail">Registered, identity-bound, policy-enforced corporate asset</div>
-        <div class="arc-artifacts">Agent Registry &middot; IAM Identity &middot; Agent Gateway &middot; Model Armor</div>
+        <div class="arc-detail">Verified as a registered, identity-bound, attack-shielded corporate asset</div>
+        <div class="arc-artifacts">Agent Registry &middot; SPIFFE Identity &middot; Model Armor template</div>
       </div>
     </div>
 
     <div class="arc-card" style="border-color:#0891b2;">
       <div class="arc-module" style="color:#0891b2;">M4 &middot; Optimize</div>
       <div>
-        <div class="arc-detail">Empirically measured and automatically optimized</div>
-        <div class="arc-artifacts">100 scenarios &middot; AutoRater scores &middot; loss clusters &middot; optimized instruction</div>
+        <div class="arc-detail">Evaluated and improved locally with the eval-fix loop</div>
+        <div class="arc-artifacts">Graded eval (agents-cli eval) &middot; before/after compare &middot; grounding fix + pytest</div>
       </div>
     </div>
 
     <div class="arc-card" style="border-color:#b45309; background:#fffbeb;">
       <div class="arc-module" style="color:#b45309;">M5 &middot; Engage</div>
       <div>
-        <div class="arc-detail">Published to Gemini Enterprise &mdash; anyone can chat with your agent</div>
-        <div class="arc-artifacts">Gemini Enterprise agent &middot; VPC-SC compliant &middot; cross-project &middot; personalized</div>
+        <div class="arc-detail">Redeployed fresh and published to Gemini Enterprise &mdash; anyone can chat with your agent</div>
+        <div class="arc-artifacts">Gemini Enterprise agent &middot; fresh redeploy &middot; agent identity &middot; GE-compatible sessions</div>
       </div>
     </div>
 
