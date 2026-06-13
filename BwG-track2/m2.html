@@ -648,6 +648,8 @@
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 1: deploy to Agent Runtime.
+
 Deploy this agent to Agent Runtime. Before deploying:
 1. Copy the data/ directory into app/ so it ships with the bundle
 2. Update the data-path resolution in the code (e.g. tools.py) to be
@@ -709,6 +711,8 @@ status polling fails, just tell me and I will check the console.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 2: add session state + Memory Bank (no redeploy yet).
+
 Add session state for the current conversation and long-term memory
 so the agent remembers my home station across visits. Use ADK's
 session service for short-term state and Memory Bank for cross-session
@@ -791,6 +795,8 @@ feature in the next step and redeploy just once, to save time.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 3: add code execution + single redeploy.
+
 Add a code execution sandbox so the agent can write and run Python
 on the fly for ad-hoc math the tools don't already return &mdash; like
 the average delay across delayed trains, the cancellation ratio, or

@@ -547,6 +547,8 @@
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 1 Step 1: scaffold the ADK project (scaffold only).
+
 Scaffold a new ADK agent project for a transit assistant that will
 answer commuter questions during a service disruption. Use Python,
 gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
@@ -704,6 +706,8 @@ the tools yet; I'll describe them in the next step.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 1 Step 2: add the three tools.
+
 Add three tools to the agent:
 1. get_scheduled_departures &mdash; queries the static GTFS data in data/gtfs/
    to list departures from a given station within a time window.
@@ -749,6 +753,8 @@ modify the eval datasets or run evals (that comes later in M4).</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 1 Step 3: write the system instruction.
+
 Write the system instruction for the agent: stay calm and factual,
 always reconcile schedule against disruptions before answering,
 never invent a train, proactively compute reroutes when services are
@@ -786,6 +792,8 @@ disrupted, and end every response with one clear recommended action.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step4-instr')">Copy</button>
         <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 1 Step 4: run it locally in the playground.
+
 Can you now run the agent locally with adk web by calling agents-cli playground command and
 share the link for me to test. Also share multiple queries I can test
 to make sure the whole system works as intended. Keep checking the
