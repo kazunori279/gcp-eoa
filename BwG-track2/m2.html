@@ -713,14 +713,14 @@ memory.</div>
 
         <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Short-Term Session State (set the home station)</strong></p>
         <p>Verifies the agent processes <code>set_home_station</code> and stores it in the active session's state.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt 1</span>Hello, please set my home station to Paris Gare du Nord.</div>
+        <div class="prompt-block" id="step2-s1p1"><button class="copy-btn" onclick="copyBlock('step2-s1p1')">Copy</button><span class="prompt-label">prompt 1</span>Hello, please set my home station to Paris Gare du Nord.</div>
         <p><em>What to watch for:</em> the trace shows <code>set_home_station(station_name='Paris Gare du Nord')</code>; the agent confirms it's set.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt 2</span>What is my home station again?</div>
+        <div class="prompt-block" id="step2-s1p2"><button class="copy-btn" onclick="copyBlock('step2-s1p2')">Copy</button><span class="prompt-label">prompt 2</span>What is my home station again?</div>
         <p><em>What to watch for:</em> the agent answers immediately <em>without</em> calling any tool, reading "Paris Gare du Nord" from the injected session state.</p>
 
         <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Cross-Session Memory (Memory Bank)</strong></p>
         <p>Click <strong>New Session</strong> / <strong>Reset Session</strong> (top-right of the Console Playground). This starts a new session ID but keeps your <code>user_id</code>.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt</span>What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?</div>
+        <div class="prompt-block" id="step2-s2"><button class="copy-btn" onclick="copyBlock('step2-s2')">Copy</button><span class="prompt-label">prompt</span>What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?</div>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>The agent preloads your <code>user:home_station</code> memory ("Paris Gare du Nord") &mdash; proving recall across a brand-new session.</li>
@@ -730,7 +730,7 @@ memory.</div>
 
         <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; Personalized Reconciliation &amp; Reroute (memory + the full chain)</strong></p>
         <p>Confirms the deployed agent fuses long-term memory with live reconciliation: it infers "home" from Memory Bank, then reconciles and reroutes.</p>
-        <div class="prompt-block"><span class="prompt-label">prompt</span>I'm heading home from St Pancras this evening &mdash; what are my options given the disruption?</div>
+        <div class="prompt-block" id="step2-s3"><button class="copy-btn" onclick="copyBlock('step2-s3')">Copy</button><span class="prompt-label">prompt</span>I'm heading home from St Pancras this evening &mdash; what are my options given the disruption?</div>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Recalls your <code>user:home_station</code> ("Paris Gare du Nord") from memory &mdash; you never restate the destination.</li>
