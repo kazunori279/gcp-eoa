@@ -346,9 +346,9 @@
   <div class="govern-card" style="border-color:#1a73e8;">
     <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent Identity</a> (IAM) <span class="tag tag-handson">Hands-on</span></h4>
     <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
-    <p><strong>Protection:</strong> Every agent gets a <strong>SPIFFE-based identity</strong> with an auto-rotated
-    X.509 certificate; Context-Aware Access enforces mutual TLS + DPoP. Two default roles keep it least-privilege,
-    so a stolen token is useless without the attested context.</p>
+    <p><strong>Protection:</strong> With <strong>Agent Identity</strong> (opt-in), an agent gets a SPIFFE-based
+    identity and an auto-rotated X.509 certificate; Context-Aware Access enforces mutual TLS + DPoP, so a stolen
+    token is useless without the attested context. Otherwise it runs under a standard service account you audit.</p>
     <p class="doc-cite">Docs: <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent identity</a> &middot; <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">IAM agent identity</a></p>
   </div>
 
@@ -396,8 +396,9 @@
       <span class="tag tag-handson">Hands-on</span>
       <h3>Verify Your Agent Is a Governed Asset &mdash; Registry + Identity</h3>
       <p>You don't have to <em>make</em> your agent governable. The moment you deployed it to Agent Runtime
-      in M2, the platform <strong>auto-registered</strong> it in the Agent Registry and gave it a unique
-      <strong>SPIFFE identity</strong> with least-privilege roles. Let's verify all of that &mdash; live.</p>
+      in M2, the platform <strong>auto-registered</strong> it in the Agent Registry and gave it a
+      <strong>runtime identity</strong> (a service account; the SPIFFE-based Agent Identity is opt-in).
+      Let's verify that &mdash; and audit whether that identity is actually least-privilege &mdash; live.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
@@ -422,19 +423,18 @@ engine id from deployment_metadata.json. Show me:
         <p>AGY confirms the commands via <code>--help</code>, then runs live <code>gcloud</code> queries and reports:</p>
         <ul>
           <li><strong>Agent Registry entry</strong> &mdash; e.g. <code>projects/&hellip;/locations/us-east1/agents/&lt;id&gt;</code>, with all 5 tools (<code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>, <code>set_home_station</code>, <code>get_home_station</code>)</li>
-          <li><strong>SPIFFE identity</strong> &mdash; <code>principal://agents.global.org-&hellip;/resources/aiplatform/&hellip;/reasoningEngines/&lt;id&gt;</code></li>
-          <li><strong>Default roles</strong> &mdash; <code>roles/aiplatform.agentDefaultAccess</code> (+ <code>agentContextEditor</code>): basic model/logging access, scoped to its own sessions, memories, and sandboxes</li>
-          <li><strong>Least-privilege verdict</strong> &mdash; no owner/editor/admin, no token creation, no network or write/egress grants (its GTFS data is bundled locally, so it needs none)</li>
+          <li><strong>Runtime identity</strong> &mdash; a default service agent (e.g. <code>service-&lt;num&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>), not a SPIFFE principal &mdash; the SPIFFE-based Agent Identity is opt-in and off here</li>
+          <li><strong>Privilege audit</strong> &mdash; the roles bound to that service account. A clean project shows just the reasoning-engine service agent (+ basic <code>aiplatform.user</code>/<code>viewer</code>); <strong>in this lab you'll likely also see broad roles</strong> (<code>storage.admin</code>, <code>bigquery.admin</code>, <code>secretmanager.admin</code>) from the scaffold defaults + lab setup &mdash; flag those as excessive (its GTFS data is bundled locally, so it needs none)</li>
         </ul>
-        <p><strong>What just happened:</strong> the moment you deployed in M2, the platform made this a
-        discoverable, uniquely-identified, least-privilege corporate asset &mdash; with no extra work.</p>
+        <p><strong>What just happened:</strong> deploying in M2 made this a discoverable, uniquely-identified
+        corporate asset for free &mdash; but least-privilege still has to be <strong>audited</strong>, not assumed.</p>
       </div>
 
       <div class="callout callout-govern" style="margin-top:.75rem;">
         <div class="callout-title">See it in the console</div>
         <ul style="margin-bottom:0;">
-          <li><strong>Govern &rarr; Agent Registry</strong> &mdash; your agent, its 5 tools, and its SPIFFE identity</li>
-          <li><strong>Govern &rarr; Security</strong> &mdash; "Agents with excessive permissions" shows a clean posture</li>
+          <li><strong>Govern &rarr; Agent Registry</strong> &mdash; your agent, its 5 tools, and its identity</li>
+          <li><strong>Govern &rarr; Security</strong> &mdash; "Agents with excessive permissions" may flag your agent for the broad roles above</li>
         </ul>
       </div>
     </div>
@@ -541,8 +541,8 @@ deployment_metadata.json, and confirm exact flags via
     <div class="done-when">
       <h3>Mentor Checkpoint &mdash; Done When:</h3>
       <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Verified your agent in the Agent Registry with its 5 tools and SPIFFE identity (live)</div></li>
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Confirmed least-privilege &mdash; no excessive permissions on the agent identity</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Verified your agent in the Agent Registry with its 5 tools and identity</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Audited the agent identity's roles and flagged any that exceed what it needs</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Created a Model Armor template and watched it block a jailbreak <em>and</em> PII in the terminal</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Can locate Gateway, Policies, and Business Policies in the console and explain each</div></li>
       </ul>
@@ -571,7 +571,7 @@ deployment_metadata.json, and confirm exact flags via
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>3.2</td><td>Live <code>gcloud</code> audit &mdash; Agent Registry listing + <code>get-iam-policy</code> on the agent's SPIFFE principal</td></tr>
+          <tr><td>3.2</td><td>Live audit &mdash; Agent Registry / identity check + <code>get-iam-policy</code> on the agent's runtime service account</td></tr>
           <tr><td>3.3</td><td><code>gcloud model-armor templates create</code> + REST <code>:sanitizeUserPrompt</code> to test the attack / clean / PII prompts</td></tr>
         </tbody>
       </table>
@@ -593,7 +593,7 @@ deployment_metadata.json, and confirm exact flags via
       <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>No agent sprawl</strong> &mdash; every deployed agent is auto-registered and discoverable</li>
-        <li><strong>Attested identity</strong> &mdash; a SPIFFE identity with least-privilege by default; bounded damage even if compromised</li>
+        <li><strong>Auditable identity</strong> &mdash; a runtime identity you can audit and scope; least-privilege isn't automatic, so verify and trim it (Agent Identity adds an attested SPIFFE identity)</li>
         <li><strong>Platform-enforced safety</strong> &mdash; a Model Armor policy you proved blocks attacks and data leaks</li>
         <li><strong>Ready to scale</strong> &mdash; gateway, access policies, and semantic governance wrap every agent org-wide</li>
       </ul>
