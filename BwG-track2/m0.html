@@ -859,38 +859,33 @@ Do NOT start building yet — this context is background only.</div>
       (especially M2 and M3) out of trial-and-error spirals. <code>agents-cli</code> already covers its own
       skills, so this fills in the rest of the Google Cloud surface.</p>
 
-      <p>Let AGY set it up &mdash; paste this and it enables the API, creates the key, and writes the config:</p>
+      <p>Let AGY set it up &mdash; paste this and it enables the API and writes the config, authenticating with
+      your gcloud login (no API key needed):</p>
 
       <div class="card agent-section" style="margin-top:.75rem;">
         <button class="copy-btn" onclick="copyBlock('ctx-dk-mcp')">Copy</button>
         <div class="agent-ctx" id="ctx-dk-mcp"><span class="agent-ctx-label">Paste into AGY</span>
 Install the Google Developer Knowledge MCP for yourself so you can look up
-Google Cloud product docs in the later modules. Do it end to end:
+Google Cloud product docs in the later modules. Authenticate with my
+existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 
 1) Enable the API:
    gcloud services enable developerknowledge.googleapis.com
 
-2) Create an API key for it and capture the key string (do NOT print the
-   key back to me):
-   gcloud services api-keys create --display-name="dev-knowledge-mcp" \
-     --api-target=service=developerknowledge.googleapis.com \
-     --format="value(response.keyString)"
-
-3) Merge (don't overwrite) this server into the Antigravity CLI's global MCP
-   config at ~/.gemini/antigravity-cli/mcp_config.json (create it if missing),
-   using the key from step 2 in place of YOUR_API_KEY:
+2) Merge (don't overwrite) this server into the Antigravity CLI's global MCP
+   config at ~/.gemini/antigravity-cli/mcp_config.json (create it if missing):
    {
      "mcpServers": {
        "google-developer-knowledge": {
          "serverUrl": "https://developerknowledge.googleapis.com/mcp",
-         "headers": { "X-Goog-Api-Key": "YOUR_API_KEY" }
+         "authProviderType": "google_credentials"
        }
      }
    }
 
-4) Then tell me to refresh Antigravity's MCP servers to load it. If creating
-   the key via gcloud is blocked, stop and tell me — I'll create one in the
-   Console instead.</div>
+3) Then tell me to reload it with /mcp. If it won't connect, check that ADC
+   is set (gcloud auth application-default print-access-token returns a token)
+   and tell me what you see.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
@@ -901,18 +896,17 @@ Google Cloud product docs in the later modules. Do it end to end:
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY enables the API, creates the key, and writes the <code>google-developer-knowledge</code> server into
-        <code>~/.gemini/antigravity-cli/mcp_config.json</code> &mdash; without echoing the key. After you reload with
-        <code>/mcp</code>, it shows as a connected MCP server, and from here on AGY grounds Google Cloud questions in
-        the docs instead of guessing (you'll see it lean on this in M2 and M3).</p>
+        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into
+        <code>~/.gemini/antigravity-cli/mcp_config.json</code>, authenticating with your gcloud login (ADC) &mdash; no
+        API key. After you reload with <code>/mcp</code>, it shows as a connected MCP server, and from here on AGY
+        grounds Google Cloud questions in the docs instead of guessing (you'll see it lean on this in M2 and M3).</p>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">Fallback &mdash; do it manually</div>
-        <p>If AGY can't create the key (e.g. an org policy blocks API keys), create one in the Console
-        (<strong>APIs &amp; Services &rarr; Credentials &rarr; Create credentials &rarr; API key</strong>), then add the
-        <code>mcpServers</code> block from the prompt above to <code>~/.gemini/antigravity-cli/mcp_config.json</code>
-        yourself and reload with <code>/mcp</code>.</p>
+        <div class="callout-title">If the server won't connect</div>
+        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If it shows
+        disconnected in <code>/mcp</code>, set ADC with <code>! gcloud auth application-default login</code>, confirm
+        <code>! gcloud auth application-default print-access-token</code> returns a token, then reload <code>/mcp</code>.</p>
       </div>
     </div>
 
