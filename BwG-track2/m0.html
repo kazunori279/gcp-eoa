@@ -876,7 +876,8 @@ Google Cloud product docs in the later modules. Do it end to end:
      --api-target=service=developerknowledge.googleapis.com \
      --format="value(response.keyString)"
 
-3) Merge (don't overwrite) this server into ~/.gemini/mcp_config.json,
+3) Merge (don't overwrite) this server into the Antigravity CLI's global MCP
+   config at ~/.gemini/antigravity-cli/mcp_config.json (create it if missing),
    using the key from step 2 in place of YOUR_API_KEY:
    {
      "mcpServers": {
@@ -893,24 +894,25 @@ Google Cloud product docs in the later modules. Do it end to end:
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Last step is yours &mdash; refresh</div>
-        <p>Once AGY has written the config, load it: <strong>Settings &rarr; Customizations &rarr; Refresh</strong>
-        under Installed MCP Servers (CLI: run <code>agy</code>, then <code>/mcp</code>).</p>
+        <div class="callout-title">Last step is yours &mdash; reload</div>
+        <p>Once AGY has written the config, type <code>/mcp</code> in the AGY prompt to open the MCP Manager,
+        then reload &mdash; <code>google-developer-knowledge</code> should show as connected.</p>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
         <p>AGY enables the API, creates the key, and writes the <code>google-developer-knowledge</code> server into
-        <code>~/.gemini/mcp_config.json</code> &mdash; without echoing the key. After you refresh, it shows as an
-        installed MCP server, and from here on AGY grounds Google Cloud questions in the docs instead of guessing
-        (you'll see it lean on this in M2 and M3).</p>
+        <code>~/.gemini/antigravity-cli/mcp_config.json</code> &mdash; without echoing the key. After you reload with
+        <code>/mcp</code>, it shows as a connected MCP server, and from here on AGY grounds Google Cloud questions in
+        the docs instead of guessing (you'll see it lean on this in M2 and M3).</p>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
         <div class="callout-title">Fallback &mdash; do it manually</div>
         <p>If AGY can't create the key (e.g. an org policy blocks API keys), create one in the Console
         (<strong>APIs &amp; Services &rarr; Credentials &rarr; Create credentials &rarr; API key</strong>), then add the
-        <code>mcpServers</code> block from the prompt above to <code>~/.gemini/mcp_config.json</code> yourself and refresh.</p>
+        <code>mcpServers</code> block from the prompt above to <code>~/.gemini/antigravity-cli/mcp_config.json</code>
+        yourself and reload with <code>/mcp</code>.</p>
       </div>
     </div>
 
