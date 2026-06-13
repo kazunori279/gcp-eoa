@@ -619,7 +619,7 @@
     </div>
 
   <!-- STEPS -->
-  <h2>Scale in 3 Steps</h2>
+  <h2>Scale in 4 Steps</h2>
 
     <div class="callout callout-warning">
       <div class="callout-title">The Leap</div>
@@ -729,53 +729,9 @@ feature in the next step and redeploy just once, to save time.</div>
           <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
           <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
-        <p>Verify <strong>Scenario 1 (short-term session state) locally in the playground</strong> now.
-        The <strong>Memory Bank scenarios (2 and 3) need the cloud</strong> &mdash; run them against the
-        Console Playground after the single redeploy in Step 3.</p>
-
-        <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Short-Term Session State (set the home station)</strong></p>
-        <p>Verifies the agent processes <code>set_home_station</code> and stores it in the active session's state.</p>
-        <div class="prompt-block" id="step2-s1p1"><button class="copy-btn" onclick="copyBlock('step2-s1p1')">Copy</button><span class="prompt-label">prompt 1</span>Hello, please set my home station to Paris Gare du Nord.</div>
-        <p><em>What to watch for:</em> the trace shows <code>set_home_station(station_name='Paris Gare du Nord')</code>; the agent confirms it's set.</p>
-        <div class="prompt-block" id="step2-s1p2"><button class="copy-btn" onclick="copyBlock('step2-s1p2')">Copy</button><span class="prompt-label">prompt 2</span>What is my home station again?</div>
-        <p><em>What to watch for:</em> the agent answers immediately <em>without</em> calling any tool, reading "Paris Gare du Nord" from the injected session state.</p>
-
-        <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Cross-Session Memory (Memory Bank)</strong></p>
-        <p>Click <strong>New Session</strong> / <strong>Reset Session</strong> (top-right of the Console Playground). This starts a new session ID but keeps your <code>user_id</code>.</p>
-        <div class="prompt-block" id="step2-s2"><button class="copy-btn" onclick="copyBlock('step2-s2')">Copy</button><span class="prompt-label">prompt</span>What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?</div>
-        <p><em>What to watch for:</em></p>
-        <ol>
-          <li>The agent preloads your <code>user:home_station</code> memory ("Paris Gare du Nord") &mdash; proving recall across a brand-new session.</li>
-          <li>It queries <code>check_disruptions(station_name='Paris Gare du Nord')</code>.</li>
-          <li>It lists the active disruptions on Paris-bound Eurostar services from the St Pancras throat signal failure (e.g., the cancelled 15:31 and 16:31 departures and the delayed 17:31/18:31 services).</li>
-        </ol>
-        <p style="margin-top:.5rem;"><strong>Verify it in the console &mdash; this is the ground truth.</strong>
-        Open the <a href="https://console.cloud.google.com/agent-platform/memory-bank" target="_blank">Memory Bank console</a>
-        and confirm a memory was actually written. You should see a row like:</p>
-        <table class="data">
-          <thead><tr><th>Scope</th><th>Resource Name</th><th>Fact</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><code>app_name: app</code><br><code>user_id: cli-user</code></td>
-              <td>&hellip;/4586226276930420736</td>
-              <td>My home station is Paris Gare du Nord.</td>
-            </tr>
-          </tbody>
-        </table>
-        <p>If the agent "remembers" but <strong>no row appears here</strong>, the recall came from
-        conversation history, not Memory Bank &mdash; so make sure you truly started a new session
-        (new session ID, same <code>user_id</code>) before trusting the result.</p>
-
-        <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; Personalized Reconciliation &amp; Reroute (memory + the full chain)</strong></p>
-        <p>Confirms the deployed agent fuses long-term memory with live reconciliation: it infers "home" from Memory Bank, then reconciles and reroutes.</p>
-        <div class="prompt-block" id="step2-s3"><button class="copy-btn" onclick="copyBlock('step2-s3')">Copy</button><span class="prompt-label">prompt</span>I'm heading home from St Pancras this evening &mdash; what are my options given the disruption?</div>
-        <p><em>What to watch for:</em></p>
-        <ol>
-          <li>Recalls your <code>user:home_station</code> ("Paris Gare du Nord") from memory &mdash; you never restate the destination.</li>
-          <li>Calls <code>get_scheduled_departures(station_name='St Pancras', start_time='17:00', end_time='20:00', date_str='2026-07-15')</code> and <code>check_disruptions</code>, reconciling on <code>trip_id</code> to flag the cancelled/delayed evening Paris services.</li>
-          <li>Proactively calls <code>compute_reroute(origin='St Pancras', destination='Paris Gare du Nord', departure_after='17:31', date_str='2026-07-15')</code> for the earliest alternative (e.g., via Brussels Midi).</li>
-          <li>Closes with exactly one prominent recommended action.</li>
-        </ol>
+        <p>AGY verifies short-term session state locally (set the home station, then recall it in the same
+        session). You'll exercise the full set of scenarios &mdash; session state, cross-session memory, and
+        personalized reroute &mdash; against the deployed agent in <strong>Step 4</strong>, after the single redeploy.</p>
 
         <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
         not app code you maintain.</p>
@@ -785,7 +741,7 @@ feature in the next step and redeploy just once, to save time.</div>
     <!-- Step 3: Sandbox -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">9 min</span>
+      <span class="step-time">7 min</span>
       <h3>Safe Math &mdash; Code Execution Sandbox</h3>
       <p>Give the agent a <strong>code execution sandbox</strong> so it can write and run
       Python on the fly for ad-hoc math the fixed tools don't cover &mdash; safely, without
@@ -846,7 +802,75 @@ and code execution. After it's live, share the Console Playground link.</div>
           <li>Returns computed values: average delay <strong>26.25 min</strong> across the 4 delayed trains (45/30/15/15) and a <strong>50% cancellation rate</strong> (4 of 8 affected), then closes with one recommended action.</li>
           <li>Once verified, AGY redeploys to Agent Runtime.</li>
         </ol>
-        <p>Then open the <strong>Agent Engine Console Playground</strong> link AGY shared and try the same question in the browser &mdash; the same endpoint your users hit. This is also the moment to run the <strong>Memory Bank scenarios from Step 2</strong> (cross-session recall), now that the agent is deployed with both features live.</p>
+        <p>Once the redeploy is live, head to <strong>Step 4</strong> to test everything &mdash; session state,
+        cross-session memory, personalized reroute, and this code-exec question &mdash; against the deployed agent in
+        the Console Playground.</p>
+      </div>
+    </div>
+
+    <!-- Step 4: Test the deployed agent -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <span class="step-time">5 min</span>
+      <h3>Test the Deployed Agent &mdash; Run the Scenarios</h3>
+      <p>Now that the Step 3 redeploy is live, open the <strong>Agent Engine Console Playground</strong> link AGY
+      shared and work through these scenarios against the deployed agent &mdash; the same endpoint your users hit.
+      Run them in order; Scenario 2 depends on Scenario 1.</p>
+
+      <p style="margin-top:1rem;"><strong>Scenario 1 &mdash; Short-Term Session State (set the home station)</strong></p>
+      <p>Verifies the agent processes <code>set_home_station</code> and stores it in the active session's state.</p>
+      <div class="prompt-block" id="step4-s1p1"><button class="copy-btn" onclick="copyBlock('step4-s1p1')">Copy</button><span class="prompt-label">prompt 1</span>Hello, please set my home station to Paris Gare du Nord.</div>
+      <p><em>What to watch for:</em> the trace shows <code>set_home_station(station_name='Paris Gare du Nord')</code>; the agent confirms it's set.</p>
+      <div class="prompt-block" id="step4-s1p2"><button class="copy-btn" onclick="copyBlock('step4-s1p2')">Copy</button><span class="prompt-label">prompt 2</span>What is my home station again?</div>
+      <p><em>What to watch for:</em> the agent answers immediately <em>without</em> calling any tool, reading "Paris Gare du Nord" from the injected session state.</p>
+
+      <p style="margin-top:1rem;"><strong>Scenario 2 &mdash; Cross-Session Memory (Memory Bank)</strong></p>
+      <p>Click <strong>New Session</strong> / <strong>Reset Session</strong> (top-right of the Console Playground). This starts a new session ID but keeps your <code>user_id</code>.</p>
+      <div class="prompt-block" id="step4-s2"><button class="copy-btn" onclick="copyBlock('step4-s2')">Copy</button><span class="prompt-label">prompt</span>What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?</div>
+      <p><em>What to watch for:</em></p>
+      <ol>
+        <li>The agent preloads your <code>user:home_station</code> memory ("Paris Gare du Nord") &mdash; proving recall across a brand-new session.</li>
+        <li>It queries <code>check_disruptions(station_name='Paris Gare du Nord')</code>.</li>
+        <li>It lists the active disruptions on Paris-bound Eurostar services from the St Pancras throat signal failure (e.g., the cancelled 15:31 and 16:31 departures and the delayed 17:31/18:31 services).</li>
+      </ol>
+      <p style="margin-top:.5rem;"><strong>Verify it in the console &mdash; this is the ground truth.</strong>
+      Open the <a href="https://console.cloud.google.com/agent-platform/memory-bank" target="_blank">Memory Bank console</a>
+      and confirm a memory was actually written. You should see a row like:</p>
+      <table class="data">
+        <thead><tr><th>Scope</th><th>Resource Name</th><th>Fact</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>app_name: app</code><br><code>user_id: cli-user</code></td>
+            <td>&hellip;/4586226276930420736</td>
+            <td>My home station is Paris Gare du Nord.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>If the agent "remembers" but <strong>no row appears here</strong>, the recall came from conversation
+      history, not Memory Bank &mdash; so make sure you truly started a new session (new session ID, same
+      <code>user_id</code>) before trusting the result.</p>
+
+      <p style="margin-top:1rem;"><strong>Scenario 3 &mdash; Personalized Reconciliation &amp; Reroute (memory + the full chain)</strong></p>
+      <p>Confirms the deployed agent fuses long-term memory with live reconciliation: it infers "home" from Memory Bank, then reconciles and reroutes.</p>
+      <div class="prompt-block" id="step4-s3"><button class="copy-btn" onclick="copyBlock('step4-s3')">Copy</button><span class="prompt-label">prompt</span>I'm heading home from St Pancras this evening &mdash; what are my options given the disruption?</div>
+      <p><em>What to watch for:</em></p>
+      <ol>
+        <li>Recalls your <code>user:home_station</code> ("Paris Gare du Nord") from memory &mdash; you never restate the destination.</li>
+        <li>Calls <code>get_scheduled_departures(station_name='St Pancras', start_time='17:00', end_time='20:00', date_str='2026-07-15')</code> and <code>check_disruptions</code>, reconciling on <code>trip_id</code> to flag the cancelled/delayed evening Paris services.</li>
+        <li>Proactively calls <code>compute_reroute(origin='St Pancras', destination='Paris Gare du Nord', departure_after='17:31', date_str='2026-07-15')</code> for the earliest alternative (e.g., via Brussels Midi).</li>
+        <li>Closes with exactly one prominent recommended action.</li>
+      </ol>
+
+      <p style="margin-top:1rem;"><strong>Scenario 4 &mdash; Code Execution (ad-hoc math)</strong></p>
+      <p>Confirms the built-in sandbox computes a stat no single tool returns &mdash; the same question AGY verified locally in Step 3, now on the deployed agent.</p>
+      <div class="prompt-block" id="step4-s4"><button class="copy-btn" onclick="copyBlock('step4-s4')">Copy</button><span class="prompt-label">prompt</span>Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?</div>
+      <p><em>What to watch for:</em> the trace shows the model writing and running Python in the built-in sandbox, returning e.g. average delay <strong>26.25 min</strong> and a <strong>50% cancellation rate</strong>, then one recommended action.</p>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>All four scenarios pass against the deployed agent: session-state recall, cross-session memory (with a row
+        in the Memory Bank console), personalized reroute, and sandbox-computed math &mdash; the same endpoint your
+        end users hit.</p>
       </div>
     </div>
 
