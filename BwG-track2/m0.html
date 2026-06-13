@@ -859,32 +859,58 @@ Do NOT start building yet — this context is background only.</div>
       (especially M2 and M3) out of trial-and-error spirals. <code>agents-cli</code> already covers its own
       skills, so this fills in the rest of the Google Cloud surface.</p>
 
-      <p><strong>a)</strong> Enable the API:</p>
-      <div class="prompt-block" id="cmd-dk-enable"><button class="copy-btn" onclick="copyBlock('cmd-dk-enable')">Copy</button><span class="prompt-label">shell</span>! gcloud services enable developerknowledge.googleapis.com</div>
+      <p>Let AGY set it up &mdash; paste this and it enables the API, creates the key, and writes the config:</p>
 
-      <p><strong>b)</strong> Create an API key: in the Console, <strong>APIs &amp; Services &rarr; Credentials &rarr;
-      Create credentials &rarr; API key</strong> (optionally restrict it to the Developer Knowledge API). Copy the
-      key &mdash; that's <code>YOUR_API_KEY</code> below.</p>
+      <div class="card agent-section" style="margin-top:.75rem;">
+        <button class="copy-btn" onclick="copyBlock('ctx-dk-mcp')">Copy</button>
+        <div class="agent-ctx" id="ctx-dk-mcp"><span class="agent-ctx-label">Paste into AGY</span>
+Install the Google Developer Knowledge MCP for yourself so you can look up
+Google Cloud product docs in the later modules. Do it end to end:
 
-      <p><strong>c)</strong> Add the MCP server in Antigravity &mdash; <strong>Settings &rarr; Customizations &rarr;
-      MCP Servers</strong> (or edit <code>~/.gemini/mcp_config.json</code>):</p>
-      <div class="prompt-block" id="cmd-dk-mcp"><button class="copy-btn" onclick="copyBlock('cmd-dk-mcp')">Copy</button><span class="prompt-label">mcp_config.json</span>{
-  "mcpServers": {
-    "google-developer-knowledge": {
-      "serverUrl": "https://developerknowledge.googleapis.com/mcp",
-      "headers": { "X-Goog-Api-Key": "YOUR_API_KEY" }
-    }
-  }
-}</div>
+1) Enable the API:
+   gcloud services enable developerknowledge.googleapis.com
 
-      <p><strong>d)</strong> Refresh: <strong>Settings &rarr; Customizations &rarr; Refresh</strong> under Installed
-      MCP Servers (CLI: run <code>agy</code>, then <code>/mcp</code>).</p>
+2) Create an API key for it and capture the key string (do NOT print the
+   key back to me):
+   gcloud services api-keys create --display-name="dev-knowledge-mcp" \
+     --api-target=service=developerknowledge.googleapis.com \
+     --format="value(response.keyString)"
+
+3) Merge (don't overwrite) this server into ~/.gemini/mcp_config.json,
+   using the key from step 2 in place of YOUR_API_KEY:
+   {
+     "mcpServers": {
+       "google-developer-knowledge": {
+         "serverUrl": "https://developerknowledge.googleapis.com/mcp",
+         "headers": { "X-Goog-Api-Key": "YOUR_API_KEY" }
+       }
+     }
+   }
+
+4) Then tell me to refresh Antigravity's MCP servers to load it. If creating
+   the key via gcloud is blocked, stop and tell me — I'll create one in the
+   Console instead.</div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">Last step is yours &mdash; refresh</div>
+        <p>Once AGY has written the config, load it: <strong>Settings &rarr; Customizations &rarr; Refresh</strong>
+        under Installed MCP Servers (CLI: run <code>agy</code>, then <code>/mcp</code>).</p>
+      </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p><code>google-developer-knowledge</code> shows as an installed MCP server. From here on, when AGY is
-        unsure of a Google Cloud command or whether a feature is on by default, it grounds in the docs instead
-        of guessing &mdash; you'll see it lean on this in M2 and M3.</p>
+        <p>AGY enables the API, creates the key, and writes the <code>google-developer-knowledge</code> server into
+        <code>~/.gemini/mcp_config.json</code> &mdash; without echoing the key. After you refresh, it shows as an
+        installed MCP server, and from here on AGY grounds Google Cloud questions in the docs instead of guessing
+        (you'll see it lean on this in M2 and M3).</p>
+      </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">Fallback &mdash; do it manually</div>
+        <p>If AGY can't create the key (e.g. an org policy blocks API keys), create one in the Console
+        (<strong>APIs &amp; Services &rarr; Credentials &rarr; Create credentials &rarr; API key</strong>), then add the
+        <code>mcpServers</code> block from the prompt above to <code>~/.gemini/mcp_config.json</code> yourself and refresh.</p>
       </div>
     </div>
 
