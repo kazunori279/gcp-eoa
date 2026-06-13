@@ -521,14 +521,6 @@
     <strong>most recent link AGY prints after the latest deploy</strong>, not one you saved earlier.</p>
   </div>
 
-  <div class="callout callout-info">
-    <div class="callout-title">Ground AGY first</div>
-    <p>This module uses several managed products (Agent Runtime, Sessions, Memory Bank, Code Execution).
-    If AGY is unsure of a command or whether a feature is on by default, have it check the
-    <strong>Developer Knowledge MCP</strong> (installed in M0) before acting &mdash; grounding in the docs beats
-    guessing flags. <code>agents-cli</code> skills already cover the CLI itself.</p>
-  </div>
-
   <!-- PLATFORM ARTIFACTS -->
   <h2>Platform Artifacts &mdash; What You Build in M2</h2>
 
@@ -650,6 +642,9 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 1: deploy to Agent Runtime.
 
+First, use the google-developer-knowledge MCP to read up on Agent Runtime
+(Vertex AI Agent Engine) deployment, so you use current commands and defaults.
+
 Deploy this agent to Agent Runtime. Before deploying:
 1. Copy the data/ directory into app/ so it ships with the bundle
 2. Update the data-path resolution in the code (e.g. tools.py) to be
@@ -712,6 +707,10 @@ status polling fails, just tell me and I will check the console.</div>
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 2: add session state + Memory Bank (no redeploy yet).
+
+First, use the google-developer-knowledge MCP to read up on ADK Sessions and
+Memory Bank (including how memory generation is triggered), so you use current
+APIs and defaults.
 
 Add session state for the current conversation and long-term memory
 so the agent remembers my home station across visits. Use ADK's
@@ -796,6 +795,9 @@ feature in the next step and redeploy just once, to save time.</div>
         <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 3: add code execution + single redeploy.
+
+First, use the google-developer-knowledge MCP to read up on ADK code execution
+(code executors / BuiltInCodeExecutor), so you use the current API.
 
 Add a code execution sandbox so the agent can write and run Python
 on the fly for ad-hoc math the tools don't already return &mdash; like

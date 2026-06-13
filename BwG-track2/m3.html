@@ -290,14 +290,6 @@
     rather than provision.</p>
   </div>
 
-  <div class="callout callout-info">
-    <div class="callout-title">Ground AGY first</div>
-    <p>The governance products here (Agent Registry, Agent Identity, Model Armor) have non-obvious behaviors.
-    If AGY is unsure of a command or whether a feature is on by default, have it check the
-    <strong>Developer Knowledge MCP</strong> (installed in M0) before acting &mdash; so it grounds in the docs
-    instead of guessing.</p>
-  </div>
-
   <!-- SECURITY MODEL -->
   <h2>The 4-Layer Security Model</h2>
 
@@ -405,6 +397,10 @@
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 3 Step 2: verify Registry, identity, and least-privilege.
 
+First, use the google-developer-knowledge MCP to read up on the Agent Registry,
+Agent Identity (is it opt-in?), and reasoning-engine IAM, so you check the right
+things the right way.
+
 My "Rush Hour" agent was deployed to Agent Runtime in M2 (a reasoningEngine
 in us-east1). When it deployed, the platform automatically gave it an
 identity and registered it in the Agent Registry. Verify that for me — do
@@ -455,6 +451,10 @@ engine id from deployment_metadata.json. Show me:
         <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 3 Step 3: shield with Model Armor.
+
+First, use the google-developer-knowledge MCP to read up on Model Armor
+(templates, regional endpoints, and the sanitize API), so you use current
+commands.
 
 Add an attack shield with Model Armor and prove it works in the terminal —
 no gateway, no Gemini Enterprise. Read project/region from
