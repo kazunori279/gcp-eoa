@@ -831,12 +831,18 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
         <div class="callout-title">If the native MCP is blocked &mdash; use the direct helper</div>
         <p>Some lab projects block remote MCP servers at the runtime level (errors like <em>"server &hellip; not
         allowed in this context"</em> or <em>"tool &hellip; is not enabled"</em>) that the allow rule can't fix.
-        If so, grab a tiny helper that queries the same Developer Knowledge docs directly via your gcloud login,
-        and use it wherever a later step says "use the google-developer-knowledge MCP":</p>
-        <div class="prompt-block" id="cmd-dk-helper"><button class="copy-btn" onclick="copyBlock('cmd-dk-helper')">Copy</button><span class="prompt-label">shell</span>! curl -L -o dk.py https://kazunori279.github.io/gcp-eoa/BwG-track2/dk.py && python3 dk.py "What is the Gemini Enterprise Agent Platform?"</div>
-        <p>Then tell AGY: <em>"The native google-developer-knowledge MCP is blocked &mdash; use
-        <code>python3 dk.py "&lt;question&gt;"</code> (or <code>python3 dk.py --search "&lt;keywords&gt;"</code>)
-        whenever a step asks you to use the MCP."</em></p>
+        If so, paste this once &mdash; AGY downloads a tiny helper that queries the same Developer Knowledge docs
+        directly via your gcloud login, and uses it for grounding from then on:</p>
+        <div class="card agent-section">
+          <button class="copy-btn" onclick="copyBlock('ctx-dk-helper')">Copy</button>
+          <div class="agent-ctx" id="ctx-dk-helper"><span class="agent-ctx-label">Paste into AGY</span>
+The native google-developer-knowledge MCP is blocked in this lab. Download the
+direct-access helper and use it instead of the MCP:
+  curl -L -o dk.py https://kazunori279.github.io/gcp-eoa/BwG-track2/dk.py
+Test it with: python3 dk.py "What is the Gemini Enterprise Agent Platform?"
+From now on, whenever a step tells you to use the google-developer-knowledge
+MCP, run: python3 dk.py "your question"  (or python3 dk.py --search "keywords")</div>
+        </div>
       </div>
     </div>
 
