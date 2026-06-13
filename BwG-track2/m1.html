@@ -717,6 +717,9 @@ Add three tools to the agent:
 Write clear docstrings and type hints so the model can call them
 correctly. The critical pattern is reconciliation: joining schedule
 data with disruption data on trip_id and stop_id.
+Keep tool return values compact &mdash; return only what the model needs
+(trip_id, route, destination, departure/arrival time); do not dump full
+per-stop lists, so large queries don't overflow the model's context window.
 Scope: only add the tools and wire them into the agent &mdash; do not
 modify the eval datasets or run evals (that comes later in M4).</div>
       </div>
