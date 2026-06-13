@@ -712,19 +712,21 @@ Add three tools to the agent:
    services, and finds an alternative path (BFS/shortest-path).
 Write clear docstrings and type hints so the model can call them
 correctly. The critical pattern is reconciliation: joining schedule
-data with disruption data on trip_id and stop_id.</div>
+data with disruption data on trip_id and stop_id.
+Scope: only add the tools and wire them into the agent &mdash; do not
+modify the eval datasets or run evals (that comes later in M4).</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY writes the three tools into <code>agent.py</code>, runs linting and tests:</p>
+        <p>AGY writes the three tools into <code>app/tools.py</code>, wires them into the agent, runs linting:</p>
         <ul>
           <li><strong><code>get_scheduled_departures</code></strong> &mdash; joins <code>stops.txt</code>, <code>calendar_dates.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>stop_times.txt</code>; normalizes departures with times and route names</li>
           <li><strong><code>check_disruptions</code></strong> &mdash; parses <code>disruptions.json</code>; filters by <code>station_query</code> (fuzzy) or <code>trip_id</code> (exact)</li>
           <li><strong><code>compute_reroute</code></strong> &mdash; Dijkstra priority-queue search; filters cancelled trips, adjusts for delays, enforces 5-min transfer buffer</li>
           <li>Helper: <code>resolve_station_id</code> &mdash; maps user input like "St Pancras" to <code>st_pancras_international</code></li>
         </ul>
-        <p>All unit and integration tests pass (<code>uv run pytest</code>).</p>
+        <p>Linting passes and a smoke test (<code>agents-cli run "&hellip;"</code>) confirms the tools are wired up correctly.</p>
         <p><strong>What just happened:</strong> The agent now has deterministic capabilities.
         The reconciliation pattern (Tool 1 + Tool 2 joined on <code>trip_id</code>) is the core
         of what makes this agent useful. See the tool specifications above for details.</p>
