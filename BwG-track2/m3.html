@@ -397,30 +397,44 @@
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 My "Rush Hour" agent was deployed to Agent Runtime in M2 (a reasoningEngine
 in us-east1). Verify it's a governed, least-privilege asset — do not create,
-publish, or change anything, and do not touch Gemini Enterprise. Use LIVE
-gcloud (don't read leftover *.json files except deployment_metadata.json for
-the project/region/engine id). Then:
-1) gcloud ai reasoning-engines describe <id> — show its resource name, that
-   it's platform-managed (agent_framework=google-adk), and the service
-   account it runs as (its runtime identity).
-2) gcloud projects get-iam-policy <project> — find that service account's
-   roles and give a least-privilege verdict: no owner/editor/admin, no
-   token-creation, no network/write/egress, and why that's correct here
-   (its GTFS data is bundled locally, so it needs none).
-Do NOT hunt for an Agent Registry CLI or a SPIFFE principal via gcloud —
-there's no reliable command for those. Tell me to view the Registry entry,
-its 5 tools, and the identity in the console (Govern → Agent Registry).</div>
+publish, or change anything, and do not touch Gemini Enterprise. Read the
+project/region/engine id from deployment_metadata.json (don't read other
+leftover *.json files). Then:
+1) Describe the engine. gcloud may not have the reasoning-engines command
+   group, so use the REST API:
+     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+       "https://<region>-aiplatform.googleapis.com/v1/<engine-resource-name>"
+   Show its resource name, that it's platform-managed (agentFramework=
+   google-adk), and its effectiveIdentity — the service account it runs as.
+   Expect a default service agent (service-<num>@gcp-sa-aiplatform-re
+   .iam.gserviceaccount.com), not a SPIFFE principal — Agent Identity is
+   opt-in and off here, which is fine.
+2) List ONLY the roles bound to that service account — filter the policy,
+   do NOT dump the whole project:
+     gcloud projects get-iam-policy <project> \
+       --flatten="bindings[].members" \
+       --filter="bindings.members:<service-account>" \
+       --format="value(bindings.role)"
+   Report exactly those roles and give an HONEST least-privilege verdict: is
+   there any owner/editor/admin, token-creation, or network/write/egress? If
+   the only roles are the reasoning-engine service agent (+ basic aiplatform/
+   viewer), that's least-privilege — correct here because its GTFS data is
+   bundled locally, so it needs none. If you find broad admin roles, say so.
+Do NOT query the Agent Registry or a SPIFFE principal via gcloud, and do NOT
+describe what the console shows — just tell me to open it myself to view the
+Registry entry, its 5 tools, and the agent's identity (Govern → Agent
+Registry).</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY reads <code>deployment_metadata.json</code>, runs the live <code>gcloud</code> commands, and reports:</p>
+        <p>AGY reads <code>deployment_metadata.json</code>, then runs a REST <code>describe</code> on the engine and a <strong>filtered</strong> IAM query, and reports:</p>
         <ul>
-          <li><strong>Engine</strong> &mdash; <code>projects/&hellip;/locations/us-east1/reasoningEngines/&lt;id&gt;</code>, platform-managed (<code>agent_framework=google-adk</code>)</li>
-          <li><strong>Runtime identity</strong> &mdash; the service account it runs as (e.g. <code>service-&lt;project-number&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>)</li>
-          <li><strong>Least-privilege verdict</strong> &mdash; no owner/editor/admin, no token-creation, no network or write/egress grants (its GTFS data is bundled locally, so it needs none)</li>
+          <li><strong>Engine</strong> &mdash; <code>projects/&hellip;/locations/us-east1/reasoningEngines/&lt;id&gt;</code>, platform-managed (<code>agentFramework=google-adk</code>)</li>
+          <li><strong>Runtime identity</strong> &mdash; its <code>effectiveIdentity</code> is the default service agent (e.g. <code>service-&lt;num&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>) &mdash; a service account, not a SPIFFE principal, since Agent Identity is opt-in and off</li>
+          <li><strong>Least-privilege verdict</strong> &mdash; the roles bound to <em>that</em> service account (filtered, not the whole project) should be just the reasoning-engine service agent plus basic <code>aiplatform.user</code>/<code>viewer</code>: no owner/editor/admin, no token-creation, no network/write/egress (its GTFS data is bundled locally, so it needs none)</li>
         </ul>
-        <p>Then view the rest in the console (next callout): the <strong>Agent Registry entry with all 5 tools</strong>
+        <p>Then open the console yourself (next callout): the <strong>Agent Registry entry with all 5 tools</strong>
         (<code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>,
         <code>set_home_station</code>, <code>get_home_station</code>) and the agent's identity.</p>
         <p><strong>What just happened:</strong> the moment you deployed in M2, the platform made this a
@@ -570,7 +584,7 @@ deployment_metadata.json, and confirm exact flags via
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>3.2</td><td>Live <code>gcloud</code> &mdash; <code>reasoning-engines describe</code> + <code>get-iam-policy</code> on the runtime service account; Registry &amp; tools viewed in the console</td></tr>
+          <tr><td>3.2</td><td>Live checks &mdash; REST <code>describe</code> on the engine + filtered <code>get-iam-policy</code> on the runtime service account; Registry &amp; tools viewed in the console</td></tr>
           <tr><td>3.3</td><td><code>gcloud model-armor templates create</code> + REST <code>:sanitizeUserPrompt</code> to test the attack / clean / PII prompts</td></tr>
         </tbody>
       </table>
