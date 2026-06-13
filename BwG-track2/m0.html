@@ -840,6 +840,18 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
         <code>mcp(google-developer-knowledge/*)</code> allow rule is missing from
         <code>~/.gemini/antigravity-cli/settings.json</code> &mdash; add it and restart.</p>
       </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">Still blocked? (lab policy) &mdash; use the direct helper</div>
+        <p>Some lab projects block remote MCP servers at the runtime level (errors like <em>"server &hellip; not
+        allowed in this context"</em> or <em>"tool &hellip; is not enabled"</em>) that the allow rule can't fix.
+        If so, grab a tiny helper that queries the same Developer Knowledge docs directly via your gcloud login,
+        and use it wherever a later step says "use the google-developer-knowledge MCP":</p>
+        <div class="prompt-block" id="cmd-dk-helper"><button class="copy-btn" onclick="copyBlock('cmd-dk-helper')">Copy</button><span class="prompt-label">shell</span>! curl -L -o dk.py https://kazunori279.github.io/gcp-eoa/BwG-track2/dk.py && python3 dk.py "What is the Gemini Enterprise Agent Platform?"</div>
+        <p>Then tell AGY: <em>"The native google-developer-knowledge MCP is blocked &mdash; use
+        <code>python3 dk.py "&lt;question&gt;"</code> (or <code>python3 dk.py --search "&lt;keywords&gt;"</code>)
+        whenever a step asks you to use the MCP."</em></p>
+      </div>
     </div>
 
     <!-- Step 2 -->
