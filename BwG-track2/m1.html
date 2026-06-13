@@ -537,18 +537,15 @@
       creates a standard layout with <code>pyproject.toml</code>, agent definition, tools module,
       and environment config &mdash; the same shape that later deploys cleanly to Agent Runtime in M2.</p>
 
-      <div class="callout callout-warning" style="margin-bottom:1rem;">
-        <div class="callout-title">First, set up your environment &mdash; run once</div>
-        <p>Make sure <code>agents-cli</code> is on your PATH and your GCP project is set:</p>
-        <div class="prompt-block" id="cmd-env-setup"><button class="copy-btn" onclick="copyBlock('cmd-env-setup')">Copy</button><span class="prompt-label">shell</span>! export PATH="$HOME/.local/bin:$PATH" && echo "Project: $(gcloud config get-value project)"</div>
-      </div>
-
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 1 Step 1: scaffold the ADK project (scaffold only).
 
-Scaffold a new ADK agent project for a transit assistant that will
+First make sure agents-cli is runnable: add $HOME/.local/bin to PATH (or
+use its full path) and confirm the active GCP project with
+"gcloud config get-value project".
+Then scaffold a new ADK agent project for a transit assistant that will
 answer commuter questions during a service disruption. Use Python,
 gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
 change it), and uv for dependency management.
