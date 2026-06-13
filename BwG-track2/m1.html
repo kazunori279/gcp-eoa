@@ -528,13 +528,6 @@
 
   <h2>Build in 4 Steps</h2>
 
-    <!-- Step 0: Environment -->
-    <div class="callout callout-warning" style="margin-bottom:1.5rem;">
-      <div class="callout-title">Environment Setup &mdash; run once before you start</div>
-      <p>Make sure <code>agents-cli</code> is on your PATH and your GCP project is set:</p>
-      <div class="prompt-block" id="cmd-env-setup"><button class="copy-btn" onclick="copyBlock('cmd-env-setup')">Copy</button><span class="prompt-label">shell</span>! export PATH="$HOME/.local/bin:$PATH" && echo "Project: $(gcloud config get-value project)"</div>
-    </div>
-
     <!-- Step 1: Scaffold -->
     <div class="step">
       <div class="step-num">1</div>
@@ -543,6 +536,12 @@
       <p>We need a project structure before we can write any agent code. The <a href="https://google.github.io/agents-cli/guide/lifecycle/#1-scaffold" target="_blank">agents-cli scaffold command</a>
       creates a standard layout with <code>pyproject.toml</code>, agent definition, tools module,
       and environment config &mdash; the same shape that later deploys cleanly to Agent Runtime in M2.</p>
+
+      <div class="callout callout-warning" style="margin-bottom:1rem;">
+        <div class="callout-title">First, set up your environment &mdash; run once</div>
+        <p>Make sure <code>agents-cli</code> is on your PATH and your GCP project is set:</p>
+        <div class="prompt-block" id="cmd-env-setup"><button class="copy-btn" onclick="copyBlock('cmd-env-setup')">Copy</button><span class="prompt-label">shell</span>! export PATH="$HOME/.local/bin:$PATH" && echo "Project: $(gcloud config get-value project)"</div>
+      </div>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
