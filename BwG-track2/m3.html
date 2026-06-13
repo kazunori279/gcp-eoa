@@ -338,9 +338,9 @@
   <div class="govern-card" style="border-color:#1a73e8;">
     <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent Identity</a> (IAM) <span class="tag tag-handson">Hands-on</span></h4>
     <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
-    <p><strong>Protection:</strong> Every agent gets a <strong>SPIFFE-based identity</strong> with an auto-rotated
-    X.509 certificate; Context-Aware Access enforces mutual TLS + DPoP. Two default roles keep it least-privilege,
-    so a stolen token is useless without the attested context.</p>
+    <p><strong>Protection:</strong> Every agent runs under a <strong>least-privilege identity</strong> by default.
+    With <strong>Agent Identity</strong> (opt-in) it gets a SPIFFE-based identity and auto-rotated X.509 cert, and
+    Context-Aware Access enforces mutual TLS + DPoP &mdash; so a stolen token is useless without the attested context.</p>
     <p class="doc-cite">Docs: <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent identity</a> &middot; <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">IAM agent identity</a></p>
   </div>
 
@@ -388,44 +388,51 @@
       <span class="tag tag-handson">Hands-on</span>
       <h3>Verify Your Agent Is a Governed Asset &mdash; Registry + Identity</h3>
       <p>You don't have to <em>make</em> your agent governable. The moment you deployed it to Agent Runtime
-      in M2, the platform <strong>auto-registered</strong> it in the Agent Registry and gave it a unique
-      <strong>SPIFFE identity</strong> with least-privilege roles. Let's verify all of that &mdash; live.</p>
+      in M2, the platform <strong>registered</strong> it in the Agent Registry and runs it under a
+      <strong>least-privilege identity</strong>. Let's verify that &mdash; one live <code>gcloud</code> check for
+      the engine and its identity, then the console for the Registry entry and its tools.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 My "Rush Hour" agent was deployed to Agent Runtime in M2 (a reasoningEngine
-in us-east1). When it deployed, the platform automatically gave it an
-identity and registered it in the Agent Registry. Verify that for me — do
-not create, publish, or change anything, and do not touch Gemini Enterprise.
-Use LIVE gcloud (don't read leftover *.json files); read project/region/
-engine id from deployment_metadata.json. Show me:
-1) the Agent Registry entry and its 5 tools,
-2) its SPIFFE identity (principal://.../reasoningEngines/...),
-3) the IAM roles on that identity pulled live — note agents get two
-   defaults: roles/aiplatform.agentDefaultAccess and
-   roles/aiplatform.agentContextEditor,
-4) a least-privilege verdict (no owner/editor/admin, no token creation,
-   no network/write/egress) and why that's correct for this agent.</div>
+in us-east1). Verify it's a governed, least-privilege asset — do not create,
+publish, or change anything, and do not touch Gemini Enterprise. Use LIVE
+gcloud (don't read leftover *.json files except deployment_metadata.json for
+the project/region/engine id). Then:
+1) gcloud ai reasoning-engines describe <id> — show its resource name, that
+   it's platform-managed (agent_framework=google-adk), and the service
+   account it runs as (its runtime identity).
+2) gcloud projects get-iam-policy <project> — find that service account's
+   roles and give a least-privilege verdict: no owner/editor/admin, no
+   token-creation, no network/write/egress, and why that's correct here
+   (its GTFS data is bundled locally, so it needs none).
+Do NOT hunt for an Agent Registry CLI or a SPIFFE principal via gcloud —
+there's no reliable command for those. Tell me to view the Registry entry,
+its 5 tools, and the identity in the console (Govern → Agent Registry).</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY confirms the commands via <code>--help</code>, then runs live <code>gcloud</code> queries and reports:</p>
+        <p>AGY reads <code>deployment_metadata.json</code>, runs the live <code>gcloud</code> commands, and reports:</p>
         <ul>
-          <li><strong>Agent Registry entry</strong> &mdash; e.g. <code>projects/&hellip;/locations/us-east1/agents/&lt;id&gt;</code>, with all 5 tools (<code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>, <code>set_home_station</code>, <code>get_home_station</code>)</li>
-          <li><strong>SPIFFE identity</strong> &mdash; <code>principal://agents.global.org-&hellip;/resources/aiplatform/&hellip;/reasoningEngines/&lt;id&gt;</code></li>
-          <li><strong>Default roles</strong> &mdash; <code>roles/aiplatform.agentDefaultAccess</code> (+ <code>agentContextEditor</code>): basic model/logging access, scoped to its own sessions, memories, and sandboxes</li>
-          <li><strong>Least-privilege verdict</strong> &mdash; no owner/editor/admin, no token creation, no network or write/egress grants (its GTFS data is bundled locally, so it needs none)</li>
+          <li><strong>Engine</strong> &mdash; <code>projects/&hellip;/locations/us-east1/reasoningEngines/&lt;id&gt;</code>, platform-managed (<code>agent_framework=google-adk</code>)</li>
+          <li><strong>Runtime identity</strong> &mdash; the service account it runs as (e.g. <code>service-&lt;project-number&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>)</li>
+          <li><strong>Least-privilege verdict</strong> &mdash; no owner/editor/admin, no token-creation, no network or write/egress grants (its GTFS data is bundled locally, so it needs none)</li>
         </ul>
+        <p>Then view the rest in the console (next callout): the <strong>Agent Registry entry with all 5 tools</strong>
+        (<code>get_scheduled_departures</code>, <code>check_disruptions</code>, <code>compute_reroute</code>,
+        <code>set_home_station</code>, <code>get_home_station</code>) and the agent's identity.</p>
         <p><strong>What just happened:</strong> the moment you deployed in M2, the platform made this a
-        discoverable, uniquely-identified, least-privilege corporate asset &mdash; with no extra work.</p>
+        discoverable, least-privilege corporate asset &mdash; with no extra work.</p>
       </div>
 
       <div class="callout callout-govern" style="margin-top:.75rem;">
-        <div class="callout-title">See it in the console</div>
+        <div class="callout-title">See it in the console &mdash; this is where the Registry lives</div>
+        <p style="margin-bottom:.5rem;">There's no reliable <code>gcloud</code> command for the Agent Registry or the
+        agent's identity &mdash; the console is the source of truth:</p>
         <ul style="margin-bottom:0;">
-          <li><strong>Govern &rarr; Agent Registry</strong> &mdash; your agent, its 5 tools, and its SPIFFE identity</li>
+          <li><strong>Govern &rarr; Agent Registry</strong> &mdash; your agent, its 5 tools, and its identity</li>
           <li><strong>Govern &rarr; Security</strong> &mdash; "Agents with excessive permissions" shows a clean posture</li>
         </ul>
       </div>
@@ -533,7 +540,7 @@ deployment_metadata.json, and confirm exact flags via
     <div class="done-when">
       <h3>Mentor Checkpoint &mdash; Done When:</h3>
       <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Verified your agent in the Agent Registry with its 5 tools and SPIFFE identity (live)</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Verified your agent in the Agent Registry console with its 5 tools and identity</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Confirmed least-privilege &mdash; no excessive permissions on the agent identity</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Created a Model Armor template and watched it block a jailbreak <em>and</em> PII in the terminal</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Can locate Gateway, Policies, and Business Policies in the console and explain each</div></li>
@@ -550,7 +557,7 @@ deployment_metadata.json, and confirm exact flags via
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
-          <tr><td>3.2 Verify</td><td>"Verify my deployed agent's Agent Registry entry, SPIFFE identity, and least-privilege roles &mdash; live."</td></tr>
+          <tr><td>3.2 Verify</td><td>"Verify my deployed agent &mdash; engine + least-privilege identity via live gcloud, then the Registry entry and 5 tools in the console."</td></tr>
           <tr><td>3.3 Model Armor</td><td>"Create a Model Armor template, then prove it blocks a jailbreak and PII via the sanitize API."</td></tr>
         </tbody>
       </table>
@@ -563,7 +570,7 @@ deployment_metadata.json, and confirm exact flags via
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>3.2</td><td>Live <code>gcloud</code> audit &mdash; Agent Registry listing + <code>get-iam-policy</code> on the agent's SPIFFE principal</td></tr>
+          <tr><td>3.2</td><td>Live <code>gcloud</code> &mdash; <code>reasoning-engines describe</code> + <code>get-iam-policy</code> on the runtime service account; Registry &amp; tools viewed in the console</td></tr>
           <tr><td>3.3</td><td><code>gcloud model-armor templates create</code> + REST <code>:sanitizeUserPrompt</code> to test the attack / clean / PII prompts</td></tr>
         </tbody>
       </table>
@@ -574,7 +581,7 @@ deployment_metadata.json, and confirm exact flags via
     <div class="card">
       <h3><span class="beat-badge beat-3" style="margin-left:0;">Beat 3</span> What You Can See in the Console</h3>
       <ul>
-        <li><strong>Agent Registry</strong> &mdash; your agent listed with its 5 tools and SPIFFE identity</li>
+        <li><strong>Agent Registry</strong> &mdash; your agent listed with its 5 tools and identity</li>
         <li><strong>Security</strong> &mdash; clean posture; no agents with excessive permissions</li>
         <li><strong>Model Armor</strong> &mdash; your template and its block events in Cloud Logging</li>
         <li><strong>Gateways / Policies / Business Policies</strong> &mdash; where gateway, access, and semantic governance live</li>
@@ -585,7 +592,7 @@ deployment_metadata.json, and confirm exact flags via
       <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>No agent sprawl</strong> &mdash; every deployed agent is auto-registered and discoverable</li>
-        <li><strong>Attested identity</strong> &mdash; a SPIFFE identity with least-privilege by default; bounded damage even if compromised</li>
+        <li><strong>Least-privilege identity</strong> &mdash; scoped by default; bounded damage even if compromised (Agent Identity adds an attested SPIFFE identity)</li>
         <li><strong>Platform-enforced safety</strong> &mdash; a Model Armor policy you proved blocks attacks and data leaks</li>
         <li><strong>Ready to scale</strong> &mdash; gateway, access policies, and semantic governance wrap every agent org-wide</li>
       </ul>
