@@ -754,9 +754,87 @@
        ───────────────────────────────────────────────────────────── -->
     <h2>Setup in 5 Steps</h2>
 
-    <!-- Step 1 -->
+    <!-- Step 1: Developer Knowledge MCP -->
     <div class="step">
       <div class="step-num">1</div>
+      <span class="step-time">3 min</span>
+      <h3>Install the Developer Knowledge MCP</h3>
+      <p>Give your coding agent <strong>grounded, current knowledge of Google Cloud products</strong> &mdash;
+      Agent Runtime, Memory Bank, Agent Registry, Identity, Model Armor. The
+      <a href="https://codelabs.developers.google.com/developer-knowledge-mcp-antigravity" target="_blank">Developer Knowledge MCP</a>
+      lets AGY look up official docs instead of guessing commands &mdash; which keeps the later modules
+      (especially M2 and M3) out of trial-and-error spirals. <code>agents-cli</code> already covers its own
+      skills, so this fills in the rest of the Google Cloud surface.</p>
+
+      <p>Let AGY set it up &mdash; paste this and it enables the API and writes the config, authenticating with
+      your gcloud login (no API key needed):</p>
+
+      <div class="card agent-section" style="margin-top:.75rem;">
+        <button class="copy-btn" onclick="copyBlock('ctx-dk-mcp')">Copy</button>
+        <div class="agent-ctx" id="ctx-dk-mcp"><span class="agent-ctx-label">Paste into AGY</span>
+Module 0 Step 1: install the Developer Knowledge MCP.
+
+Install the Google Developer Knowledge MCP for yourself so you can look up
+Google Cloud product docs in the later modules. Authenticate with my
+existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
+
+1) Enable the API:
+   gcloud services enable developerknowledge.googleapis.com
+
+2) Merge (don't overwrite) this server into the Antigravity CLI's global MCP
+   config at ~/.gemini/antigravity-cli/mcp_config.json (create it if missing):
+   {
+     "mcpServers": {
+       "google-developer-knowledge": {
+         "serverUrl": "https://developerknowledge.googleapis.com/mcp",
+         "authProviderType": "google_credentials"
+       }
+     }
+   }
+
+3) Then tell me to restart the CLI in a FRESH session (run "agy", not "agy
+   --continue") so the new tools load into the model — a /mcp reload or
+   --continue keeps the current session's toolset and the model can't call
+   the new tools. If it still won't connect, check ADC (gcloud auth
+   application-default print-access-token returns a token) and tell me what
+   you see.</div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">Then restart &mdash; fresh session</div>
+        <p>Once AGY has written the config, <strong>quit and start a fresh <code>agy</code> session</strong>
+        (just <code>agy</code> &mdash; no <code>--continue</code> needed, since this is the first step and there's
+        nothing to preserve yet) so the new MCP tools load into the model from the start. Then type
+        <code>/mcp</code> to confirm <code>google-developer-knowledge</code> is connected and lists its tools,
+        and continue with Step 2.</p>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into the AGY CLI's
+        MCP config (<code>~/.gemini/antigravity-cli/mcp_config.json</code>), authenticating with your gcloud login
+        (ADC) &mdash; no API key. After you restart AGY in a fresh session and check <code>/mcp</code>, it shows as a
+        connected MCP server with its tools listed, and from here on AGY grounds Google Cloud questions in the docs
+        instead of guessing (you'll see it lean on this in M2 and M3).</p>
+        <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
+        <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Use the google-developer-knowledge MCP to investigate what is Antigravity.</div>
+      </div>
+
+      <div class="callout callout-warning" style="margin-top:.75rem;">
+        <div class="callout-title">If the server won't connect (or its tools aren't callable)</div>
+        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If
+        <code>/mcp</code> shows it disconnected or absent: (1) set ADC with
+        <code>! gcloud auth application-default login</code> and confirm
+        <code>! gcloud auth application-default print-access-token</code> returns a token; (2) if the server isn't
+        listed at all, the config path varies by Antigravity version &mdash; try
+        <code>~/.gemini/antigravity/mcp_config.json</code> or <code>~/.gemini/config/mcp_config.json</code> instead;
+        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
       <span class="step-time">2 min</span>
       <h3>Brief Your Coding Agent</h3>
       <p>Open <strong>Antigravity</strong> and paste the block below to give your coding agent the scenario background.
@@ -765,7 +843,7 @@
       <div class="card agent-section" style="margin-top:.75rem;">
         <button class="copy-btn" onclick="copyBlock('ctx-combined')">Copy</button>
         <div class="agent-ctx" id="ctx-combined"><span class="agent-ctx-label">Paste into AGY</span>
-Module 0 Step 1: brief the agent and create the workshop plan.
+Module 0 Step 2: brief the agent and create the workshop plan.
 
 # Rush Hour: Transit-Crisis Agent — Scenario Background
 
@@ -811,9 +889,9 @@ item is tagged (agy) if it's yours or (user) if it's mine to run:
 
 # Rush Hour Workshop — Plan
 ## M0 Setup
-- [ ] 0.1 Brief the agent + create this plan  (agy)
-- [ ] 0.2 Verify cockpit — agents-cli setup  (user)
-- [ ] 0.3 Install Developer Knowledge MCP  (agy)
+- [ ] 0.1 Install Developer Knowledge MCP  (agy)
+- [ ] 0.2 Brief the agent + create this plan  (agy)
+- [ ] 0.3 Verify cockpit — agents-cli setup  (user)
 - [ ] 0.4 Download the data  (user)
 - [ ] 0.5 Open the "before" shot  (user)
 ## M1 Build
@@ -850,9 +928,9 @@ Do NOT start building yet — this is context and your plan only.</div>
       </div>
     </div>
 
-    <!-- Step 2 -->
+    <!-- Step 3 -->
     <div class="step">
-      <div class="step-num">2</div>
+      <div class="step-num">3</div>
       <span class="step-time">3 min</span>
       <h3>Verify Your Cockpit</h3>
       <div class="card" style="margin-bottom:1rem;">
@@ -884,84 +962,6 @@ Do NOT start building yet — this is context and your plan only.</div>
         <h4>Expected Result</h4>
         <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
         by the coding agent. Your cockpit is ready.</p>
-      </div>
-    </div>
-
-    <!-- Step 3: Developer Knowledge MCP -->
-    <div class="step">
-      <div class="step-num">3</div>
-      <span class="step-time">3 min</span>
-      <h3>Install the Developer Knowledge MCP</h3>
-      <p>Give your coding agent <strong>grounded, current knowledge of Google Cloud products</strong> &mdash;
-      Agent Runtime, Memory Bank, Agent Registry, Identity, Model Armor. The
-      <a href="https://codelabs.developers.google.com/developer-knowledge-mcp-antigravity" target="_blank">Developer Knowledge MCP</a>
-      lets AGY look up official docs instead of guessing commands &mdash; which keeps the later modules
-      (especially M2 and M3) out of trial-and-error spirals. <code>agents-cli</code> already covers its own
-      skills, so this fills in the rest of the Google Cloud surface.</p>
-
-      <p>Let AGY set it up &mdash; paste this and it enables the API and writes the config, authenticating with
-      your gcloud login (no API key needed):</p>
-
-      <div class="card agent-section" style="margin-top:.75rem;">
-        <button class="copy-btn" onclick="copyBlock('ctx-dk-mcp')">Copy</button>
-        <div class="agent-ctx" id="ctx-dk-mcp"><span class="agent-ctx-label">Paste into AGY</span>
-Module 0 Step 3: install the Developer Knowledge MCP.
-
-Install the Google Developer Knowledge MCP for yourself so you can look up
-Google Cloud product docs in the later modules. Authenticate with my
-existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
-
-1) Enable the API:
-   gcloud services enable developerknowledge.googleapis.com
-
-2) Merge (don't overwrite) this server into the Antigravity CLI's global MCP
-   config at ~/.gemini/antigravity-cli/mcp_config.json (create it if missing):
-   {
-     "mcpServers": {
-       "google-developer-knowledge": {
-         "serverUrl": "https://developerknowledge.googleapis.com/mcp",
-         "authProviderType": "google_credentials"
-       }
-     }
-   }
-
-3) Then tell me to restart the CLI in a FRESH session (run "agy", not "agy
-   --continue") so the new tools load into the model — a /mcp reload or
-   --continue keeps the current session's toolset and the model can't call
-   the new tools. If it still won't connect, check ADC (gcloud auth
-   application-default print-access-token returns a token) and tell me what
-   you see.</div>
-      </div>
-
-      <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Last step is yours &mdash; restart in a fresh session</div>
-        <p>Once AGY has written the config, <strong>fully restart the AGY CLI in a new session</strong> (run
-        <code>agy</code>, not <code>agy --continue</code>) so the new MCP tools load into the model &mdash; a
-        <code>/mcp</code> reload or <code>--continue</code> keeps the current session's toolset, so the agent
-        can't call the new tools. Your <code>plan.md</code> persists, so you don't lose your place. Then type
-        <code>/mcp</code> to confirm <code>google-developer-knowledge</code> is connected and lists its tools.</p>
-      </div>
-
-      <div class="step-expected">
-        <h4>Expected Result</h4>
-        <p>AGY enables the API and writes the <code>google-developer-knowledge</code> server into the AGY CLI's
-        MCP config (<code>~/.gemini/antigravity-cli/mcp_config.json</code>), authenticating with your gcloud login
-        (ADC) &mdash; no API key. After you restart AGY in a fresh session and check <code>/mcp</code>, it shows as a
-        connected MCP server with its tools listed, and from here on AGY grounds Google Cloud questions in the docs
-        instead of guessing (you'll see it lean on this in M2 and M3).</p>
-        <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
-        <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Use the google-developer-knowledge MCP to investigate what is Antigravity.</div>
-      </div>
-
-      <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">If the server won't connect (or its tools aren't callable)</div>
-        <p>The MCP authenticates with your <strong>gcloud login (ADC)</strong> &mdash; no API key needed. If
-        <code>/mcp</code> shows it disconnected or absent: (1) set ADC with
-        <code>! gcloud auth application-default login</code> and confirm
-        <code>! gcloud auth application-default print-access-token</code> returns a token; (2) if the server isn't
-        listed at all, the config path varies by Antigravity version &mdash; try
-        <code>~/.gemini/antigravity/mcp_config.json</code> or <code>~/.gemini/config/mcp_config.json</code> instead;
-        then <strong>start a fresh <code>agy</code> session</strong> (not <code>--continue</code>) so the tools load.</p>
       </div>
     </div>
 
