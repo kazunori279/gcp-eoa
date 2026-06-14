@@ -448,10 +448,10 @@ adk eval fails with a missing-dependencies error.
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
    { "criteria": { "hallucinations_v1": { "threshold": 0.8,
-       "judge_model_options": { "judge_model": "gemini-2.5-flash",
+       "judge_model_options": { "judge_model": "gemini-2.5-flash-lite",
                                 "num_samples": 1 } } } }
-   (If gemini-2.5-flash isn't enabled in the project, set judge_model to one
-   that is.)
+   (flash-lite keeps the judge fast; if it isn't enabled in the project, set
+   judge_model to one that is, e.g. gemini-2.5-flash.)
 3) Finish writing BOTH files above before you run anything. Then run the eval
    once in the FOREGROUND and wait for it to finish — do NOT run it as a
    background task, or you'll lose the stdout score table. Use adk eval directly:
