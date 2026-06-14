@@ -232,13 +232,13 @@
   <div class="hero-track">Build with Gemini World Tour &middot; Track 2</div>
   <div class="hero-module">Module 4</div>
   <h1>OPTIMIZE</h1>
-  <p class="hero-sub">Move from "looks right" to measured quality &mdash;<br>score your agent locally, fix what fails, and prove the improvement. No deployment.</p>
+  <p class="hero-sub">Move from "looks right" to measured quality &mdash;<br>score your agent locally and see exactly where it's grounded and where it slips. No deployment.</p>
   <div class="hero-time">20 minutes &middot; 1:30 &ndash; 1:50 &middot; Hands-on &middot; Local only</div>
   <div class="hero-pills">
     <span class="hero-pill">Eval-Fix Loop</span>
     <span class="hero-pill">Scenario Simulation</span>
     <span class="hero-pill">agents-cli eval</span>
-    <span class="hero-pill">pytest</span>
+    <span class="hero-pill">LLM-as-judge</span>
   </div>
 </div>
 
@@ -246,16 +246,16 @@
 
   <div class="callout callout-optimize">
     <div class="callout-title">Objective</div>
-    <p>Run the local <strong>eval-fix loop</strong>: simulate the crisis at scale, turn the scenarios into a
-    <strong>graded eval suite</strong>, find the weakest case, fix the agent's logic, and prove the improvement
-    with before/after scores and tests &mdash; all <strong>locally, no deployment</strong>. This is the difference
+    <p>Run the local <strong>eval loop</strong>: simulate the crisis at scale, then turn the scenarios into a
+    <strong>graded eval suite</strong> and score the agent with an LLM judge &mdash; reading exactly where it's
+    grounded and where it slips, all <strong>locally, no deployment</strong>. This is the difference
     between a demo and a production agent.</p>
   </div>
 
   <div class="callout callout-info">
     <div class="callout-title">Everything here runs locally</div>
     <p>M4 is about quality, not shipping. You already deployed in M2 &mdash; here you evaluate and improve the agent
-    on your machine with <code>agents-cli eval</code> and <code>pytest</code>, with <strong>no redeploy</strong>.
+    on your machine with <code>agents-cli eval</code> and an LLM judge, with <strong>no redeploy</strong>.
     Publishing the improved agent happens later.</p>
   </div>
 
@@ -326,22 +326,24 @@
       <li><strong>Simulation creates coverage</strong> &mdash; many scenarios catch failures your one test query never will</li>
       <li><strong>Graded metrics remove subjectivity</strong> &mdash; quality becomes a number you can define, measure, and compare</li>
       <li><strong>The weakest case reveals the fix</strong> &mdash; you target a real failure, not a guess</li>
-      <li><strong>Before/after closes the loop</strong> &mdash; comparing the two eval score tables proves the change actually helped</li>
+      <li><strong>Flagged sentences point to the fix</strong> &mdash; the judge shows exactly which sentences weren't grounded, so you know what to tighten</li>
     </ul>
   </div>
 
   <div class="card">
-    <h3>Example: Before vs. After <span style="font-weight:400; font-size:.85rem; color:var(--text-muted);">(illustrative)</span></h3>
+    <h3>Example: Per-Case Scores <span style="font-weight:400; font-size:.85rem; color:var(--text-muted);">(illustrative)</span></h3>
     <table class="data">
-      <thead><tr><th>Metric (what it checks)</th><th>Before</th><th>After</th></tr></thead>
+      <thead><tr><th>Case</th><th><code>hallucinations_v1</code></th><th>What it means</th></tr></thead>
       <tbody>
-        <tr><td><code>hallucinations_v1</code> &mdash; fraction of sentences grounded in tool output (the metric we gate on)</td><td>0.60</td><td>1.00</td></tr>
-        <tr><td><code>response_match_score</code> &mdash; lexical ROUGE overlap (not gated; low on free-form text)</td><td>0.18</td><td>0.22</td></tr>
+        <tr><td>cancellation + reroute</td><td>1.00</td><td>every sentence grounded in tool output</td></tr>
+        <tr><td>delay</td><td>0.92</td><td>one mild reassurance not from a tool</td></tr>
+        <tr><td>503 fallback</td><td>1.00</td><td>correctly defers to station boards</td></tr>
+        <tr><td>grounding trap (platform)</td><td>0.50</td><td>invented a platform no tool returned</td></tr>
       </tbody>
     </table>
-    <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
-    stops inventing times/platforms. One change, validated by re-running the eval. <em>Your real numbers come from
-    re-running <code>adk eval</code> and comparing the two score tables.</em></p>
+    <p>The low score on the grounding trap points straight at the fix &mdash; a strict rule to state only
+    tool-returned facts. In practice you'd make that one change and re-run; here we stop at the measurement to keep
+    the step fast. <em>Your real numbers come from running <code>adk eval</code> once and reading the score table.</em></p>
   </div>
 
   <!-- STEPS -->
@@ -409,23 +411,22 @@ First, use the google-developer-knowledge MCP to read up on ADK evaluation
   <!-- Step 3: Fix -->
   <div class="step">
     <div class="step-num">3</div>
-    <span class="step-time">12 min</span>
-    <h3>Grade, Fix, and Prove It (One Cycle)</h3>
-    <p>Now turn the scenarios into a <strong>graded eval suite</strong>, find the single weakest case, make
-    <strong>one</strong> targeted fix, and prove the improvement with before/after scores &mdash; all locally,
-    in a single bounded cycle so it stays fast.</p>
+    <span class="step-time">6 min</span>
+    <h3>Grade Your Agent Locally</h3>
+    <p>Now turn the scenarios into a <strong>graded eval suite</strong> and score the agent with an LLM judge
+    &mdash; locally, in <strong>one run</strong>. The per-case scores show exactly where the agent is solid and
+    where it slips, and the judge quotes the ungrounded sentences so you know what you'd tighten next.</p>
 
     <div class="card agent-section">
       <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
       <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Module 4 Step 3: grade, fix, and prove one cycle.
+Module 4 Step 3: grade the agent locally.
 
 First, use the google-developer-knowledge MCP to read up on ADK evaluation
 (adk eval, the evalset format, and the eval config criteria), so you build the
 graded eval the current way.
 
-Score my agent locally and fix the single biggest issue, then show me
-before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
+Build a small graded eval and score my agent once. Keep it fast, do not deploy.
 
 Before the steps below, install the eval dependencies so adk eval can run:
 uv sync --extra eval  (or: uv pip install "google-adk[eval]"). Without them,
@@ -442,25 +443,17 @@ adk eval fails with a missing-dependencies error.
    continuous 0-1, reference-free):
    { "criteria": { "hallucinations_v1": { "threshold": 0.8,
        "judge_model_options": { "judge_model": "gemini-2.5-flash",
-                                "num_samples": 3 } } } }
+                                "num_samples": 1 } } } }
    (If gemini-2.5-flash isn't enabled in the project, set judge_model to one
    that is.)
-3) Baseline run — use adk eval directly:
+3) Run the eval once — use adk eval directly:
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
      --config_file_path tests/eval/eval_config.json
-   adk eval prints a per-case score table to stdout -- SAVE it as the baseline.
-   Find the LOWEST-scoring case and, in its *.evalset_result.json under
-   app/.adk/eval_history/, read which sentences the judge flagged as
-   unsupported/contradicted. Let the scores pick the weakest case; don't assume.
-4) Make ONE targeted fix for that weakest case — a strict grounding rule in the
-   system instruction so the agent only states facts a tool returned and stops
-   adding unsupported sentences (for unknowns like a platform, tell the user to
-   check the station boards). Add a pytest test that locks it in. Then re-run the
-   same `uv run adk eval` command and `uv run pytest tests/` once.
-5) STOP and PRINT a report: the weakest case and the exact sentences the judge
-   flagged, the fix, and before -> after by putting the two adk eval score tables
-   (baseline vs re-run) side by side -- show that case's hallucinations score
-   rising. Also show the pytest result. No further iteration. No deploy.</div>
+4) STOP and PRINT the per-case score table adk eval prints to stdout. For any
+   case scoring below the 0.8 threshold, open its *.evalset_result.json under
+   app/.adk/eval_history/ and quote the sentences the judge flagged as
+   unsupported/contradicted, so I can see exactly what isn't grounded. Don't fix
+   or re-run -- just report. No deploy.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
@@ -480,27 +473,25 @@ adk eval fails with a missing-dependencies error.
           <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, right order &mdash; but an <strong>EXACT</strong> match on tool name AND args, so it's brittle for a generative agent (re-runs vary the args) and we don't gate on it</td><td>not gated</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:.5rem;">Each run prints a per-case score table to stdout (and writes a full
-      <code>*.evalset_result.json</code> under <code>app/.adk/eval_history/</code>); compare two runs by putting
-      their printed score tables side by side.</p>
+      <p style="margin-top:.5rem;">The run prints a per-case score table to stdout (and writes a full
+      <code>*.evalset_result.json</code> under <code>app/.adk/eval_history/</code> with the per-sentence judge
+      labels you can quote for any low-scoring case).</p>
       <p class="doc-cite">Docs: <a href="https://adk.dev/evaluate/" target="_blank">ADK evaluation</a> &middot; <a href="https://adk.dev/evaluate/criteria/" target="_blank">Criteria reference</a> &middot; <a href="https://adk.dev/evaluate/user-sim/" target="_blank">User simulation</a></p>
     </div>
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY builds the 4-case evalset, runs a baseline, and reads the per-case <code>hallucinations_v1</code>
-      scores. Because the score is a continuous <em>fraction of grounded sentences</em>, the <strong>real</strong>
-      weakest case surfaces from the data &mdash; often the one where the agent slips in an unsupported sentence
-      (an invented platform, or a reassurance no tool returned). AGY adds a <strong>targeted grounding rule</strong>
-      for that case, a <code>pytest</code> test to lock it in, then re-runs.</p>
+      <p>AGY builds the 4-case evalset, runs <code>adk eval</code> once, and prints the per-case
+      <code>hallucinations_v1</code> scores (the fraction of each answer's sentences grounded in the tool outputs).</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the weakest case's <code>hallucinations_v1</code> score <strong>rising</strong> (e.g. ~0.6 &rarr; ~1.0) as the flagged sentences become grounded; the other cases stay high. No staging &mdash; the fix targets whatever the scores actually flagged</li>
-        <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
-        <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
+        <li><strong>Per-case scores</strong> &mdash; well-grounded cases score near 1.0; a case that slips in an unsupported sentence (an invented platform, or a reassurance no tool returned) scores lower</li>
+        <li><strong>Flagged sentences</strong> &mdash; for any case below the threshold, AGY quotes the exact sentences the judge marked unsupported/contradicted, so you see precisely what isn't grounded</li>
+        <li><strong>No fix, no deploy</strong> &mdash; this step <em>measures</em>; tightening the instruction to ground those sentences is the next turn of the same loop, which you'd run in practice</li>
       </ul>
-      <p><strong>What just happened:</strong> quality became a <strong>number</strong>, the fine-grained score
-      pointed you at the <strong>real</strong> weakest case, you fixed it, and you <strong>proved</strong> the
-      improvement &mdash; the local eval-fix loop.</p>
+      <p><strong>What just happened:</strong> quality became a <strong>number</strong>, and the fine-grained,
+      reference-free judge pointed at exactly which sentences weren't grounded &mdash; the measurement that drives
+      the eval-fix loop. <em>(Improvement isn't guaranteed from one tweak, and the judge is non-deterministic &mdash;
+      so in practice you iterate; here we stop at the measurement to keep the step fast.)</em></p>
     </div>
   </div>
 
@@ -509,9 +500,8 @@ adk eval fails with a missing-dependencies error.
     <h3>Mentor Checkpoint &mdash; Done When:</h3>
     <ul class="checklist">
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 scenarios were simulated against your agent locally</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>adk eval</code>)</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You identified the single weakest case and fixed the agent's logic</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown by comparing the two adk eval score tables, with <code>pytest</code> green &mdash; no deployment</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced per-case scores (<code>adk eval</code> + <code>hallucinations_v1</code>)</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You can see which cases are well-grounded and which slip, with the judge's flagged sentences &mdash; no deployment</div></li>
     </ul>
   </div>
 
@@ -525,7 +515,7 @@ adk eval fails with a missing-dependencies error.
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
           <tr><td>4.2 Simulate</td><td>"Generate 10 commuter scenarios during a St Pancras signal failure and run them in parallel against my agent locally (incl. a disruption-feed outage). Print a report."</td></tr>
-          <tr><td>4.3 Grade &amp; Fix</td><td>"Score my agent locally, fix the single biggest issue, and show me before/after &mdash; one cycle, no deploy."</td></tr>
+          <tr><td>4.3 Grade</td><td>"Build a small graded eval and score my agent once with an LLM judge &mdash; show me the per-case scores, no deploy."</td></tr>
         </tbody>
       </table>
     </div>
@@ -536,11 +526,11 @@ adk eval fails with a missing-dependencies error.
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
           <tr><td>4.2</td><td>A local parallel runner (ADK <code>Runner</code>) executing 10 scenarios concurrently</td></tr>
-          <tr><td>4.3</td><td><code>adk eval</code> for scoring (<code>agents-cli eval</code> wraps it), <code>pytest</code> for tests, and comparing the two adk eval score tables for before/after</td></tr>
+          <tr><td>4.3</td><td><code>adk eval</code> for scoring (<code>agents-cli eval</code> wraps it), with the <code>hallucinations_v1</code> LLM judge grading each case's groundedness</td></tr>
         </tbody>
       </table>
-      <p>The analysis and the fix are done by the coding agent reasoning over the scores &mdash; there is no
-      auto-optimize command. You stay in control of the change.</p>
+      <p>The analysis is done by the coding agent reasoning over the scores &mdash; there is no auto-optimize
+      command. You read the per-case scores and the flagged sentences, and you stay in control of any change.</p>
     </div>
 
     <div class="card">
@@ -548,8 +538,8 @@ adk eval fails with a missing-dependencies error.
       <ul>
         <li><strong>Eval scores</strong> &mdash; per-case, per-metric, saved as JSON (and an HTML report)</li>
         <li><strong>Trace viewer</strong> &mdash; <code>adk web</code> Eval tab: drill into a case and see exactly where the agent went wrong</li>
-        <li><strong>Before/after</strong> &mdash; comparing the two <code>adk eval</code> score tables as concrete evidence the fix worked</li>
-        <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> locking in the new behavior</li>
+        <li><strong>Per-case scores</strong> &mdash; the <code>adk eval</code> score table plus the judge's flagged sentences, showing exactly where the agent is grounded</li>
+        <li><strong>Flagged sentences</strong> &mdash; the judge's per-sentence labels showing what wasn't grounded</li>
       </ul>
     </div>
 
@@ -557,9 +547,9 @@ adk eval fails with a missing-dependencies error.
       <h3><span class="beat-badge beat-4" style="margin-left:0;">Beat 4</span> Why It Matters</h3>
       <ul>
         <li><strong>Empirical quality</strong> &mdash; measured, not guessed</li>
-        <li><strong>Fast local feedback</strong> &mdash; evaluate and fix without a deploy in the loop</li>
-        <li><strong>Fix the real weakness</strong> &mdash; you target the failing case, then prove the fix moved the score</li>
-        <li><strong>Regression-proof</strong> &mdash; the eval suite + tests keep quality from sliding as you add scenarios</li>
+        <li><strong>Fast local feedback</strong> &mdash; measure quality without a deploy in the loop</li>
+        <li><strong>Pinpoint the weakness</strong> &mdash; the judge flags the exact ungrounded sentences, so you know precisely what to fix next</li>
+        <li><strong>Regression-ready</strong> &mdash; the eval suite is reusable: re-run it whenever you change the agent to catch quality sliding</li>
       </ul>
     </div>
   </div>
