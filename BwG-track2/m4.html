@@ -384,10 +384,13 @@ First, use the google-developer-knowledge MCP to read up on ADK evaluation
 
 1. Generate 10 commuter scenarios during a St Pancras signal failure,
    including a case where the disruption feed is unavailable (HTTP 503).
-2. Run them in parallel against my agent LOCALLY using ADK's in-memory
-   session and memory services (InMemorySessionService / InMemoryMemoryService)
-   so the memory callback doesn't error outside Agent Runtime. Do not deploy —
-   local only.
+2. Run all 10 against my agent LOCALLY using ADK's in-memory session and
+   memory services (InMemorySessionService / InMemoryMemoryService) so the
+   memory callback doesn't error outside Agent Runtime. Drive them from ONE
+   asyncio event loop (use asyncio.gather for concurrency) — do NOT run each
+   scenario in its own thread or process, which makes aiohttp crash with
+   "attached to a different event loop" errors. If you still hit loop errors,
+   run them sequentially in that same single loop. Do not deploy — local only.
 3. When done, PRINT a final report table: each scenario, what the agent did,
    which tools it used, and whether it resolved sensibly.</div>
     </div>
