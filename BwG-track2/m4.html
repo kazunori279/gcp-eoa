@@ -335,9 +335,8 @@
     <table class="data">
       <thead><tr><th>Metric (what it checks)</th><th>Before</th><th>After</th></tr></thead>
       <tbody>
-        <tr><td><code>tool_trajectory_avg_score</code> &mdash; right tools, right order</td><td>0.85</td><td>1.00</td></tr>
-        <tr><td><code>response_match_score</code> &mdash; close to reference answer</td><td>0.74</td><td>0.88</td></tr>
-        <tr><td><code>hallucinations_v1</code> &mdash; grounded, no invented data</td><td>0.60</td><td>0.95</td></tr>
+        <tr><td><code>response_match_score</code> &mdash; close to reference answer (the metric we gate on)</td><td>0.19</td><td>0.78</td></tr>
+        <tr><td><code>hallucinations_v1</code> &mdash; grounded, no invented data (optional LLM judge)</td><td>0.60</td><td>0.95</td></tr>
       </tbody>
     </table>
     <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
@@ -440,17 +439,12 @@ adk eval fails with a missing-dependencies error.
    platform does the 18:16 to Paris depart from?") whose reference response is
    a refusal ("I can't give a platform — that's not in the data; check the
    station boards").
-   Do NOT hand-guess the expected tool trajectories: tool_trajectory_avg_score
-   is an EXACT match on tool name AND args, so guessed args always score 0.0.
-   Instead, run the agent once on each case prompt, capture the actual tool
-   calls it makes (name + args), sanity-check they're sensible (e.g.
-   check_disruptions before compute_reroute), and write those into each case's
-   intermediate_data.tool_uses as the expected trajectory. The grounding-trap
-   case (d) should expect NO tool calls (empty tool_uses).
-2) Write tests/eval/eval_config.json with fast, deterministic criteria:
-   { "criteria": { "tool_trajectory_avg_score": 1.0,
-                   "response_match_score": 0.5 } }
-   (hallucinations_v1 also exists but adds an LLM judge — skip it to stay fast.)
+2) Write tests/eval/eval_config.json with one fast, deterministic criterion:
+   { "criteria": { "response_match_score": 0.5 } }
+   (tool_trajectory_avg_score and hallucinations_v1 also exist, but we don't
+   gate on them here — tool_trajectory is an EXACT match on tool name AND args,
+   which is brittle for a generative agent whose args vary across re-runs, and
+   hallucinations adds an LLM judge. One fast metric keeps this cycle quick.)
 3) Baseline run with adk eval directly (agents-cli wraps this as "eval", but
    its eval flags vary by build, so call adk eval for a stable command):
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
@@ -473,13 +467,13 @@ adk eval fails with a missing-dependencies error.
       <div class="callout-title">How <code>adk eval</code> scores (while you wait)</div>
       <p><code>adk eval</code> scores each case against the <code>criteria</code> in
       <code>eval_config.json</code> (<code>agents-cli eval</code> wraps it, but its flags vary by build &mdash; so we
-      call <code>adk eval</code> directly). We use the two <strong>fast, deterministic</strong>
-      metrics below; <code>hallucinations_v1</code> also exists but adds an LLM judge, so we skip it to stay quick.</p>
+      call <code>adk eval</code> directly). We gate on one <strong>fast, deterministic</strong> metric &mdash;
+      <code>response_match_score</code>. The other two below exist, but we don't gate on them here (see why).</p>
       <table class="data" style="margin-top:.5rem;">
         <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
         <tbody>
-          <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, called in the right order (e.g. <code>check_disruptions</code> before <code>compute_reroute</code>)</td><td>fast</td></tr>
-          <tr><td><code>response_match_score</code></td><td>How close the answer is to the reference (ROUGE) &mdash; for the grounding trap, the reference is a refusal</td><td>fast</td></tr>
+          <tr><td><code>response_match_score</code> <strong>(gated)</strong></td><td>How close the answer is to the reference (ROUGE) &mdash; for the grounding trap, the reference is a refusal</td><td>fast</td></tr>
+          <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, right order &mdash; but an <strong>EXACT</strong> match on tool name AND args, so it's brittle for a generative agent (re-runs vary the args) and we don't gate on it</td><td>not gated</td></tr>
           <tr><td><code>hallucinations_v1</code></td><td>Optional &mdash; is the answer grounded in tool output, with no invented times/platforms?</td><td>LLM judge</td></tr>
         </tbody>
       </table>
@@ -496,7 +490,7 @@ adk eval fails with a missing-dependencies error.
       <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
       station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference); because the expected trajectories were seeded from a real run, <code>tool_trajectory_avg_score</code> reflects the agent's actual tool use, not guesses</li>
+        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the grounding-trap case's <code>response_match_score</code> rising toward the refusal reference, the other cases steady</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
