@@ -799,8 +799,7 @@ First, use the google-developer-knowledge MCP to read up on ADK code execution
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY configures <code>BuiltInCodeExecutor</code>, updates the system instruction, then verifies with <code>agents-cli run</code> before redeploying. Test question that needs math no single tool returns:</p>
-        <div class="prompt-block"><span class="prompt-label">agents-cli run</span>Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?</div>
+        <p>AGY configures <code>BuiltInCodeExecutor</code>, updates the system instruction, then verifies with <code>agents-cli run</code> before redeploying &mdash; using a test question that needs math no single tool returns.</p>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Calls <code>check_disruptions</code> to pull the affected trips.</li>
