@@ -326,7 +326,7 @@
       <li><strong>Simulation creates coverage</strong> &mdash; many scenarios catch failures your one test query never will</li>
       <li><strong>Graded metrics remove subjectivity</strong> &mdash; quality becomes a number you can define, measure, and compare</li>
       <li><strong>The weakest case reveals the fix</strong> &mdash; you target a real failure, not a guess</li>
-      <li><strong>Before/after closes the loop</strong> &mdash; <code>agents-cli eval compare</code> proves the change actually helped</li>
+      <li><strong>Before/after closes the loop</strong> &mdash; <code>agents-cli compare</code> proves the change actually helped</li>
     </ul>
   </div>
 
@@ -342,7 +342,7 @@
     </table>
     <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
     stops inventing times/platforms. One change, validated by re-running the eval. <em>Your real numbers come from
-    <code>agents-cli eval compare</code>.</em></p>
+    <code>agents-cli compare</code>.</em></p>
   </div>
 
   <!-- STEPS -->
@@ -427,6 +427,11 @@ graded eval the current way.
 
 Score my agent locally and fix the single biggest issue, then show me
 before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
+
+Before the steps below, install the eval dependencies so adk eval can run:
+uv sync --extra eval  (or: uv pip install "google-adk[eval]"). Without them,
+adk eval fails with a missing-dependencies error.
+
 1) Build a 4-case evalset in ADK format at
    tests/eval/evalsets/rushhour.evalset.json (eval_cases -> conversation with
    user_content + intermediate_data.tool_uses, plus session_input). Cases:
@@ -449,7 +454,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
    unknowns, tell the user to check station boards). Add a pytest test that
    locks it in. Then re-run the same agents-cli eval and `pytest tests/` once.
 5) STOP and PRINT a report: the weakest case (the grounding trap), the fix,
-   before -> after via `agents-cli eval compare` on the two *.evalset_result.json
+   before -> after via `agents-cli compare` on the two *.evalset_result.json
    files, and the pytest result. No further iteration. No deploy.</div>
     </div>
 
@@ -468,7 +473,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
       </table>
       <p style="margin-top:.5rem;">Each run writes a <code>*.evalset_result.json</code> under
       <code>app/.adk/eval_history/</code>; compare two runs with
-      <code>agents-cli eval compare BASELINE CANDIDATE</code>.</p>
+      <code>agents-cli compare BASELINE CANDIDATE</code>.</p>
       <p class="doc-cite">Docs: <a href="https://adk.dev/evaluate/" target="_blank">ADK evaluation</a> &middot; <a href="https://adk.dev/evaluate/criteria/" target="_blank">Criteria reference</a> &middot; <a href="https://adk.dev/evaluate/user-sim/" target="_blank">User simulation</a></p>
     </div>
 
@@ -479,7 +484,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
       <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
       station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli eval compare</code> shows the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference), other cases unchanged</li>
+        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli compare</code> shows the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference), other cases unchanged</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
@@ -495,7 +500,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 scenarios were simulated against your agent locally</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>agents-cli eval</code>)</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You identified the single weakest case and fixed the agent's logic</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown via <code>agents-cli eval compare</code>, with <code>pytest</code> green &mdash; no deployment</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown via <code>agents-cli compare</code>, with <code>pytest</code> green &mdash; no deployment</div></li>
     </ul>
   </div>
 
@@ -520,7 +525,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
           <tr><td>4.2</td><td>A local parallel runner (ADK <code>Runner</code>) executing 10 scenarios concurrently</td></tr>
-          <tr><td>4.3</td><td><code>agents-cli eval</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli eval compare</code> for before/after</td></tr>
+          <tr><td>4.3</td><td><code>agents-cli eval</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli compare</code> for before/after</td></tr>
         </tbody>
       </table>
       <p>The analysis and the fix are done by the coding agent reasoning over the scores &mdash; there is no
@@ -532,7 +537,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
       <ul>
         <li><strong>Eval scores</strong> &mdash; per-case, per-metric, saved as JSON (and an HTML report)</li>
         <li><strong>Trace viewer</strong> &mdash; <code>adk web</code> Eval tab: drill into a case and see exactly where the agent went wrong</li>
-        <li><strong>Before/after</strong> &mdash; <code>agents-cli eval compare</code> as concrete evidence the fix worked</li>
+        <li><strong>Before/after</strong> &mdash; <code>agents-cli compare</code> as concrete evidence the fix worked</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> locking in the new behavior</li>
       </ul>
     </div>
