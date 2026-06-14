@@ -972,7 +972,7 @@ Do NOT start building yet — this is context and your plan only.</div>
       </div>
 
       <p>Confirm that <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a></code> and its skills are installed:</p>
-      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">prompt</span>Run this command in the shell for me and show me the output: uvx google-agents-cli setup</div>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 3: run this command in the shell for me and show me the output — uvx google-agents-cli setup</div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
       <table class="data">
         <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
@@ -999,11 +999,11 @@ Do NOT start building yet — this is context and your plan only.</div>
       <p>Download the <strong>Eurostar <a href="https://gtfs.org/" target="_blank">GTFS</a> bundle</strong> (official public feed from
       <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
       and the <strong>disruption file</strong> into your project:</p>
-      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Run this command in the shell for me and show me the output: mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
+      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this command in the shell for me and show me the output — mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
       <div class="callout callout-warning" style="margin-top:.5rem;">
         <div class="callout-title">Fallback &mdash; if the official GTFS link is unavailable</div>
         <p>A copy of the GTFS bundle is included in the workshop repo. Use this instead:</p>
-        <div class="prompt-block" id="cmd-download-data-fallback"><button class="copy-btn" onclick="copyBlock('cmd-download-data-fallback')">Copy</button><span class="prompt-label">prompt</span>Run this command in the shell for me and show me the output: mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
+        <div class="prompt-block" id="cmd-download-data-fallback"><button class="copy-btn" onclick="copyBlock('cmd-download-data-fallback')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this fallback command in the shell for me and show me the output — mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
       </div>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
