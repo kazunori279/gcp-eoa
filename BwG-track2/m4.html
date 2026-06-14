@@ -335,8 +335,8 @@
     <table class="data">
       <thead><tr><th>Metric (what it checks)</th><th>Before</th><th>After</th></tr></thead>
       <tbody>
-        <tr><td><code>response_match_score</code> &mdash; close to reference answer (the metric we gate on)</td><td>0.19</td><td>0.78</td></tr>
-        <tr><td><code>hallucinations_v1</code> &mdash; grounded, no invented data (optional LLM judge)</td><td>0.60</td><td>0.95</td></tr>
+        <tr><td><code>final_response_match_v2</code> &mdash; semantic match to reference, LLM judge (the metric we gate on)</td><td>0.00</td><td>1.00</td></tr>
+        <tr><td><code>response_match_score</code> &mdash; lexical ROUGE overlap (not gated; low on free-form text)</td><td>0.06</td><td>0.60</td></tr>
       </tbody>
     </table>
     <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
@@ -439,12 +439,18 @@ adk eval fails with a missing-dependencies error.
    platform does the 18:16 to Paris depart from?") whose reference response is
    a refusal ("I can't give a platform — that's not in the data; check the
    station boards").
-2) Write tests/eval/eval_config.json with one fast, deterministic criterion:
-   { "criteria": { "response_match_score": 0.5 } }
-   (tool_trajectory_avg_score and hallucinations_v1 also exist, but we don't
-   gate on them here — tool_trajectory is an EXACT match on tool name AND args,
-   which is brittle for a generative agent whose args vary across re-runs, and
-   hallucinations adds an LLM judge. One fast metric keeps this cycle quick.)
+2) Write tests/eval/eval_config.json gating on a semantic LLM-judge metric, so
+   open-ended answers grade on meaning rather than word overlap:
+   { "criteria": { "final_response_match_v2": { "threshold": 0.5,
+       "judge_model_options": { "judge_model": "gemini-2.5-flash",
+                                "num_samples": 3 } } } }
+   (We use final_response_match_v2 instead of the lexical response_match_score
+   because ROUGE word-overlap scores correct-but-free-form answers low. The
+   trade-off: an LLM judge is slower and slightly non-deterministic. The other
+   metrics — response_match_score (lexical) and tool_trajectory_avg_score (an
+   EXACT name+args match, brittle for a generative agent) — exist but we don't
+   gate on them. If gemini-2.5-flash isn't enabled in the project, set
+   judge_model to one that is.)
 3) Baseline run with adk eval directly (agents-cli wraps this as "eval", but
    its eval flags vary by build, so call adk eval for a stable command):
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
@@ -467,12 +473,14 @@ adk eval fails with a missing-dependencies error.
       <div class="callout-title">How <code>adk eval</code> scores (while you wait)</div>
       <p><code>adk eval</code> scores each case against the <code>criteria</code> in
       <code>eval_config.json</code> (<code>agents-cli eval</code> wraps it, but its flags vary by build &mdash; so we
-      call <code>adk eval</code> directly). We gate on one <strong>fast, deterministic</strong> metric &mdash;
-      <code>response_match_score</code>. The other two below exist, but we don't gate on them here (see why).</p>
+      call <code>adk eval</code> directly). We gate on one <strong>semantic</strong> metric &mdash;
+      <code>final_response_match_v2</code>, an LLM judge &mdash; so correct but free-form answers score on meaning,
+      not word overlap. The other three below exist, but we don't gate on them here.</p>
       <table class="data" style="margin-top:.5rem;">
         <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
         <tbody>
-          <tr><td><code>response_match_score</code> <strong>(gated)</strong></td><td>How close the answer is to the reference (ROUGE) &mdash; for the grounding trap, the reference is a refusal</td><td>fast</td></tr>
+          <tr><td><code>final_response_match_v2</code> <strong>(gated)</strong></td><td>Does the answer <em>mean</em> the same as the reference? An LLM judge, so it grades free-form reroute/delay answers fairly (not just word overlap)</td><td>LLM judge</td></tr>
+          <tr><td><code>response_match_score</code></td><td>Lexical closeness to the reference (ROUGE) &mdash; fast, but scores correct-but-free-form answers low, so we don't gate on it</td><td>fast</td></tr>
           <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, right order &mdash; but an <strong>EXACT</strong> match on tool name AND args, so it's brittle for a generative agent (re-runs vary the args) and we don't gate on it</td><td>not gated</td></tr>
           <tr><td><code>hallucinations_v1</code></td><td>Optional &mdash; is the answer grounded in tool output, with no invented times/platforms?</td><td>LLM judge</td></tr>
         </tbody>
@@ -490,7 +498,7 @@ adk eval fails with a missing-dependencies error.
       <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
       station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the grounding-trap case's <code>response_match_score</code> rising toward the refusal reference, the other cases steady</li>
+        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the grounding-trap case flipping <strong>fail &rarr; pass</strong> on <code>final_response_match_v2</code> (the ungrounded agent invents a platform; the grounded one refuses, matching the reference); the other cases stay passing, since the LLM judge grades their correct free-form answers on meaning, not word overlap</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
