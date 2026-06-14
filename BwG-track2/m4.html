@@ -326,7 +326,7 @@
       <li><strong>Simulation creates coverage</strong> &mdash; many scenarios catch failures your one test query never will</li>
       <li><strong>Graded metrics remove subjectivity</strong> &mdash; quality becomes a number you can define, measure, and compare</li>
       <li><strong>The weakest case reveals the fix</strong> &mdash; you target a real failure, not a guess</li>
-      <li><strong>Before/after closes the loop</strong> &mdash; <code>agents-cli compare</code> proves the change actually helped</li>
+      <li><strong>Before/after closes the loop</strong> &mdash; comparing the two eval result files proves the change actually helped</li>
     </ul>
   </div>
 
@@ -342,7 +342,7 @@
     </table>
     <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
     stops inventing times/platforms. One change, validated by re-running the eval. <em>Your real numbers come from
-    <code>agents-cli compare</code>.</em></p>
+    re-running <code>adk eval</code> and comparing the two result files.</em></p>
   </div>
 
   <!-- STEPS -->
@@ -444,24 +444,29 @@ adk eval fails with a missing-dependencies error.
    { "criteria": { "tool_trajectory_avg_score": 1.0,
                    "response_match_score": 0.5 } }
    (hallucinations_v1 also exists but adds an LLM judge — skip it to stay fast.)
-3) Baseline run:
-   agents-cli eval --evalset tests/eval/evalsets/rushhour.evalset.json \
-     --config tests/eval/eval_config.json
+3) Baseline run with adk eval directly (agents-cli wraps this as "eval", but
+   its eval flags vary by build, so call adk eval for a stable command):
+   uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
+     --config_file_path tests/eval/eval_config.json
    Keep the result file it writes under app/.adk/eval_history/ (the
    *.evalset_result.json) as the baseline.
 4) Make ONE targeted fix — a strict grounding rule in the system instruction so
    the agent never states a time/platform/number not returned by a tool (for
    unknowns, tell the user to check station boards). Add a pytest test that
-   locks it in. Then re-run the same agents-cli eval and `pytest tests/` once.
+   locks it in. Then re-run the same `uv run adk eval` command and
+   `uv run pytest tests/` once.
 5) STOP and PRINT a report: the weakest case (the grounding trap), the fix,
-   before -> after via `agents-cli compare` on the two *.evalset_result.json
-   files, and the pytest result. No further iteration. No deploy.</div>
+   and before -> after by reading the two *.evalset_result.json files under
+   app/.adk/eval_history/ and showing each case's tool_trajectory_avg_score and
+   response_match_score (baseline vs after) -- don't rely on a separate compare
+   subcommand. Also show the pytest result. No further iteration. No deploy.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
-      <div class="callout-title">How <code>agents-cli eval</code> scores (while you wait)</div>
-      <p><code>agents-cli eval</code> wraps <code>adk eval</code> and scores each case against the
-      <code>criteria</code> in <code>eval_config.json</code>. We use the two <strong>fast, deterministic</strong>
+      <div class="callout-title">How <code>adk eval</code> scores (while you wait)</div>
+      <p><code>adk eval</code> scores each case against the <code>criteria</code> in
+      <code>eval_config.json</code> (<code>agents-cli eval</code> wraps it, but its flags vary by build &mdash; so we
+      call <code>adk eval</code> directly). We use the two <strong>fast, deterministic</strong>
       metrics below; <code>hallucinations_v1</code> also exists but adds an LLM judge, so we skip it to stay quick.</p>
       <table class="data" style="margin-top:.5rem;">
         <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
@@ -472,8 +477,8 @@ adk eval fails with a missing-dependencies error.
         </tbody>
       </table>
       <p style="margin-top:.5rem;">Each run writes a <code>*.evalset_result.json</code> under
-      <code>app/.adk/eval_history/</code>; compare two runs with
-      <code>agents-cli compare BASELINE CANDIDATE</code>.</p>
+      <code>app/.adk/eval_history/</code>; compare two runs by reading both files and diffing the
+      per-case scores.</p>
       <p class="doc-cite">Docs: <a href="https://adk.dev/evaluate/" target="_blank">ADK evaluation</a> &middot; <a href="https://adk.dev/evaluate/criteria/" target="_blank">Criteria reference</a> &middot; <a href="https://adk.dev/evaluate/user-sim/" target="_blank">User simulation</a></p>
     </div>
 
@@ -484,7 +489,7 @@ adk eval fails with a missing-dependencies error.
       <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
       station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli compare</code> shows the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference), other cases unchanged</li>
+        <li><strong>Before &rarr; after</strong> &mdash; reading the two <code>*.evalset_result.json</code> files shows the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference), other cases unchanged</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
@@ -498,9 +503,9 @@ adk eval fails with a missing-dependencies error.
     <h3>Mentor Checkpoint &mdash; Done When:</h3>
     <ul class="checklist">
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 scenarios were simulated against your agent locally</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>agents-cli eval</code>)</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>adk eval</code>)</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You identified the single weakest case and fixed the agent's logic</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown via <code>agents-cli compare</code>, with <code>pytest</code> green &mdash; no deployment</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown by comparing the two eval result files, with <code>pytest</code> green &mdash; no deployment</div></li>
     </ul>
   </div>
 
@@ -525,7 +530,7 @@ adk eval fails with a missing-dependencies error.
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
           <tr><td>4.2</td><td>A local parallel runner (ADK <code>Runner</code>) executing 10 scenarios concurrently</td></tr>
-          <tr><td>4.3</td><td><code>agents-cli eval</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli compare</code> for before/after</td></tr>
+          <tr><td>4.3</td><td><code>adk eval</code> for scoring (<code>agents-cli eval</code> wraps it), <code>pytest</code> for tests, and reading the two result JSONs for before/after</td></tr>
         </tbody>
       </table>
       <p>The analysis and the fix are done by the coding agent reasoning over the scores &mdash; there is no
@@ -537,7 +542,7 @@ adk eval fails with a missing-dependencies error.
       <ul>
         <li><strong>Eval scores</strong> &mdash; per-case, per-metric, saved as JSON (and an HTML report)</li>
         <li><strong>Trace viewer</strong> &mdash; <code>adk web</code> Eval tab: drill into a case and see exactly where the agent went wrong</li>
-        <li><strong>Before/after</strong> &mdash; <code>agents-cli compare</code> as concrete evidence the fix worked</li>
+        <li><strong>Before/after</strong> &mdash; diffing the two eval result JSONs as concrete evidence the fix worked</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> locking in the new behavior</li>
       </ul>
     </div>
