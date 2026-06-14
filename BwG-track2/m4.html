@@ -431,6 +431,8 @@ First, use the google-developer-knowledge MCP to read up on ADK evaluation
 graded eval the current way.
 
 Build a small graded eval and score my agent once. Keep it fast, do not deploy.
+Do NOT modify the agent's code (app/agent.py, app/tools.py, etc.) — grade the
+real agent as-is, with no mocking or tweaks, or the score is meaningless.
 
 Before the steps below, install the eval dependencies so adk eval can run:
 uv sync --extra eval  (or: uv pip install "google-adk[eval]"). Without them,
@@ -450,12 +452,15 @@ adk eval fails with a missing-dependencies error.
                                 "num_samples": 1 } } } }
    (If gemini-2.5-flash isn't enabled in the project, set judge_model to one
    that is.)
-3) Run the eval once — use adk eval directly:
+3) Finish writing BOTH files above before you run anything. Then run the eval
+   once in the FOREGROUND and wait for it to finish — do NOT run it as a
+   background task, or you'll lose the stdout score table. Use adk eval directly:
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
      --config_file_path tests/eval/eval_config.json
-4) STOP and PRINT the per-case score table adk eval prints to stdout. For any
-   case scoring below the 0.8 threshold, open its *.evalset_result.json under
-   app/.adk/eval_history/ and quote the sentences the judge flagged as
+4) STOP and PRINT the per-case score table exactly as adk eval prints it to
+   stdout — do NOT hand-parse the *.evalset_result.json files to compute scores.
+   For any case scoring below the 0.8 threshold, open its *.evalset_result.json
+   under app/.adk/eval_history/ ONLY to quote the sentences the judge flagged as
    unsupported/contradicted, so I can see exactly what isn't grounded. Don't fix
    or re-run -- just report. No deploy.</div>
     </div>
