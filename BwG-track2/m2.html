@@ -654,7 +654,22 @@ Deploy this agent to Agent Runtime. Before deploying:
    to add the Agent Runtime entrypoint (app/agent_runtime_app.py) if the
    project doesn't have one yet. Do NOT hand-write this file or
    reverse-engineer it from a reference project.
-4. Run agents-cli deploy to create the Agent Runtime instance
+4. In that generated app/agent_runtime_app.py, normalize the session_id so
+   Gemini Enterprise can call the agent later (the why is explained in M5).
+   Add a helper:
+     def _normalize_session_id(sid):
+         return sid.rstrip("/").split("/")[-1] if sid else sid
+   and in the AdkApp subclass override streaming_agent_run_with_events (and
+   the structured methods async_stream_query, async_get_session,
+   async_delete_session) to normalize the session_id and then delegate to
+   super() — do NOT re-implement the base method body. For the streaming entry
+   point, parse request_json, swap in the normalized session_id, re-serialize,
+   then:
+     async for ev in super().streaming_agent_run_with_events(new_json):
+         yield ev
+5. Run agents-cli deploy --agent-identity to create the Agent Runtime instance
+   (--agent-identity gives the agent a per-user identity for personalization;
+   more in M5)
 
 After deploy completes (~5-10 min), verify the endpoint works by
 running: agents-cli run --url ENDPOINT_URL --mode adk
@@ -691,6 +706,7 @@ status polling fails, just tell me and I will check the console.</div>
           <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint</li>
           <li>AGY shares the endpoint URL and a link to the <strong>Agent Engine Console Playground</strong> (the deploy step writes these to <code>deployment_metadata.json</code>)</li>
           <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00, so the agent confirms it's running normally and recommends boarding as scheduled</li>
+          <li>Deployed with <strong>agent identity</strong> enabled, and the runtime wrapper <strong>normalizes the full-path <code>session_id</code></strong> that Gemini Enterprise sends &mdash; both set up here for the M5 portal (the "why" is covered in M5)</li>
         </ul>
         <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
         of concurrent users without managing infrastructure. Your M1 code deployed without changes.
@@ -770,9 +786,9 @@ First, use the google-developer-knowledge MCP to read up on ADK code execution
 3. Test it with agents-cli run using a question that needs this math, and
    show me from the trace that the built-in code execution actually ran
    (not a hardcoded tool).
-4. Once verified, redeploy to Agent Runtime &mdash; this one redeploy ships
-   both the session/memory changes from Step 2 and code execution. After it's
-   live, share the Console Playground link.</div>
+4. Once verified, redeploy to Agent Runtime (keep --agent-identity enabled)
+   &mdash; this one redeploy ships both the session/memory changes from Step 2
+   and code execution. After it's live, share the Console Playground link.</div>
       </div>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">

@@ -270,68 +270,70 @@
     <!-- Step 1: Publish -->
     <div class="step">
       <div class="step-num">1</div>
-      <span class="step-time">6 min</span>
-      <h3>Deploy Fresh &amp; Publish to Gemini Enterprise</h3>
-      <p>This is the payoff. One prompt takes the agent you optimized in M4, <strong>redeploys it fresh</strong>
-      to Agent Runtime, and <strong>attaches it</strong> to your Gemini Enterprise app &mdash; so anyone in the
+      <span class="step-time">4 min</span>
+      <h3>Publish to Gemini Enterprise</h3>
+      <p>This is the payoff. One prompt takes the agent you built in M1 and deployed in M2 and
+      <strong>attaches it</strong> to your Gemini Enterprise app &mdash; no redeploy needed (M2 already
+      shipped it with agent identity and Gemini Enterprise compatibility) &mdash; so anyone in the
       organization can chat with it, no IDE, no code, no API calls.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Module 5 Step 1: deploy fresh and publish to Gemini Enterprise.
+Module 5 Step 1: publish to Gemini Enterprise.
 
 First, use the google-developer-knowledge MCP to read up on publishing agents
-to Gemini Enterprise (and Agent Runtime with agent identity), so you use the
-current flow.
+to Gemini Enterprise, so you use the current flow.
 
-Take the agent I optimized in M4 and ship it to business users — don't
-change its logic.
-1) Deploy it FRESH to Agent Runtime so the optimized version is live, with
-   agent identity enabled for per-user personalization.
-   Before deploying, fix one GE compatibility issue in
-   app/agent_runtime_app.py so live portal chats work — do NOT reverse-engineer
-   vertexai internals. Gemini Enterprise (AgentSpace) calls the wrapper's
-   streaming_agent_run_with_events and passes session_id as a full resource
-   path (projects/.../reasoningEngines/.../sessions/<id>); ADK's session
-   service rejects an id containing "/". In your AdkApp subclass:
-   - add a helper:
-     def _normalize_session_id(sid):
-         return sid.rstrip("/").split("/")[-1] if sid else sid
-   - override streaming_agent_run_with_events (and the structured methods
-     async_stream_query, async_get_session, async_delete_session) to normalize
-     the session_id and then delegate to super() — do NOT re-implement the base
-     method body. For the streaming entry point, parse request_json, swap in
-     the normalized session_id, re-serialize, then:
-       async for ev in super().streaming_agent_run_with_events(new_json):
-           yield ev
-2) Publish it to our Gemini Enterprise app: list the available apps,
-   register the agent to ours, and give me the console links and a
+Publish the agent I already deployed to Agent Runtime in M2 to business users
+— do NOT redeploy and do NOT change its logic. It was deployed with agent
+identity and its runtime wrapper already normalizes the session_id Gemini
+Enterprise sends, so it's ready to publish as-is.
+1) List the available Gemini Enterprise apps.
+2) Register the existing deployed agent (from deployment_metadata.json) to our
+   app.
+3) Give me the Agent Engine and Gemini Enterprise console links and write a
    registration_results.md.</div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">What M2 set up for this moment</div>
+        <p>You're publishing the <strong>existing M2 deployment</strong> &mdash; no new Reasoning Engine
+        revision. Two things M2 enabled are what make the portal work now:</p>
+        <ul>
+          <li><strong>Session-id compatibility</strong> &mdash; Gemini Enterprise (AgentSpace) calls the
+          runtime's <code>streaming_agent_run_with_events</code> and passes <code>session_id</code> as a full
+          resource path (<code>projects/&hellip;/sessions/&lt;id&gt;</code>); ADK's session service rejects an id
+          containing <code>/</code>. The wrapper you patched in M2 normalizes it to the bare id, so live portal
+          chats don't fail with <code>REMOTE_AGENT_FAILURE</code>.</li>
+          <li><strong>Agent identity</strong> &mdash; deploying with <code>--agent-identity</code> in M2 gave the
+          agent a per-user identity, so personalization (home-station recall via Memory Bank) is scoped to each
+          business user in the portal, not shared across everyone.</li>
+        </ul>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY runs <code>agents-cli deploy</code> to redeploy the optimized agent fresh (with
-        <code>--agent-identity</code>), then <code>agents-cli publish gemini-enterprise</code> &mdash; discovering
-        your Gemini Enterprise app with <code>--list</code> and registering the agent. It writes
-        <code>registration_results.md</code> with:</p>
+        <p>AGY runs <code>agents-cli publish gemini-enterprise</code> &mdash; discovering your Gemini
+        Enterprise app with <code>--list</code> and registering the <strong>existing M2 deployment</strong> (no
+        redeploy). It writes <code>registration_results.md</code> with:</p>
         <ul>
-          <li>Optimized agent <strong>redeployed fresh</strong> to Agent Runtime (new Reasoning Engine revision), <strong>agent identity</strong> enabled for per-user personalization</li>
-          <li><strong>Gemini Enterprise compatibility</strong> &mdash; the runtime normalizes the full-path <code>session_id</code> that GE sends, so live portal chats don't fail with <code>REMOTE_AGENT_FAILURE</code></li>
-          <li>Registered into your Gemini Enterprise app (<strong>"My Gemini Google Search App"</strong>)</li>
+          <li>The agent you built in M1 and deployed in M2 &mdash; already <strong>agent-identity enabled</strong>
+          and GE <code>session_id</code>-compatible &mdash; registered into your Gemini Enterprise app
+          (<strong>"My Gemini Google Search App"</strong>)</li>
           <li>Links to the <strong>Agent Engine console</strong> and the <strong>Gemini Enterprise console</strong></li>
         </ul>
-        <p><strong>What just happened:</strong> the agent you optimized is live and registered in Gemini
-        Enterprise &mdash; ready for business users. You'll test it in Step 2.</p>
+        <p><strong>What just happened:</strong> the agent you built, scaled, and governed is now registered in
+        Gemini Enterprise &mdash; ready for business users. You'll test it in Step 2.</p>
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
         <div class="callout-title">If a portal chat fails</div>
         <p>If a Gemini Enterprise chat returns <code>REMOTE_AGENT_FAILURE</code> or "stream closed cleanly,"
-        that's the known GE&harr;ADK session-id conflict: GE sends a full resource path as the
-        <code>session_id</code> and ADK rejects it. Ask AGY to <strong>normalize the session id in the runtime
-        wrapper and redeploy</strong> &mdash; then retry the chat.</p>
+        the deployed wrapper is probably missing the M2 <code>session_id</code> normalization (GE sends a full
+        resource path and ADK rejects an id containing <code>/</code>). Ask AGY to add the
+        <code>_normalize_session_id</code> override to <code>app/agent_runtime_app.py</code> (see M2 Step 1) and
+        <strong>redeploy once</strong> &mdash; then retry the chat.</p>
       </div>
     </div>
 
@@ -385,7 +387,7 @@ change its logic.
     <div class="done-when">
       <h3>Final Checkpoint &mdash; Workshop Complete When:</h3>
       <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The optimized agent is redeployed fresh and published to Gemini Enterprise</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The agent deployed in M2 is published to Gemini Enterprise</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You can chat with it as a non-technical user in the Gemini Enterprise portal (no <code>REMOTE_AGENT_FAILURE</code>)</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>The agent answers the crisis question with a concrete reroute</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Compare the "before" (empty console) to the "after" (full platform)</div></li>
@@ -506,8 +508,8 @@ change its logic.
     <div class="arc-card" style="border-color:#b45309; background:#fffbeb;">
       <div class="arc-module" style="color:#b45309;">M5 &middot; Engage</div>
       <div>
-        <div class="arc-detail">Redeployed fresh and published to Gemini Enterprise &mdash; anyone can chat with your agent</div>
-        <div class="arc-artifacts">Gemini Enterprise agent &middot; fresh redeploy &middot; agent identity &middot; GE-compatible sessions</div>
+        <div class="arc-detail">Published the M2 deployment to Gemini Enterprise &mdash; anyone can chat with your agent</div>
+        <div class="arc-artifacts">Gemini Enterprise agent &middot; agent identity &middot; GE-compatible sessions</div>
       </div>
     </div>
 
