@@ -418,44 +418,54 @@ which tools it used, and whether it resolved sensibly.</div>
       <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 4 Step 3: grade, fix, and prove one cycle.
 
-First, use the google-developer-knowledge MCP to read up on ADK evaluation and
-LLM-as-judge scoring, so you build the graded eval the current way.
+First, use the google-developer-knowledge MCP to read up on ADK evaluation
+(adk eval, the evalset format, and the eval config criteria), so you build the
+graded eval the current way.
 
-Score my agent locally, fix the single biggest issue, and show me
+Score my agent locally and fix the single biggest issue, then show me
 before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
-1) Build a small 4-case graded eval from our scenarios: a cancellation
-   + reroute, a delay, the offline-feed 503 fallback, and a grounding
-   trap that asks for something no tool returns (e.g. "which platform
-   does the 18:16 to Paris depart from?"). Reuse my existing tests/eval
-   files.
-2) Use fast metrics: tool_trajectory_avg_score (IN_ORDER) and
-   response_match_score; add hallucinations_v1 on ONLY the grounding
-   -trap case.
-3) Run `agents-cli eval run` once for a baseline and save it.
-4) Make ONE targeted fix (e.g. a strict grounding rule so it never
-   states a time/platform/number not returned by a tool), add a pytest
-   test for it, then re-run `agents-cli eval run` and `pytest tests/`
-   once.
-5) STOP and PRINT a report: weakest case, the fix, before->after via
-   `agents-cli eval compare`, and pytest result. No further iteration.
-   No deploy.</div>
+1) Build a 4-case evalset in ADK format at
+   tests/eval/evalsets/rushhour.evalset.json (eval_cases -> conversation with
+   user_content + intermediate_data.tool_uses, plus session_input). Cases:
+   a) cancellation + reroute, b) a delay, c) the offline-feed 503 fallback,
+   d) a grounding trap asking for something no tool returns (e.g. "which
+   platform does the 18:16 to Paris depart from?") whose reference response is
+   a refusal ("I can't give a platform — that's not in the data; check the
+   station boards").
+2) Write tests/eval/eval_config.json with fast, deterministic criteria:
+   { "criteria": { "tool_trajectory_avg_score": 1.0,
+                   "response_match_score": 0.5 } }
+   (hallucinations_v1 also exists but adds an LLM judge — skip it to stay fast.)
+3) Baseline run:
+   agents-cli eval --evalset tests/eval/evalsets/rushhour.evalset.json \
+     --config tests/eval/eval_config.json
+   Keep the result file it writes under app/.adk/eval_history/ (the
+   *.evalset_result.json) as the baseline.
+4) Make ONE targeted fix — a strict grounding rule in the system instruction so
+   the agent never states a time/platform/number not returned by a tool (for
+   unknowns, tell the user to check station boards). Add a pytest test that
+   locks it in. Then re-run the same agents-cli eval and `pytest tests/` once.
+5) STOP and PRINT a report: the weakest case (the grounding trap), the fix,
+   before -> after via `agents-cli eval compare` on the two *.evalset_result.json
+   files, and the pytest result. No further iteration. No deploy.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
-      <div class="callout-title">How <code>agents-cli eval run</code> scores (while you wait)</div>
-      <p><code>agents-cli eval run</code> wraps <code>adk eval</code> and scores each case against the metrics
-      below. The first two are <strong>fast and deterministic</strong>; <code>hallucinations_v1</code> uses an
-      <strong>LLM-as-judge</strong>, so we run it on just one case to keep things quick.</p>
+      <div class="callout-title">How <code>agents-cli eval</code> scores (while you wait)</div>
+      <p><code>agents-cli eval</code> wraps <code>adk eval</code> and scores each case against the
+      <code>criteria</code> in <code>eval_config.json</code>. We use the two <strong>fast, deterministic</strong>
+      metrics below; <code>hallucinations_v1</code> also exists but adds an LLM judge, so we skip it to stay quick.</p>
       <table class="data" style="margin-top:.5rem;">
         <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
         <tbody>
           <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, called in the right order (e.g. <code>check_disruptions</code> before <code>compute_reroute</code>)</td><td>fast</td></tr>
-          <tr><td><code>response_match_score</code></td><td>How close the answer is to a reference (ROUGE)</td><td>fast</td></tr>
-          <tr><td><code>hallucinations_v1</code></td><td>Is the answer grounded in tool output &mdash; no invented times/platforms?</td><td>LLM judge</td></tr>
+          <tr><td><code>response_match_score</code></td><td>How close the answer is to the reference (ROUGE) &mdash; for the grounding trap, the reference is a refusal</td><td>fast</td></tr>
+          <tr><td><code>hallucinations_v1</code></td><td>Optional &mdash; is the answer grounded in tool output, with no invented times/platforms?</td><td>LLM judge</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:.5rem;">Results are saved as JSON; compare two runs with
-      <code>agents-cli eval compare baseline.json candidate.json</code>.</p>
+      <p style="margin-top:.5rem;">Each run writes a <code>*.evalset_result.json</code> under
+      <code>app/.adk/eval_history/</code>; compare two runs with
+      <code>agents-cli eval compare BASELINE CANDIDATE</code>.</p>
       <p class="doc-cite">Docs: <a href="https://adk.dev/evaluate/" target="_blank">ADK evaluation</a> &middot; <a href="https://adk.dev/evaluate/criteria/" target="_blank">Criteria reference</a> &middot; <a href="https://adk.dev/evaluate/user-sim/" target="_blank">User simulation</a></p>
     </div>
 
@@ -466,7 +476,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
       <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
       station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli eval compare</code> shows the grounding case improving (e.g. <code>hallucinations_v1</code> jumps), other cases unchanged</li>
+        <li><strong>Before &rarr; after</strong> &mdash; <code>agents-cli eval compare</code> shows the grounding-trap case improving (its <code>response_match_score</code> rises toward the refusal reference), other cases unchanged</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
@@ -480,7 +490,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
     <h3>Mentor Checkpoint &mdash; Done When:</h3>
     <ul class="checklist">
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>10 scenarios were simulated against your agent locally</div></li>
-      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>agents-cli eval run</code>)</div></li>
+      <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>A graded eval suite produced a baseline score (<code>agents-cli eval</code>)</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>You identified the single weakest case and fixed the agent's logic</div></li>
       <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Before/after improvement shown via <code>agents-cli eval compare</code>, with <code>pytest</code> green &mdash; no deployment</div></li>
     </ul>
@@ -507,7 +517,7 @@ before/after. Do EXACTLY ONE cycle, keep it fast, do not deploy.
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
           <tr><td>4.2</td><td>A local parallel runner (ADK <code>Runner</code>) executing 10 scenarios concurrently</td></tr>
-          <tr><td>4.3</td><td><code>agents-cli eval run</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli eval compare</code> for before/after</td></tr>
+          <tr><td>4.3</td><td><code>agents-cli eval</code> (wraps <code>adk eval</code>) for scoring, <code>pytest</code> for tests, and <code>agents-cli eval compare</code> for before/after</td></tr>
         </tbody>
       </table>
       <p>The analysis and the fix are done by the coding agent reasoning over the scores &mdash; there is no
