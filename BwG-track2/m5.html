@@ -288,11 +288,23 @@ current flow.
 Take the agent I optimized in M4 and ship it to business users — don't
 change its logic.
 1) Deploy it FRESH to Agent Runtime so the optimized version is live, with
-   agent identity enabled for per-user personalization. Make sure the
-   deployed runtime is compatible with how Gemini Enterprise calls the
-   agent — GE passes a full Google Cloud resource path as the session_id,
-   which ADK's session validation rejects, so handle/normalize that in the
-   runtime wrapper so live portal chats don't fail.
+   agent identity enabled for per-user personalization.
+   Before deploying, fix one GE compatibility issue in
+   app/agent_runtime_app.py so live portal chats work — do NOT reverse-engineer
+   vertexai internals. Gemini Enterprise (AgentSpace) calls the wrapper's
+   streaming_agent_run_with_events and passes session_id as a full resource
+   path (projects/.../reasoningEngines/.../sessions/<id>); ADK's session
+   service rejects an id containing "/". In your AdkApp subclass:
+   - add a helper:
+     def _normalize_session_id(sid):
+         return sid.rstrip("/").split("/")[-1] if sid else sid
+   - override streaming_agent_run_with_events (and the structured methods
+     async_stream_query, async_get_session, async_delete_session) to normalize
+     the session_id and then delegate to super() — do NOT re-implement the base
+     method body. For the streaming entry point, parse request_json, swap in
+     the normalized session_id, re-serialize, then:
+       async for ev in super().streaming_agent_run_with_events(new_json):
+           yield ev
 2) Publish it to our Gemini Enterprise app: list the available apps,
    register the agent to ours, and give me the console links and a
    registration_results.md.</div>
