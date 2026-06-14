@@ -436,31 +436,22 @@ adk eval fails with a missing-dependencies error.
    user_content + a reference final_response, plus session_input). Cases:
    a) cancellation + reroute, b) a delay, c) the offline-feed 503 fallback,
    d) a grounding trap asking for something no tool returns (e.g. "which
-   platform does the 18:16 to Paris depart from?") whose reference response is
-   a refusal ("I can't give a platform — that's not in the data; check the
-   station boards").
-2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge,
-   which scores the FRACTION of the answer's sentences that are grounded in the
-   tool outputs — a continuous 0-1 score, not pass/fail — so you can see exactly
-   how grounded each answer is:
+   platform does the 18:16 to Paris depart from?").
+2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge
+   (scores the fraction of the answer's sentences grounded in the tool outputs,
+   continuous 0-1, reference-free):
    { "criteria": { "hallucinations_v1": { "threshold": 0.8,
        "judge_model_options": { "judge_model": "gemini-2.5-flash",
                                 "num_samples": 3 } } } }
-   (hallucinations_v1 is reference-free: it grades the response against the
-   agent's actual tool outputs, not a hand-written answer, so the scores aren't
-   circular. The other metrics — response_match_score (lexical ROUGE) and
-   tool_trajectory_avg_score (an EXACT name+args match, brittle for a generative
-   agent) — exist but we don't gate on them. If gemini-2.5-flash isn't enabled
-   in the project, set judge_model to one that is.)
-3) Baseline run with adk eval directly (agents-cli wraps this as "eval", but
-   its eval flags vary by build, so call adk eval for a stable command):
+   (If gemini-2.5-flash isn't enabled in the project, set judge_model to one
+   that is.)
+3) Baseline run — use adk eval directly:
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
      --config_file_path tests/eval/eval_config.json
-   adk eval prints a per-case score table to stdout -- SAVE that table as the
-   baseline. Then find the LOWEST-scoring case and, in its *.evalset_result.json
-   under app/.adk/eval_history/, read which sentences the judge flagged as
-   unsupported/contradicted. That flagged case is the real weakest one to fix --
-   don't assume which case it is; let the scores tell you.
+   adk eval prints a per-case score table to stdout -- SAVE it as the baseline.
+   Find the LOWEST-scoring case and, in its *.evalset_result.json under
+   app/.adk/eval_history/, read which sentences the judge flagged as
+   unsupported/contradicted. Let the scores pick the weakest case; don't assume.
 4) Make ONE targeted fix for that weakest case — a strict grounding rule in the
    system instruction so the agent only states facts a tool returned and stops
    adding unsupported sentences (for unknowns like a platform, tell the user to
