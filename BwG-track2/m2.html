@@ -650,7 +650,11 @@ Deploy this agent to Agent Runtime. Before deploying:
 2. Update the data-path resolution in the code (e.g. tools.py) to be
    relative to the file location using pathlib.Path(__file__).parent
    (so it works both locally and inside the Agent Runtime container)
-3. Run agents-cli deploy to create the Agent Runtime instance
+3. Run agents-cli scaffold enhance . --deployment-target agent_runtime
+   to add the Agent Runtime entrypoint (app/agent_runtime_app.py) if the
+   project doesn't have one yet. Do NOT hand-write this file or
+   reverse-engineer it from a reference project.
+4. Run agents-cli deploy to create the Agent Runtime instance
 
 After deploy completes (~5-10 min), verify the endpoint works by
 running: agents-cli run --url ENDPOINT_URL --mode adk
