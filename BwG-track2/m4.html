@@ -335,8 +335,8 @@
     <table class="data">
       <thead><tr><th>Metric (what it checks)</th><th>Before</th><th>After</th></tr></thead>
       <tbody>
-        <tr><td><code>final_response_match_v2</code> &mdash; semantic match to reference, LLM judge (the metric we gate on)</td><td>0.00</td><td>1.00</td></tr>
-        <tr><td><code>response_match_score</code> &mdash; lexical ROUGE overlap (not gated; low on free-form text)</td><td>0.06</td><td>0.60</td></tr>
+        <tr><td><code>hallucinations_v1</code> &mdash; fraction of sentences grounded in tool output (the metric we gate on)</td><td>0.60</td><td>1.00</td></tr>
+        <tr><td><code>response_match_score</code> &mdash; lexical ROUGE overlap (not gated; low on free-form text)</td><td>0.18</td><td>0.22</td></tr>
       </tbody>
     </table>
     <p>The biggest jump comes from fixing the single weakest case &mdash; here, a strict grounding rule so the agent
@@ -439,50 +439,54 @@ adk eval fails with a missing-dependencies error.
    platform does the 18:16 to Paris depart from?") whose reference response is
    a refusal ("I can't give a platform — that's not in the data; check the
    station boards").
-2) Write tests/eval/eval_config.json gating on a semantic LLM-judge metric, so
-   open-ended answers grade on meaning rather than word overlap:
-   { "criteria": { "final_response_match_v2": { "threshold": 0.5,
+2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge,
+   which scores the FRACTION of the answer's sentences that are grounded in the
+   tool outputs — a continuous 0-1 score, not pass/fail — so you can see exactly
+   how grounded each answer is:
+   { "criteria": { "hallucinations_v1": { "threshold": 0.8,
        "judge_model_options": { "judge_model": "gemini-2.5-flash",
                                 "num_samples": 3 } } } }
-   (We use final_response_match_v2 instead of the lexical response_match_score
-   because ROUGE word-overlap scores correct-but-free-form answers low. The
-   trade-off: an LLM judge is slower and slightly non-deterministic. The other
-   metrics — response_match_score (lexical) and tool_trajectory_avg_score (an
-   EXACT name+args match, brittle for a generative agent) — exist but we don't
-   gate on them. If gemini-2.5-flash isn't enabled in the project, set
-   judge_model to one that is.)
+   (hallucinations_v1 is reference-free: it grades the response against the
+   agent's actual tool outputs, not a hand-written answer, so the scores aren't
+   circular. The other metrics — response_match_score (lexical ROUGE) and
+   tool_trajectory_avg_score (an EXACT name+args match, brittle for a generative
+   agent) — exist but we don't gate on them. If gemini-2.5-flash isn't enabled
+   in the project, set judge_model to one that is.)
 3) Baseline run with adk eval directly (agents-cli wraps this as "eval", but
    its eval flags vary by build, so call adk eval for a stable command):
    uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
      --config_file_path tests/eval/eval_config.json
    adk eval prints a per-case score table to stdout -- SAVE that table as the
-   baseline (the full *.evalset_result.json under app/.adk/eval_history/ is the
-   detailed record, but the printed table is all you need for before/after).
-4) Make ONE targeted fix — a strict grounding rule in the system instruction so
-   the agent never states a time/platform/number not returned by a tool (for
-   unknowns, tell the user to check station boards). Add a pytest test that
-   locks it in. Then re-run the same `uv run adk eval` command and
-   `uv run pytest tests/` once.
-5) STOP and PRINT a report: the weakest case (the grounding trap), the fix, and
-   before -> after by putting the two adk eval score tables (baseline vs re-run)
-   side by side -- no JSON parsing, no separate compare subcommand. Also show
-   the pytest result. No further iteration. No deploy.</div>
+   baseline. Then find the LOWEST-scoring case and, in its *.evalset_result.json
+   under app/.adk/eval_history/, read which sentences the judge flagged as
+   unsupported/contradicted. That flagged case is the real weakest one to fix --
+   don't assume which case it is; let the scores tell you.
+4) Make ONE targeted fix for that weakest case — a strict grounding rule in the
+   system instruction so the agent only states facts a tool returned and stops
+   adding unsupported sentences (for unknowns like a platform, tell the user to
+   check the station boards). Add a pytest test that locks it in. Then re-run the
+   same `uv run adk eval` command and `uv run pytest tests/` once.
+5) STOP and PRINT a report: the weakest case and the exact sentences the judge
+   flagged, the fix, and before -> after by putting the two adk eval score tables
+   (baseline vs re-run) side by side -- show that case's hallucinations score
+   rising. Also show the pytest result. No further iteration. No deploy.</div>
     </div>
 
     <div class="callout callout-info" style="margin-top:.75rem;">
       <div class="callout-title">How <code>adk eval</code> scores (while you wait)</div>
       <p><code>adk eval</code> scores each case against the <code>criteria</code> in
       <code>eval_config.json</code> (<code>agents-cli eval</code> wraps it, but its flags vary by build &mdash; so we
-      call <code>adk eval</code> directly). We gate on one <strong>semantic</strong> metric &mdash;
-      <code>final_response_match_v2</code>, an LLM judge &mdash; so correct but free-form answers score on meaning,
-      not word overlap. The other three below exist, but we don't gate on them here.</p>
+      call <code>adk eval</code> directly). We gate on <code>hallucinations_v1</code>, an LLM judge that scores the
+      <strong>fraction of the answer's sentences grounded in the tool outputs</strong> &mdash; a continuous 0&ndash;1
+      score that's reference-free (no hand-written answer to game). The other three below exist, but we don't gate on
+      them here.</p>
       <table class="data" style="margin-top:.5rem;">
         <thead><tr><th>Metric</th><th>What it measures</th><th>Speed</th></tr></thead>
         <tbody>
-          <tr><td><code>final_response_match_v2</code> <strong>(gated)</strong></td><td>Does the answer <em>mean</em> the same as the reference? An LLM judge, so it grades free-form reroute/delay answers fairly (not just word overlap)</td><td>LLM judge</td></tr>
+          <tr><td><code>hallucinations_v1</code> <strong>(gated)</strong></td><td>Fraction of sentences grounded in the tool outputs &mdash; continuous 0&ndash;1, reference-free, so it directly measures "did the agent invent anything?"</td><td>LLM judge</td></tr>
+          <tr><td><code>final_response_match_v2</code></td><td>Semantic match to a reference answer (LLM judge) &mdash; but majority-vote binary per single-turn case, so it can't show fine-grained movement here</td><td>LLM judge</td></tr>
           <tr><td><code>response_match_score</code></td><td>Lexical closeness to the reference (ROUGE) &mdash; fast, but scores correct-but-free-form answers low, so we don't gate on it</td><td>fast</td></tr>
           <tr><td><code>tool_trajectory_avg_score</code></td><td>Right tools, right order &mdash; but an <strong>EXACT</strong> match on tool name AND args, so it's brittle for a generative agent (re-runs vary the args) and we don't gate on it</td><td>not gated</td></tr>
-          <tr><td><code>hallucinations_v1</code></td><td>Optional &mdash; is the answer grounded in tool output, with no invented times/platforms?</td><td>LLM judge</td></tr>
         </tbody>
       </table>
       <p style="margin-top:.5rem;">Each run prints a per-case score table to stdout (and writes a full
@@ -493,17 +497,19 @@ adk eval fails with a missing-dependencies error.
 
     <div class="step-expected">
       <h4>Expected Result</h4>
-      <p>AGY builds the 4-case evalset, runs a baseline, and finds the <strong>grounding-trap</strong> case
-      scoring low &mdash; the agent tries to answer a platform/time no tool returned. It adds a
-      <strong>strict grounding rule</strong> (state only what tools return; otherwise tell the user to check
-      station boards), adds a <code>pytest</code> test that locks this in, then re-runs.</p>
+      <p>AGY builds the 4-case evalset, runs a baseline, and reads the per-case <code>hallucinations_v1</code>
+      scores. Because the score is a continuous <em>fraction of grounded sentences</em>, the <strong>real</strong>
+      weakest case surfaces from the data &mdash; often the one where the agent slips in an unsupported sentence
+      (an invented platform, or a reassurance no tool returned). AGY adds a <strong>targeted grounding rule</strong>
+      for that case, a <code>pytest</code> test to lock it in, then re-runs.</p>
       <ul>
-        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the grounding-trap case flipping <strong>fail &rarr; pass</strong> on <code>final_response_match_v2</code> (the ungrounded agent invents a platform; the grounded one refuses, matching the reference); the other cases stay passing, since the LLM judge grades their correct free-form answers on meaning, not word overlap</li>
+        <li><strong>Before &rarr; after</strong> &mdash; the two <code>adk eval</code> score tables show the weakest case's <code>hallucinations_v1</code> score <strong>rising</strong> (e.g. ~0.6 &rarr; ~1.0) as the flagged sentences become grounded; the other cases stay high. No staging &mdash; the fix targets whatever the scores actually flagged</li>
         <li><strong>Green tests</strong> &mdash; <code>pytest tests/</code> passes, including the new grounding test</li>
         <li><strong>No deploy</strong> &mdash; the improved agent stays local; publishing happens later</li>
       </ul>
-      <p><strong>What just happened:</strong> quality became a <strong>number</strong>, you fixed the
-      <strong>real</strong> weakest case, and you <strong>proved</strong> the fix &mdash; the local eval-fix loop.</p>
+      <p><strong>What just happened:</strong> quality became a <strong>number</strong>, the fine-grained score
+      pointed you at the <strong>real</strong> weakest case, you fixed it, and you <strong>proved</strong> the
+      improvement &mdash; the local eval-fix loop.</p>
     </div>
   </div>
 
