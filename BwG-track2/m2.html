@@ -716,13 +716,14 @@ First, use the google-developer-knowledge MCP to read up on ADK Sessions and
 Memory Bank (including how memory generation is triggered), so you use current
 APIs and defaults.
 
-Add session state for the current conversation and long-term memory
-so the agent remembers my home station across visits. Use ADK's
-session service for short-term state and Memory Bank for cross-session
-personalization.
-Make the code changes and verify short-term session state locally in
-the playground &mdash; but do NOT redeploy yet. We'll add one more
-feature in the next step and redeploy just once, to save time.</div>
+1. Add session state for the current conversation and long-term memory so the
+   agent remembers my home station across visits. Use ADK's session service
+   for short-term state and Memory Bank for cross-session personalization.
+2. Make the code changes and verify short-term session state locally in the
+   playground.
+
+Do NOT redeploy yet &mdash; we'll add one more feature in the next step and
+redeploy just once, to save time.</div>
       </div>
 
       <div class="step-expected">
@@ -759,18 +760,19 @@ Module 2 Step 3: add code execution + single redeploy.
 First, use the google-developer-knowledge MCP to read up on ADK code execution
 (code executors / BuiltInCodeExecutor), so you use the current API.
 
-Add a code execution sandbox so the agent can write and run Python
-on the fly for ad-hoc math the tools don't already return &mdash; like
-the average delay across delayed trains, the cancellation ratio, or
-the peak bottleneck hour. Use BuiltInCodeExecutor from
-google.adk.code_executors (the model's built-in sandbox, no external
-infra). Run the math over the data the existing tools return, and
-update the system instruction to mention the sandbox. Then test it
-with agents-cli run using a question that needs this math, and show
-me from the trace that the built-in code execution actually ran
-(not a hardcoded tool). Once verified, redeploy to Agent Runtime &mdash;
-this one redeploy ships both the session/memory changes from Step 2
-and code execution. After it's live, share the Console Playground link.</div>
+1. Add a code execution sandbox so the agent can write and run Python on the
+   fly for ad-hoc math the tools don't already return &mdash; like the average
+   delay across delayed trains, the cancellation ratio, or the peak
+   bottleneck hour. Use BuiltInCodeExecutor from google.adk.code_executors
+   (the model's built-in sandbox, no external infra). Run the math over the
+   data the existing tools return.
+2. Update the system instruction to mention the sandbox.
+3. Test it with agents-cli run using a question that needs this math, and
+   show me from the trace that the built-in code execution actually ran
+   (not a hardcoded tool).
+4. Once verified, redeploy to Agent Runtime &mdash; this one redeploy ships
+   both the session/memory changes from Step 2 and code execution. After it's
+   live, share the Console Playground link.</div>
       </div>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">

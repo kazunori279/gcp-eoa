@@ -542,16 +542,17 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 1 Step 1: scaffold the ADK project (scaffold only).
 
-First make sure agents-cli is runnable: add $HOME/.local/bin to PATH (or
-use its full path) and confirm the active GCP project with
-"gcloud config get-value project".
-Then scaffold a new ADK agent project for a transit assistant that will
-answer commuter questions during a service disruption. Use Python,
-gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
-change it), and uv for dependency management.
-Also move my existing data/ folder (downloaded in M0) into the project
-root so the tools can read it later. Scaffold only &mdash; do not write
-the tools yet; I'll describe them in the next step.</div>
+1. Make sure agents-cli is runnable: add $HOME/.local/bin to PATH (or use
+   its full path) and confirm the active GCP project with
+   "gcloud config get-value project".
+2. Scaffold a new ADK agent project for a transit assistant that will
+   answer commuter questions during a service disruption. Use Python,
+   gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
+   change it), and uv for dependency management.
+3. Move my existing data/ folder (downloaded in M0) into the project root
+   so the tools can read it later.
+
+Scaffold only &mdash; do not write the tools yet; I'll describe them in the next step.</div>
       </div>
 
       <div class="step-expected">
@@ -755,10 +756,12 @@ eval datasets or run evals (that comes later in M4).</div>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 1 Step 3: write the system instruction.
 
-Write the system instruction for the agent: stay calm and factual,
-always reconcile schedule against disruptions before answering,
-never invent a train, proactively compute reroutes when services are
-disrupted, and end every response with one clear recommended action.</div>
+Write the system instruction for the agent with these five rules:
+1. Stay calm and factual.
+2. Always reconcile schedule against disruptions before answering.
+3. Never invent a train.
+4. Proactively compute reroutes when services are disrupted.
+5. End every response with one clear recommended action.</div>
       </div>
 
       <div class="step-expected">
@@ -794,10 +797,12 @@ disrupted, and end every response with one clear recommended action.</div>
         <div class="agent-ctx" id="step4-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 1 Step 4: run it locally in the playground.
 
-Can you now run the agent locally with adk web by calling agents-cli playground command and
-share the link for me to test. Also share multiple queries I can test
-to make sure the whole system works as intended. Keep checking the
-server that's running in the background and catch errors and fix them.</div>
+1. Run the agent locally with adk web by calling the agents-cli playground
+   command, and share the link for me to test.
+2. Share multiple queries I can test to make sure the whole system works as
+   intended.
+3. Keep checking the server that's running in the background, and catch and
+   fix any errors.</div>
       </div>
 
       <div class="step-expected">
