@@ -26,6 +26,15 @@
 # Validated locally via runtime_smoke.py (import + region assert + end-to-end
 # async_stream_query). Assumes this workshop's project shape: app/agent.py
 # exposes `app`, and app/app_utils/{telemetry,typing}.py exist (from scaffold).
+#
+# Reference version: 2026-06-15 (validated against agents-cli scaffold of that date).
+# MAINTENANCE: this file is a drop-in over what `scaffold enhance` generates. If the
+#   scaffold's project shape changes (e.g. app/agent.py stops exposing `app`, or
+#   app/app_utils/* moves), refresh this file from a fresh scaffold, re-apply the four
+#   fixes above, and re-run runtime_smoke.py before re-publishing.
+# TODO(upstream): fold these four fixes into `agents-cli scaffold enhance
+#   --deployment-target agent_runtime` so the generated file is correct out of the box
+#   and M2 Step 1 needs no curl at all.
 # ──────────────────────────────────────────────────────────────────────────
 import logging
 import os

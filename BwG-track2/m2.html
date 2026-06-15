@@ -961,6 +961,7 @@ fails, just tell me and I will check the console.</div>
       <p>Confirms the built-in sandbox computes a stat no single tool returns &mdash; the same question AGY verified locally in Step 3, now on the deployed agent.</p>
       <div class="prompt-block" id="step4-s4"><button class="copy-btn" onclick="copyBlock('step4-s4')">Copy</button><span class="prompt-label">prompt</span>Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?</div>
       <p><em>What to watch for:</em> the trace shows the model writing and running Python in the built-in sandbox, returning e.g. average delay <strong>26.25 min</strong> and a <strong>50% cancellation rate</strong>, then one recommended action.</p>
+      <p><em>Cold start:</em> on the <strong>deployed</strong> agent the <strong>first</strong> code-execution call may time out while the sandbox warms up &mdash; just send it again and it returns promptly. This is warmup latency, not a failure.</p>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
