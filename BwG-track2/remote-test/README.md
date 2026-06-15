@@ -157,6 +157,7 @@ Two independent concerns, solved by two independent mechanisms:
 | `drive.sh` | local | send one workshop step (`<module> <blockid> <step>`) to agy, detached. |
 | `poll.sh` | local | one-shot status: live pane + done/running. |
 | `deploy.sh` | local | push `remote/*.sh` to the workstation `$HOME`. |
+| `setlab.sh` | local | **point the harness at a new lab in one command** (account/project → discover workstation → rewrite `config.sh` → provision key → tunnel → tmux/deploy → agy-auth check). |
 | `remote/agystart.sh` | workstation | (re)start the persistent `agy` tmux session. |
 | `remote/agysend.sh` | workstation | paste a prompt, wait for completion, log the trajectory. |
 | `eval-report/m*.md` | output | per-module trajectory evaluation + content-improvement plan. |
@@ -235,6 +236,24 @@ nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &   # only if not already runnin
 nohup ./mirror.sh >/dev/null 2>&1 &
 nohup ./live.sh   >/dev/null 2>&1 &
 ```
+
+## Switching labs (new Qwiklabs account / project)
+
+Qwiklabs labs are time-boxed — when one expires, the student account is deleted and the
+workstation is gone. To repoint at a fresh lab, do the two human logins, then one command:
+
+```bash
+gcloud auth login                       # the NEW student-NN-...@qwiklabs.net (interactive)
+./setlab.sh <new-project-id> [student-NN-...@qwiklabs.net]
+```
+
+`setlab.sh` sets the gcloud account+project, **auto-discovers** the workstation
+(`gcloud workstations list` → `config.sh`), provisions the SSH key, restarts the tunnel
+supervisor, installs `tmux`, deploys the remote scripts, and tells you whether `agy` still
+needs its one-time OAuth. Then start the session + watchers as it prints.
+
+> Everything lab-specific lives in `config.sh`; `setlab.sh` is just the automated way to
+> rewrite it. You can still edit `config.sh` by hand for non-Qwiklabs targets.
 
 ## Driving the workshop
 
