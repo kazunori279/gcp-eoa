@@ -830,8 +830,9 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 
 4) Pin the project so you don't drift to the wrong one. Read the active project
    with: gcloud config get-value project  (it should be my Qwiklabs project, not
-   cloudshell-gca). Then set "gcp": { "project": "<that project id>" } in the
-   same ~/.gemini/antigravity-cli/settings.json (merge — keep "location"). From
+   cloudshell-gca). Then, in the same ~/.gemini/antigravity-cli/settings.json,
+   set the "gcp" object's "project" field to that exact project id (merge — keep
+   "location"). From
    now on use this project for every gcloud / agents-cli command; never switch
    to cloudshell-gca.
 
