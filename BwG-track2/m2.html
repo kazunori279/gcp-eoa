@@ -509,16 +509,16 @@
   </div>
 
   <div class="callout callout-info">
-    <div class="callout-title">Heads up &mdash; deployment takes a few minutes</div>
-    <p>You deploy <strong>twice</strong> in this module: once in Step 1, and once more in Step 3
-    after all the code changes are in (Steps 2 and 3 share a single redeploy to save time).
-    Each deploy runs server-side and takes a few minutes &mdash; <strong>kick it off and keep
-    reading or exploring the console while it builds</strong>, no need to babysit it.
-    AGY tells you automatically once it's live and the endpoint or Console Playground link is ready.</p>
-    <p>A redeploy <strong>updates the same instance in place</strong> (matched by agent name),
-    so the endpoint and Console Playground link stay the same. The link only changes if the
-    previous instance was deleted &mdash; then the redeploy creates a fresh one. Either way, use the
-    <strong>most recent link AGY prints after the latest deploy</strong>, not one you saved earlier.</p>
+    <div class="callout-title">Heads up &mdash; you deploy ONCE, at the end</div>
+    <p>This module is structured <strong>code first, test locally, deploy once</strong>. You make all
+    the changes (runtime entrypoint, sessions, memory, code execution) and prove them with a
+    <strong>local smoke test</strong> &mdash; then deploy a <strong>single</strong> time in Step 5.
+    A cloud deploy takes ~5&ndash;10 min and only tells you about runtime bugs <em>after</em> the wait,
+    so we catch those bugs locally in seconds first.</p>
+    <p>When the deploy runs (Step 5), <strong>kick it off and keep reading or exploring the
+    console while it builds</strong> &mdash; AGY pings you once it's live and the endpoint /
+    Console Playground link is ready. Use the <strong>most recent link AGY prints</strong>, not one
+    you saved earlier.</p>
   </div>
 
   <!-- PLATFORM ARTIFACTS -->
@@ -619,105 +619,100 @@
     </div>
 
   <!-- STEPS -->
-  <h2>Scale in 4 Steps</h2>
+  <h2>Scale in 6 Steps</h2>
 
     <div class="callout callout-warning">
       <div class="callout-title">The Leap</div>
       <p>In M1, your agent ran locally. Now you'll deploy it to a <strong>managed cloud service</strong>
       that scales from zero to thousands of concurrent users &mdash; without infrastructure management.
-      The same project shape from M1 deploys directly.</p>
+      You'll prepare the runtime entrypoint, add sessions, memory, and code execution, <strong>smoke-test
+      the runtime path locally</strong>, and then deploy <strong>once</strong>.</p>
     </div>
 
-    <!-- Step 1: Deploy -->
+    <!-- Step 1: Prep runtime entrypoint -->
     <div class="step">
       <div class="step-num">1</div>
-      <span class="step-time">9 min</span>
-      <h3>Deploy to Agent Runtime</h3>
-      <p>Your agent is working locally. Now let's make it a managed cloud service with an HTTPS
-      endpoint, auto-scaling, and health monitoring. The <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a> deploy</code> skill packages
-      your ADK app and creates an Agent Runtime instance.</p>
+      <span class="step-time">4 min</span>
+      <h3>Prepare the Runtime Entrypoint &mdash; no deploy yet</h3>
+      <p>Before deploying, get the project deploy-ready and make the runtime wrapper
+      (<code>app/agent_runtime_app.py</code>) robust. Three small things here are what make the
+      <strong>single</strong> deploy in Step 5 succeed on the first try instead of failing in the cloud.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Module 2 Step 1: deploy to Agent Runtime.
+Module 2 Step 1: prepare the Agent Runtime entrypoint (do NOT deploy yet).
 
 First, use the google-developer-knowledge MCP to read up on Agent Runtime
-(Vertex AI Agent Engine) deployment, so you use current commands and defaults.
+(Vertex AI Agent Engine) deployment and the AdkApp runtime wrapper, so you use
+current commands and defaults.
 
-Deploy this agent to Agent Runtime. Before deploying:
-1. Copy the data/ directory into app/ so it ships with the bundle
-2. Update the data-path resolution in the code (e.g. tools.py) to be
-   relative to the file location using pathlib.Path(__file__).parent
-   (so it works both locally and inside the Agent Runtime container)
-3. Run agents-cli scaffold enhance . --deployment-target agent_runtime
-   to add the Agent Runtime entrypoint (app/agent_runtime_app.py) if the
-   project doesn't have one yet. Do NOT hand-write this file or
-   reverse-engineer it from a reference project.
-4. In that generated app/agent_runtime_app.py, normalize the session_id so
-   Gemini Enterprise can call the agent later (the why is explained in M5).
-   Add a helper:
+Get the project deploy-ready WITHOUT deploying:
+1. Copy the data/ directory into app/ so it ships with the bundle, and update the
+   data-path resolution in the code to be relative to the file location using
+   pathlib.Path(__file__).parent (works locally and inside the container).
+2. Run agents-cli scaffold enhance . --deployment-target agent_runtime to add the
+   Agent Runtime entrypoint (app/agent_runtime_app.py) if the project doesn't have
+   one yet. Do NOT hand-write or reverse-engineer this file.
+3. Make app/agent_runtime_app.py robust for the deployed runtime. These three
+   things each break a first deploy if you skip them:
+   a. REGION, not "global": the Vertex AI Sessions and Memory Bank APIs are
+      REGIONAL. Build the session and memory services for the agent's DEPLOY
+      REGION (the same region you deploy to). Do NOT let
+      GOOGLE_CLOUD_LOCATION="global" leak into the session/memory resource names,
+      or every deployed call fails with "Invalid Session resource name". (The
+      model client may still use global; only sessions/memory must be regional.)
+   b. Robust memory fallback: build VertexAiMemoryBankService only when the engine
+      id env var (GOOGLE_CLOUD_AGENT_ENGINE_ID) is present; otherwise fall back to
+      InMemoryMemoryService — so import/init never crashes locally or at container
+      startup.
+   c. Fresh client per request: do NOT reuse a cached genai api_client across
+      requests/threads (it causes "Event loop is closed" inside the container);
+      construct (or clear) it per request in the streaming entrypoint.
+4. Normalize the session_id so Gemini Enterprise can call the agent later. NOTE:
+   this only handles the full-path session_id GE sends — it does NOT make sessions
+   valid on its own (that is 3a). Add:
      def _normalize_session_id(sid):
          return sid.rstrip("/").split("/")[-1] if sid else sid
    and in the AdkApp subclass override streaming_agent_run_with_events (and
-   the structured methods async_stream_query, async_get_session,
-   async_delete_session) to normalize the session_id and then delegate to
-   super() — do NOT re-implement the base method body. For the streaming entry
-   point, parse request_json, swap in the normalized session_id, re-serialize,
-   then:
+   async_stream_query, async_get_session, async_delete_session) to normalize the
+   session_id then delegate to super() — do NOT re-implement the base method body.
+   For the streaming entry point: parse request_json, swap in the normalized
+   session_id, re-serialize, then:
      async for ev in super().streaming_agent_run_with_events(new_json):
          yield ev
-5. Run agents-cli deploy --agent-identity to create the Agent Runtime instance
-   (--agent-identity gives the agent a per-user identity for personalization;
-   more in M5)
 
-After deploy completes (~5-10 min), verify the endpoint works by
-running: agents-cli run --url ENDPOINT_URL --mode adk
-with a test question about the 13:31 St Pancras to Paris train.
-Also share the Console Playground link for the deployed agent.
-
-Do NOT attempt to fix or debug gcloud auth issues. If deploy
-status polling fails, just tell me and I will check the console.</div>
+Do NOT deploy in this step. We deploy ONCE at the end (Step 5), after a local
+smoke test (Step 4) proves the runtime path works.</div>
       </div>
 
-
-
-      <div class="callout callout-success" style="margin-top:.75rem;">
-        <div class="callout-title">Don't wait &mdash; overlap the build</div>
-        <p>This first deploy takes ~5&ndash;10 min. Start it, then read the <strong>Platform Artifacts</strong>
-        above and skim Steps 2&ndash;3 while it builds. AGY pings you when the endpoint is live &mdash;
-        no need to watch it.</p>
-      </div>
-
-      <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
-        <p>This is an intermittent Cloud Shell issue. Try running the deploy again in your terminal:</p>
-        <div class="prompt-block" id="step1-retry"><button class="copy-btn" onclick="copyBlock('step1-retry')">Copy</button><span class="prompt-label">terminal</span>cd ~/transit-assistant && agents-cli deploy --no-confirm-project</div>
-        <p>If it still fails, open the
-        <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong>
-        to check whether the deployment actually went through. Don't let AGY spin on retries.</p>
+      <div class="callout callout-danger" style="margin-top:.75rem;">
+        <div class="callout-title">Why these three matter</div>
+        <p>Every one of them is a real failure mode that only shows up <em>in the deployed container</em>:
+        <strong>(a)</strong> a <code>global</code> location makes the regional Sessions API reject the resource
+        name &mdash; the deployed agent then returns an <strong>empty response</strong>; <strong>(b)</strong> a
+        memory builder with no fallback <strong>crashes at container startup</strong>; <strong>(c)</strong> a
+        cached client bound to a finished event loop throws <code>Event loop is closed</code>. Fixing them now
+        (and proving it in Step 4) turns a multi-deploy debugging loop into one clean deploy.</p>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY runs <code>agents-cli deploy</code> and polls the status every 60 seconds (deployment takes ~5&ndash;10 minutes).
-        Once complete, AGY verifies the endpoint by running <code>agents-cli run --url &lt;endpoint&gt; --mode adk</code> with the crisis query.</p>
         <ul>
-          <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint</li>
-          <li>AGY shares the endpoint URL and a link to the <strong>Agent Engine Console Playground</strong> (the deploy step writes these to <code>deployment_metadata.json</code>)</li>
-          <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00, so the agent confirms it's running normally and recommends boarding as scheduled</li>
-          <li>Deployed with <strong>agent identity</strong> enabled, and the runtime wrapper <strong>normalizes the full-path <code>session_id</code></strong> that Gemini Enterprise sends &mdash; both set up here for the M5 portal (the "why" is covered in M5)</li>
+          <li><code>data/</code> ships inside <code>app/</code> with file-relative path resolution</li>
+          <li><code>app/agent_runtime_app.py</code> exists, with session/memory services pinned to the
+          <strong>deploy region</strong> (not <code>global</code>), a memory <strong>fallback</strong> to
+          <code>InMemoryMemoryService</code>, and a <strong>per-request client</strong></li>
+          <li>The full-path <code>session_id</code> is normalized for the M5 portal (the "why" is covered in M5)</li>
+          <li><strong>Nothing deployed yet</strong> &mdash; that is Step 5</li>
         </ul>
-        <p><strong>What just happened:</strong> Serverless scale for a demand spike &mdash; zero to thousands
-        of concurrent users without managing infrastructure. Your M1 code deployed without changes.
-        Open the <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong> to see your deployed agent.</p>
       </div>
     </div>
 
     <!-- Step 2: Sessions + Memory -->
     <div class="step">
       <div class="step-num">2</div>
-      <span class="step-time">5 min</span>
+      <span class="step-time">4 min</span>
       <h3>Remember the Commuter &mdash; Sessions + Memory Bank</h3>
       <p>Right now, each query is stateless. We need two kinds of memory: <strong>Sessions</strong>
       (short-term, within a conversation) so "What about the next one?" makes sense, and
@@ -726,7 +721,7 @@ status polling fails, just tell me and I will check the console.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step2-instr')">Copy</button>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Module 2 Step 2: add session state + Memory Bank (no redeploy yet).
+Module 2 Step 2: add session state + Memory Bank (code only, NO deploy).
 
 First, use the google-developer-knowledge MCP to read up on ADK Sessions and
 Memory Bank (including how memory generation is triggered), so you use current
@@ -735,24 +730,26 @@ APIs and defaults.
 1. Add session state for the current conversation and long-term memory so the
    agent remembers my home station across visits. Use ADK's session service
    for short-term state and Memory Bank for cross-session personalization.
-2. Make the code changes and verify short-term session state locally in the
-   playground.
+2. Make the code changes and verify short-term session state LOCALLY using
+   InMemorySessionService / InMemoryMemoryService (set the home station, then
+   recall it in the same session).
 
-Do NOT redeploy yet &mdash; we'll add one more feature in the next step and
-redeploy just once, to save time.</div>
+Do NOT deploy &mdash; we make all the code changes first and deploy ONCE at the
+end (Step 5), after the local smoke test in Step 4.</div>
       </div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY adds three things to <code>agent.py</code> and runs the test suite (no redeploy yet &mdash; that happens once in Step 3):</p>
+        <p>AGY adds three things to <code>agent.py</code> and runs the test suite locally (no deploy yet &mdash; the single deploy happens in Step 5):</p>
         <ul>
           <li><strong>Session state</strong> &mdash; a <code>set_home_station</code> tool writes <code>tool_context.state</code>, with an <code>init_state</code> before-agent callback; the home station is read back from injected session state (so recall needs no tool call)</li>
           <li><strong>Memory Bank</strong> &mdash; registers <code>PreloadMemoryTool()</code> and a <code>generate_memories_callback</code> (after-agent) that calls <code>callback_context.add_session_to_memory()</code></li>
           <li><strong>Graceful fallback</strong> &mdash; memory callback wrapped in try/except so local <code>pytest</code> runs don't fail when memory services are unavailable</li>
         </ul>
-        <p>AGY verifies short-term session state locally (set the home station, then recall it in the same
-        session). You'll exercise the full set of scenarios &mdash; session state, cross-session memory, and
-        personalized reroute &mdash; against the deployed agent in <strong>Step 4</strong>, after the single redeploy.</p>
+        <p>AGY verifies short-term session state locally with in-memory services (set the home station, then
+        recall it in the same session). You'll exercise the full set of scenarios &mdash; session state,
+        cross-session memory, and personalized reroute &mdash; against the deployed agent in <strong>Step 6</strong>,
+        after the single deploy.</p>
 
         <p><strong>What just happened:</strong> Personalization and continuity are now <strong>managed services</strong>,
         not app code you maintain.</p>
@@ -762,7 +759,7 @@ redeploy just once, to save time.</div>
     <!-- Step 3: Sandbox -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">7 min</span>
+      <span class="step-time">4 min</span>
       <h3>Safe Math &mdash; Code Execution Sandbox</h3>
       <p>Give the agent a <strong>code execution sandbox</strong> so it can write and run
       Python on the fly for ad-hoc math the fixed tools don't cover &mdash; safely, without
@@ -771,7 +768,7 @@ redeploy just once, to save time.</div>
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step3-instr')">Copy</button>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
-Module 2 Step 3: add code execution + single redeploy.
+Module 2 Step 3: add code execution (code only, NO deploy).
 
 First, use the google-developer-knowledge MCP to read up on ADK code execution
 (code executors / BuiltInCodeExecutor), so you use the current API.
@@ -783,12 +780,13 @@ First, use the google-developer-knowledge MCP to read up on ADK code execution
    (the model's built-in sandbox, no external infra). Run the math over the
    data the existing tools return.
 2. Update the system instruction to mention the sandbox.
-3. Test it with agents-cli run using a question that needs this math, and
-   show me from the trace that the built-in code execution actually ran
+3. Test it LOCALLY with agents-cli run using a question that needs this math,
+   and show me from the trace that the built-in code execution actually ran
    (not a hardcoded tool).
-4. Once verified, redeploy to Agent Runtime (keep --agent-identity enabled)
-   &mdash; this one redeploy ships both the session/memory changes from Step 2
-   and code execution. After it's live, share the Console Playground link.</div>
+
+Do NOT deploy. All code changes are now in (entrypoint, sessions, memory, code
+exec); next we smoke-test the runtime path locally (Step 4), then deploy ONCE
+(Step 5).</div>
       </div>
 
       <div class="callout callout-danger" style="margin-top:.75rem;">
@@ -815,26 +813,130 @@ First, use the google-developer-knowledge MCP to read up on ADK code execution
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY configures <code>BuiltInCodeExecutor</code>, updates the system instruction, then verifies with <code>agents-cli run</code> before redeploying &mdash; using a test question that needs math no single tool returns.</p>
+        <p>AGY configures <code>BuiltInCodeExecutor</code>, updates the system instruction, then verifies <strong>locally</strong> with <code>agents-cli run</code> &mdash; using a test question that needs math no single tool returns.</p>
         <p><em>What to watch for:</em></p>
         <ol>
           <li>Calls <code>check_disruptions</code> to pull the affected trips.</li>
           <li>The trace shows the model <strong>writing and running Python in the built-in sandbox</strong> over that data &mdash; confirming code execution actually fired, not a hardcoded tool.</li>
           <li>Returns computed values: average delay <strong>26.25 min</strong> across the 4 delayed trains (45/30/15/15) and a <strong>50% cancellation rate</strong> (4 of 8 affected), then closes with one recommended action.</li>
-          <li>Once verified, AGY redeploys to Agent Runtime.</li>
         </ol>
-        <p>Once the redeploy is live, head to <strong>Step 4</strong> to test everything &mdash; session state,
-        cross-session memory, personalized reroute, and this code-exec question &mdash; against the deployed agent in
-        the Console Playground.</p>
+        <p>All the code is now in. Next, <strong>Step 4</strong> proves the deployed runtime path works
+        <em>locally</em> &mdash; before spending a single deploy.</p>
       </div>
     </div>
 
-    <!-- Step 4: Test the deployed agent -->
+    <!-- Step 4: Local runtime smoke test -->
     <div class="step">
       <div class="step-num">4</div>
+      <span class="step-time">3 min</span>
+      <h3>Catch Deploy-Blockers Locally &mdash; Runtime Smoke Test</h3>
+      <p>A cloud deploy takes ~5&ndash;10 min and only reveals runtime bugs <em>after</em> the wait. So before
+      deploying, exercise the <strong>same code path the deployed container uses</strong> on your laptop &mdash;
+      each run is seconds, not minutes. This is what makes a one-shot deploy reliable.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step4-smoke')">Copy</button>
+        <div class="agent-ctx" id="step4-smoke"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 4: local runtime smoke test (catch deploy-blockers before deploying).
+
+Build a local smoke test that exercises the SAME code path the deployed runtime
+uses, so we never spend a 10-minute deploy to discover a bug a 10-second local
+run can catch. Create scripts/runtime_smoke.py that:
+1. imports app/agent_runtime_app and builds the AdkApp / runtime object (catches
+   import/init crashes — e.g. a memory builder that does not fall back);
+2. asserts the session and memory services resolve to the DEPLOY REGION, not
+   "global" (catches the "Invalid Session resource name" bug with no API call);
+3. drives ONE query end-to-end through the deployed entry method
+   (async_stream_query / streaming_agent_run_with_events) in a single fresh
+   asyncio event loop, using InMemorySessionService, printing the full response
+   and any traceback (reproduces "Event loop is closed" locally).
+
+Run it and iterate on app/agent_runtime_app.py until it passes cleanly: a real
+answer, NO "Invalid Session resource name", NO "Event loop is closed". Keep
+scripts/runtime_smoke.py in the repo. Do NOT deploy yet — Step 5 is the deploy.</div>
+      </div>
+
+      <div class="callout callout-success" style="margin-top:.75rem;">
+        <div class="callout-title">Why this catches all three without a live engine</div>
+        <p>Vertex AI sessions live <em>under</em> the reasoningEngine, so the real sessions API can't be hit
+        before the first deploy &mdash; but you don't need it: the <strong>init crash</strong> shows up on import,
+        the <strong><code>global</code> location</strong> shows up as a config/string check, and
+        <strong><code>Event loop is closed</code></strong> reproduces by driving <code>async_stream_query</code>
+        with an in-memory session service through one asyncio loop.</p>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <ul>
+          <li><code>scripts/runtime_smoke.py</code> runs locally and prints a real answer</li>
+          <li>No <code>Invalid Session resource name</code>, no <code>Event loop is closed</code>, no import/init error</li>
+          <li>If it fails, AGY fixes <code>app/agent_runtime_app.py</code> and re-runs in seconds &mdash; you reach a green smoke test <strong>before</strong> any deploy</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 5: Deploy once -->
+    <div class="step">
+      <div class="step-num">5</div>
+      <span class="step-time">8 min</span>
+      <h3>Deploy Once</h3>
+      <p>The smoke test is green, so the runtime path already works. Now deploy a <strong>single</strong> time,
+      shipping sessions + Memory Bank + code execution together.</p>
+
+      <div class="card agent-section">
+        <button class="copy-btn" onclick="copyBlock('step5-instr')">Copy</button>
+        <div class="agent-ctx" id="step5-instr"><span class="agent-ctx-label">Paste into AGY</span>
+Module 2 Step 5: deploy ONCE.
+
+The local smoke test passes, so deploy to Agent Runtime a single time, shipping
+sessions + Memory Bank + code execution together:
+  agents-cli deploy --agent-identity
+(--agent-identity gives the agent a per-user identity for personalization; more
+in M5.)
+
+After deploy completes (~5-10 min), verify the deployed endpoint by running:
+  agents-cli run --url ENDPOINT_URL --mode adk
+with a test question about the 13:31 St Pancras to Paris train, and share the
+Console Playground link.
+
+Do NOT attempt to fix or debug gcloud auth issues. If deploy status polling
+fails, just tell me and I will check the console.</div>
+      </div>
+
+      <div class="callout callout-success" style="margin-top:.75rem;">
+        <div class="callout-title">Don't wait &mdash; overlap the build</div>
+        <p>This deploy takes ~5&ndash;10 min. Kick it off, then (re)read the <strong>Platform Artifacts</strong>
+        above while it builds. AGY pings you when the endpoint is live &mdash; no need to watch it.</p>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
+        <p>This is an intermittent Cloud Shell issue. Try the deploy again from your project directory:</p>
+        <div class="prompt-block" id="step5-retry"><button class="copy-btn" onclick="copyBlock('step5-retry')">Copy</button><span class="prompt-label">terminal</span>cd "$(dirname "$(find ~ -name deployment_metadata.json -o -name pyproject.toml | head -1)")" && agents-cli deploy --agent-identity --no-confirm-project</div>
+        <p>If it still fails, open the
+        <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong>
+        to check whether the deployment actually went through. Don't let AGY spin on retries.</p>
+      </div>
+
+      <div class="step-expected">
+        <h4>Expected Result</h4>
+        <p>AGY runs <code>agents-cli deploy --agent-identity</code> once and polls status (~5&ndash;10 min).
+        Because the runtime path was proven locally in Step 4, the first deploy serves correctly.</p>
+        <ul>
+          <li>A managed <strong>Agent Runtime instance</strong> (Reasoning Engine) with an HTTPS endpoint, shipping sessions + memory + code execution</li>
+          <li>AGY shares the endpoint URL and the <strong>Agent Engine Console Playground</strong> link (written to <code>deployment_metadata.json</code>)</li>
+          <li>The remote query confirms trip 9024 (13:31 departure) is <strong>unaffected</strong> &mdash; the signal failure starts at 15:00 &mdash; with <strong>no</strong> session/runtime error</li>
+          <li>Deployed with <strong>agent identity</strong> enabled and the normalized <code>session_id</code> &mdash; both for the M5 portal</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 6: Test the deployed agent -->
+    <div class="step">
+      <div class="step-num">6</div>
       <span class="step-time">5 min</span>
       <h3>Test the Deployed Agent &mdash; Run the Scenarios</h3>
-      <p>Now that the Step 3 redeploy is live, open the <strong>Agent Engine Console Playground</strong> link AGY
+      <p>Now that the Step 5 deploy is live, open the <strong>Agent Engine Console Playground</strong> link AGY
       shared and work through these scenarios against the deployed agent &mdash; the same endpoint your users hit.
       Run them in order; Scenario 2 depends on Scenario 1.</p>
 
@@ -895,13 +997,14 @@ First, use the google-developer-knowledge MCP to read up on ADK code execution
       </div>
 
       <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">If a scenario returns nothing (or errors) &mdash; read the runtime logs</div>
-        <p>A blank reply after some tool calls usually means an exception inside the deployed agent. Have AGY pull
-        the Agent Runtime (Reasoning Engine) logs from Cloud Logging and find the cause:</p>
+        <div class="callout-title">Fallback &mdash; if a scenario returns nothing (or errors)</div>
+        <p>The Step 4 smoke test should have caught this class of bug already. If a deployed scenario still
+        returns a blank reply after some tool calls, it means an exception inside the deployed agent. Have AGY
+        pull the Agent Runtime (Reasoning Engine) logs from Cloud Logging and find the cause:</p>
         <div class="card agent-section">
           <button class="copy-btn" onclick="copyBlock('step4-debug')">Copy</button>
           <div class="agent-ctx" id="step4-debug"><span class="agent-ctx-label">Paste into AGY</span>
-Module 2 Step 4 (debug): find why the deployed agent returned nothing.
+Module 2 Step 6 (debug): find why the deployed agent returned nothing.
 
 The deployed agent called some tools then returned an empty response. Read the
 Agent Runtime logs from Cloud Logging and identify the cause &mdash; do NOT
@@ -921,7 +1024,9 @@ root cause.</div>
     <div class="done-when">
       <h3>Mentor Checkpoint &mdash; Done When:</h3>
       <ul class="checklist">
-        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is deployed to Agent Runtime with a live endpoint</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Runtime entrypoint is region-correct, with memory fallback + per-request client</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Local runtime smoke test passes (no session / event-loop error) <strong>before</strong> deploying</div></li>
+        <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Agent is deployed to Agent Runtime in a <strong>single</strong> deploy, with a live endpoint</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Endpoint answers the crisis question correctly</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Session state maintains conversation context across turns</div></li>
         <li><span class="check-icon" onclick="this.classList.toggle('checked')"></span><div>Memory Bank stores and recalls the commuter's home station</div></li>
@@ -940,13 +1045,16 @@ root cause.</div>
       <table class="data">
         <thead><tr><th>Step</th><th>The Prompt</th></tr></thead>
         <tbody>
-          <tr><td>2.1 Deploy</td><td>"Deploy this agent to Agent Runtime and give me an endpoint I can query."</td></tr>
-          <tr><td>2.2 Memory</td><td>"Add session state and long-term memory so the agent remembers my home station &mdash; verify session state locally, don't redeploy yet."</td></tr>
-          <tr><td>2.3 Code Exec</td><td>"Add a code execution sandbox (BuiltInCodeExecutor) for ad-hoc math, test it with agents-cli, then redeploy once &mdash; shipping memory + code exec together."</td></tr>
+          <tr><td>2.1 Prep</td><td>"Prepare the Agent Runtime entrypoint &mdash; region-correct sessions/memory, memory fallback, per-request client, normalized session_id. Don't deploy yet."</td></tr>
+          <tr><td>2.2 Memory</td><td>"Add session state and long-term memory so the agent remembers my home station &mdash; verify locally with in-memory services, no deploy."</td></tr>
+          <tr><td>2.3 Code Exec</td><td>"Add a code execution sandbox (BuiltInCodeExecutor) for ad-hoc math, test it locally with agents-cli. No deploy."</td></tr>
+          <tr><td>2.4 Smoke test</td><td>"Build a local runtime smoke test that drives async_stream_query in one event loop &mdash; iterate until it passes, before any deploy."</td></tr>
+          <tr><td>2.5 Deploy once</td><td>"Now deploy once with agent identity &mdash; shipping sessions + memory + code exec together."</td></tr>
         </tbody>
       </table>
-      <p><strong>Why it matters:</strong> Three prompts take you from a local script to a deployed, stateful,
-      personalized cloud service that can compute on the fly. The coding agent handles all the infrastructure wiring.</p>
+      <p><strong>Why it matters:</strong> A handful of prompts take you from a local script to a deployed, stateful,
+      personalized cloud service that can compute on the fly &mdash; and by testing the runtime path locally first,
+      you deploy <strong>once</strong> instead of debugging through repeated cloud deploys.</p>
     </div>
 
     <div class="card">
@@ -955,9 +1063,11 @@ root cause.</div>
       <table class="data">
         <thead><tr><th>Step</th><th>What ran</th></tr></thead>
         <tbody>
-          <tr><td>2.1</td><td><code>agents-cli deploy</code> &mdash; packaged ADK app, created Agent Runtime instance, provisioned HTTPS endpoint</td></tr>
-          <tr><td>2.2</td><td>ADK Session service + Memory Bank integration &mdash; configured state persistence and cross-session recall</td></tr>
-          <tr><td>2.3</td><td><code>BuiltInCodeExecutor</code> &mdash; model-written Python runs in Gemini's built-in sandbox for ad-hoc math, then redeployed</td></tr>
+          <tr><td>2.1</td><td><code>agents-cli scaffold enhance</code> &mdash; generated a region-correct <code>agent_runtime_app.py</code> (memory fallback, per-request client, normalized session_id)</td></tr>
+          <tr><td>2.2</td><td>ADK Session service + Memory Bank integration &mdash; state persistence and cross-session recall (verified locally with in-memory services)</td></tr>
+          <tr><td>2.3</td><td><code>BuiltInCodeExecutor</code> &mdash; model-written Python runs in Gemini's built-in sandbox for ad-hoc math</td></tr>
+          <tr><td>2.4</td><td><code>scripts/runtime_smoke.py</code> &mdash; drove <code>async_stream_query</code> through one event loop locally to catch session/loop bugs in seconds</td></tr>
+          <tr><td>2.5</td><td><code>agents-cli deploy --agent-identity</code> &mdash; one deploy: packaged the ADK app, created the Agent Runtime instance, provisioned the HTTPS endpoint</td></tr>
         </tbody>
       </table>
     </div>
