@@ -439,8 +439,10 @@ uv sync --extra eval  (or: uv pip install "google-adk[eval]"). Without them,
 adk eval fails with a missing-dependencies error.
 
 1) Build a 4-case evalset in ADK format at
-   tests/eval/evalsets/rushhour.evalset.json (eval_cases -> conversation with
-   user_content + a reference final_response, plus session_input). Cases:
+   tests/eval/evalsets/rushhour.evalset.json. The file needs a top-level
+   "eval_set_id" field plus eval_cases (each a conversation with user_content +
+   a reference final_response, plus session_input) — adk eval fails without
+   eval_set_id. Cases:
    - cancellation + reroute
    - a delay
    - the offline-feed 503 fallback
@@ -450,10 +452,10 @@ adk eval fails with a missing-dependencies error.
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
    { "criteria": { "hallucinations_v1": { "threshold": 0.8,
-       "judge_model_options": { "judge_model": "gemini-2.5-flash-lite",
+       "judge_model_options": { "judge_model": "gemini-2.5-flash",
                                 "num_samples": 1 } } } }
-   (flash-lite keeps the judge fast; if it isn't enabled in the project, set
-   judge_model to one that is, e.g. gemini-2.5-flash.)
+   (gemini-2.5-flash is reliably enabled in lab projects; if you want a faster
+   judge and it's enabled, you can switch to gemini-2.5-flash-lite.)
 3) Finish writing BOTH files above before you run anything. Then run the eval
    once in the FOREGROUND and wait for it to finish — do NOT run it as a
    background task, or you'll lose the stdout score table. Use adk eval directly:

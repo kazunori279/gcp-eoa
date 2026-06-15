@@ -414,12 +414,19 @@ leftover *.json files). Then:
      curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
        "https://REGION-aiplatform.googleapis.com/v1/ENGINE_RESOURCE_NAME"
    Show its resource name, that it's platform-managed (agentFramework=
-   google-adk), and its effectiveIdentity — the service account it runs as.
-   Expect a default service agent (service-PROJECT_NUMBER@gcp-sa-aiplatform-re
-   .iam.gserviceaccount.com), not a SPIFFE principal — Agent Identity is
-   opt-in and off here, which is fine.
-2) List ONLY the roles bound to that service account — filter the policy,
-   do NOT dump the whole project:
+   google-adk), and its effectiveIdentity. NOTE: in M2 you deployed with
+   --agent-identity, so Agent Identity is ON and the effectiveIdentity is a
+   SPIFFE-attested principal (an ...system.id.goog/... path), NOT a bare
+   service account — that attested identity is exactly the governed outcome we
+   want. (Deploying WITHOUT --agent-identity would instead show a default
+   service agent like service-PROJECT_NUMBER@gcp-sa-aiplatform-re
+   .iam.gserviceaccount.com.)
+2) Audit least-privilege on the service account the engine RUNS AS for IAM —
+   the reasoning-engine service agent
+   (service-PROJECT_NUMBER@gcp-sa-aiplatform-re.iam.gserviceaccount.com). The
+   SPIFFE principal above is the agent's attested identity; IAM role grants
+   still live on this service account, so that's what you audit. List ONLY its
+   roles — filter the policy, do NOT dump the whole project:
      gcloud projects get-iam-policy PROJECT_ID \
        --flatten="bindings[].members" \
        --filter="bindings.members:SERVICE_ACCOUNT" \
@@ -442,7 +449,7 @@ Registry).</div>
         <p>AGY reads <code>deployment_metadata.json</code>, then runs a REST <code>describe</code> on the engine and a <strong>filtered</strong> IAM query, and reports honestly:</p>
         <ul>
           <li><strong>Engine</strong> &mdash; <code>projects/&hellip;/locations/us-east1/reasoningEngines/&lt;id&gt;</code>, platform-managed (<code>agentFramework=google-adk</code>)</li>
-          <li><strong>Runtime identity</strong> &mdash; its <code>effectiveIdentity</code> is the default service agent (e.g. <code>service-&lt;num&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>) &mdash; a service account, not a SPIFFE principal, since Agent Identity is opt-in and off</li>
+          <li><strong>Runtime identity</strong> &mdash; because M2 deployed with <code>--agent-identity</code>, the engine's <code>effectiveIdentity</code> is a <strong>SPIFFE-attested principal</strong> (a <code>&hellip;system.id.goog/&hellip;</code> path) &mdash; the governed outcome; IAM roles are still audited on the reasoning-engine service account (<code>service-&lt;num&gt;@gcp-sa-aiplatform-re.iam.gserviceaccount.com</code>)</li>
           <li><strong>Privilege audit</strong> &mdash; the roles actually bound to that service account. A clean project shows just the reasoning-engine service agent (+ basic <code>aiplatform.user</code>/<code>viewer</code>) = least-privilege. <strong>In this lab you'll likely see broad roles too</strong> &mdash; <code>storage.admin</code>, <code>bigquery.admin</code>/<code>dataOwner</code>, <code>secretmanager.admin</code>, <code>discoveryengine.editor</code> &mdash; from the scaffold's permissive <code>app_sa_roles</code> defaults plus lab setup. AGY should <strong>flag these as excessive</strong>: this agent's GTFS data is bundled locally, so it needs none of them.</li>
           <li><strong>Governance takeaway</strong> &mdash; least-privilege is <em>not</em> automatic. Registration and an identity come free at deploy; trimming that identity to only what the agent needs is the governance action.</li>
         </ul>
