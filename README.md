@@ -24,7 +24,7 @@ Workshop catalog and event history for the Google Cloud "Era of Agents" hands-on
 
 Each module's hands-on prompts are copy-paste blocks prefixed `Module X Step Y:`. In M0 the coding agent creates a `plan.md` checklist of every module/step and works one step at a time, so it doesn't run ahead.
 
-> **Status — under testing.** M0–M4 are validated against the live lab; M5 (Engage) is the last module pending a full run-through. The native Developer Knowledge MCP grounding now works in the lab; M0 still sets up a `dk.py` direct-access fallback in case lab runtime policy blocks it.
+> **Status — under testing.** M0–M4 are validated against the live lab; M5 (Engage) is the last module pending a full run-through. The native Developer Knowledge MCP grounding now works in the lab, so M0 uses it directly (a `dk.py` direct-access helper remains in the repo as an optional fallback).
 
 Open the HTML files in any browser — no dependencies or build step required.
 

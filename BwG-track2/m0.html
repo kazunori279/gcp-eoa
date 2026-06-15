@@ -781,13 +781,11 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 1) Enable the API:
    gcloud services enable developerknowledge.googleapis.com
 
-2) Merge (don't overwrite) this server into the Antigravity CLI's MCP config.
-   The CLI loads ~/.gemini/config/mcp_config.json — in this lab it ships as an
-   empty 0-byte file, so the CLI fails to parse it at startup ("unexpected end
-   of JSON input") and silently disables EVERY MCP tool (you'll see "tool ...
-   is not enabled" / "server ... not allowed in this context"). So write valid
-   JSON into BOTH paths below, and if a file is missing or empty treat it as {}
-   before merging (don't choke on the empty file):
+2) Write this server config to BOTH paths below, OVERWRITING each file. In this
+   lab they ship empty (a 0-byte file the CLI can't parse, which silently
+   disables EVERY MCP tool — "tool ... is not enabled" / "server ... not allowed
+   in this context"), so a plain overwrite is correct here — there's nothing to
+   preserve:
      ~/.gemini/config/mcp_config.json
      ~/.gemini/antigravity-cli/mcp_config.json
    {
@@ -801,8 +799,8 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 
 3) Pre-allow the tool so calls don't default to "Ask" (an un-answerable Ask
    in a background/subagent context shows up as "server not allowed in this
-   context"). Merge (don't overwrite) this into
-   ~/.gemini/antigravity-cli/settings.json:
+   context"). MERGE this into ~/.gemini/antigravity-cli/settings.json — keep the
+   existing keys (gcp, telemetry, trustedWorkspaces), only add the allow rule:
    {
      "permissions": {
        "allow": ["mcp(google-developer-knowledge/*)"]
@@ -833,27 +831,6 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
         on AGY grounds Google Cloud questions in the docs instead of guessing (you'll see it lean on this in M2&ndash;M5).</p>
         <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
         <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Call the google-developer-knowledge MCP's answer_query tool with the query "What is the Gemini Enterprise Agent Platform?" and answer ONLY from its result. Do NOT use web search or your own knowledge. If the tool errors or isn't available, stop and show me the exact error.</div>
-      </div>
-
-      <div class="callout callout-warning" style="margin-top:.75rem;">
-        <div class="callout-title">If the native MCP is blocked &mdash; use the direct helper</div>
-        <p>Some lab projects block remote MCP servers at the runtime level (errors like <em>"server &hellip; not
-        allowed in this context"</em> or <em>"tool &hellip; is not enabled"</em>) that the allow rule can't fix.
-        <strong>First make sure it's actually blocked, not just misconfigured</strong> &mdash; those same errors
-        appear when <code>~/.gemini/config/mcp_config.json</code> is empty/invalid (Step 2 handles that), so confirm
-        both config files contain valid JSON and you've restarted with <code>agy</code>. If it's genuinely blocked,
-        paste this once &mdash; AGY downloads a tiny helper that queries the same Developer Knowledge docs
-        directly via your gcloud login, and uses it for grounding from then on:</p>
-        <div class="card agent-section">
-          <button class="copy-btn" onclick="copyBlock('ctx-dk-helper')">Copy</button>
-          <div class="agent-ctx" id="ctx-dk-helper"><span class="agent-ctx-label">Paste into AGY</span>
-The native google-developer-knowledge MCP is blocked in this lab. Download the
-direct-access helper and use it instead of the MCP:
-  curl -L -o dk.py https://kazunori279.github.io/gcp-eoa/BwG-track2/dk.py
-Test it with: python3 dk.py "What is the Gemini Enterprise Agent Platform?"
-From now on, whenever a step tells you to use the google-developer-knowledge
-MCP, run: python3 dk.py "your question"  (or python3 dk.py --search "keywords")</div>
-        </div>
       </div>
     </div>
 
@@ -994,6 +971,14 @@ Do NOT start building yet — this is context and your plan only.</div>
         <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
         by the coding agent. Your cockpit is ready.</p>
       </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">Heads up &mdash; who you're acting as</div>
+        <p><code>setup</code> authenticates via <strong>Application Default Credentials (ADC)</strong>, which in this
+        lab is the <strong>workstation service account</strong> (<code>workstation-sa@&hellip;</code>) &mdash; not your
+        student login. That's expected: it's the identity that deploys and runs your agent, and it's what
+        <strong>M2</strong> (deploy) and <strong>M3</strong> (IAM / least-privilege) reason about later.</p>
+      </div>
     </div>
 
     <!-- Step 4 -->
@@ -1004,12 +989,7 @@ Do NOT start building yet — this is context and your plan only.</div>
       <p>Download the <strong>Eurostar <a href="https://gtfs.org/" target="_blank">GTFS</a> bundle</strong> (official public feed from
       <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
       and the <strong>disruption file</strong> into your project:</p>
-      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this command in the shell for me and show me the output — mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
-      <div class="callout callout-warning" style="margin-top:.5rem;">
-        <div class="callout-title">Fallback &mdash; if the official GTFS link is unavailable</div>
-        <p>A copy of the GTFS bundle is included in the workshop repo. Use this instead:</p>
-        <div class="prompt-block" id="cmd-download-data-fallback"><button class="copy-btn" onclick="copyBlock('cmd-download-data-fallback')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this fallback command in the shell for me and show me the output — mkdir -p data/gtfs && curl -L -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
-      </div>
+      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this in the shell for me and show me the output. It tries the official Eurostar GTFS feed first and automatically falls back to the workshop repo mirror if that download fails, then fetches the disruption file — mkdir -p data/gtfs && { curl -fL -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip || curl -fL -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip; } && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
         <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>
