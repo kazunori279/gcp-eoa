@@ -754,6 +754,17 @@
        ───────────────────────────────────────────────────────────── -->
     <h2>Setup in 5 Steps</h2>
 
+    <div class="callout callout-warning" style="margin-top:1rem;">
+      <div class="callout-title">First &mdash; pin your project (do this before Step 1)</div>
+      <p>Set your <strong>Qwiklabs Project ID</strong> as the active project in the terminal. Otherwise
+      Cloud Shell / AGY can default to the wrong project (e.g. <code>cloudshell-gca</code>), and the
+      <code>enable</code> / <code>deploy</code> commands in later modules fail:</p>
+      <div class="prompt-block" id="cmd-set-project"><button class="copy-btn" onclick="copyBlock('cmd-set-project')">Copy</button><span class="prompt-label">terminal</span>export GOOGLE_CLOUD_PROJECT=&lt;your qwiklabs project id&gt;
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"</div>
+      <p>Replace <code>&lt;your qwiklabs project id&gt;</code> with the Project ID from the Qwiklabs lab panel.
+      Step 1 below also pins this into AGY's own settings so it can't switch projects mid-run.</p>
+    </div>
+
     <!-- Step 1: Developer Knowledge MCP -->
     <div class="step">
       <div class="step-num">1</div>
@@ -800,14 +811,21 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 3) Pre-allow the tool so calls don't default to "Ask" (an un-answerable Ask
    in a background/subagent context shows up as "server not allowed in this
    context"). MERGE this into ~/.gemini/antigravity-cli/settings.json — keep the
-   existing keys (gcp, telemetry, trustedWorkspaces), only add the allow rule:
+   existing keys (telemetry, trustedWorkspaces), only add the allow rule:
    {
      "permissions": {
        "allow": ["mcp(google-developer-knowledge/*)"]
      }
    }
 
-4) Then tell me to restart the CLI by running "agy" so the new tools and
+4) Pin the project so you don't drift to the wrong one. Read the active project
+   with: gcloud config get-value project  (it should be my Qwiklabs project, not
+   cloudshell-gca). Then set "gcp": { "project": "<that project id>" } in the
+   same ~/.gemini/antigravity-cli/settings.json (merge — keep "location"). From
+   now on use this project for every gcloud / agents-cli command; never switch
+   to cloudshell-gca.
+
+5) Then tell me to restart the CLI by running "agy" so the new tools and
    permission take effect. If it still won't connect, check ADC (gcloud auth
    application-default print-access-token returns a token) and tell me what
    you see.</div>
