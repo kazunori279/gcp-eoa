@@ -305,8 +305,10 @@ Enterprise sends, so it's ready to publish as-is.
 
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">What M2 set up for this moment</div>
-        <p>You're publishing the <strong>existing M2 deployment</strong> &mdash; no new Reasoning Engine
-        revision. Two things M2 enabled are what make the portal work now:</p>
+        <p>Remember the runtime wrapper you dropped in at <strong>M2 Step 1</strong> &mdash; we said we'd
+        revisit it here. <em>This</em> is why it was required. You're publishing the
+        <strong>existing M2 deployment</strong> &mdash; no new Reasoning Engine revision &mdash; and two
+        things that wrapper (plus the M2 deploy flags) enabled are what make the portal work now:</p>
         <ul>
           <li><strong>Session-id compatibility</strong> &mdash; Gemini Enterprise (AgentSpace) calls the
           runtime's <code>streaming_agent_run_with_events</code> and passes <code>session_id</code> as a full

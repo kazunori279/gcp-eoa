@@ -674,14 +674,16 @@ deploys once.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Under the hood &mdash; optional reading (you don't need this to proceed)</div>
-        <p>You don't have to understand the wrapper to use it. But if you're curious, here's what it
-        handles for you &mdash; each is a real failure that only shows up <em>in the deployed container</em>:</p>
+        <div class="callout-title">What the wrapper does &mdash; and why it's required</div>
+        <p>You drop it in rather than write it, but it isn't boilerplate to ignore: each item below is a
+        real failure that only shows up <em>in the deployed container</em>, and the last one is what makes
+        your agent <strong>publishable to Gemini Enterprise in Module 5</strong>. Without it, deploy
+        succeeds but M5 can't talk to the agent.</p>
         <ul style="margin-top: .5rem; margin-bottom: .5rem;">
           <li><strong>Regional Session/Memory services</strong> &mdash; a <code>global</code> location makes the regional Sessions API reject the resource name &rarr; empty responses</li>
           <li><strong>Memory Bank fallback</strong> &mdash; falls back to <code>InMemory</code> when there's no engine id (no startup crash)</li>
           <li><strong>Fresh client</strong> &mdash; a fresh GenAI client per request (no <code>Event loop is closed</code>)</li>
-          <li><strong>Session ID normalization</strong> &mdash; Gemini Enterprise <code>session_id</code> normalization</li>
+          <li><strong>Session ID normalization</strong> &mdash; rewrites the <code>session_id</code> Gemini Enterprise sends into the form Agent Runtime accepts. <strong>This is the M5 enabler</strong> &mdash; we'll come back to it when you publish.</li>
         </ul>
         <p>Step 4 proves it locally before you deploy.</p>
       </div>
