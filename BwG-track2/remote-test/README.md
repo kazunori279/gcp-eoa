@@ -27,13 +27,25 @@ laptop, which drives the *remote* `agy` for you. The split of duties:
 > "Read `BwG-track2/remote-test/README.md`. I've already done `gcloud auth login` (student account)
 > and the one-time `agy` OAuth on the workstation. Edit `config.sh` for my workstation,
 > bring up the tunnel + persistent agy session, then drive the BwG-track2 workshop steps
-> (m0…m5) one at a time; after each module, stop and write the agy trajectory eval + an
-> improvement plan for that module's content to `BwG-track2/remote-test/eval-report/m<N>.md`."
+> (m0…m5) one module at a time, following the **Per-module loop** below."
 
 The agent then owns everything else: editing `config.sh`, starting `tunnel_sup.sh`,
 `deploy.sh`, `agystart.sh`, and looping `drive.sh` / `poll.sh` per step. You watch live
 with `tail -f /tmp/agy-local.log` (after the agent starts `mirror.sh`) or
 `tmux attach -t agy` on the workstation.
+
+### Per-module loop (required)
+
+Drive **one module at a time**. After finishing each module, the agent MUST:
+
+1. **Write the eval report** to `BwG-track2/remote-test/eval-report/m<N>.md` — the per-step
+   trajectory table, timings, what worked, and a prioritized plan to improve that module's
+   content (`BwG-track2/m<N>.html`). On a re-run, overwrite the existing report.
+2. **Notify** the user (the cc-notify webhook — see the user's notify hook).
+3. **Stop and wait** for the user's instruction. Do **not** auto-advance to the next module.
+
+This keeps the human in the loop: between modules they review the report, edit the workshop
+content, and decide whether to continue, re-run, or change course.
 
 Why the human-first auth: both logins are interactive browser flows, and `agy`'s in
 particular times out in ~30s — an agent calling tools can't reliably complete it. Once the
