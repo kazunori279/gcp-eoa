@@ -292,7 +292,11 @@ Enterprise sends, so it's ready to publish as-is.
 1) List the available Gemini Enterprise apps.
 2) Register the existing deployed agent (from deployment_metadata.json) to our
    app.
-3) Create a file named registration_results.md in the project root (write it
+3) Confirm the registration from the CLI (headless check — don't rely on the
+   browser). Run: agents-cli publish gemini-enterprise --list  and show that our
+   agent now appears registered to the app (or, if that doesn't list it, do a
+   discoveryengine GET on the registered agent resource name and show it exists).
+4) Create a file named registration_results.md in the project root (write it
    with your file tools — this is a required deliverable, do NOT just print it).
    It must contain: the registered agent resource name, the app it was
    registered to, the Agent Engine console link, and the Gemini Enterprise
