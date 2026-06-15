@@ -299,6 +299,7 @@ markers), what worked, and a prioritized plan for improving that module's conten
 - [`eval-report/m2.md`](eval-report/m2.md) — M2 · Scale (deploy/sessions/code-exec ✅; **deployed agent broken** — 3 stacked runtime bugs, `global`-location is the key one)
 - [`eval-report/m3.md`](eval-report/m3.md) — M3 · Govern (Step 2 verify + Step 3 Model Armor ✅; identity-expectation caveat)
 - [`eval-report/m4.md`](eval-report/m4.md) — M4 · Optimize (10-scenario sim + graded eval 4/4 ✅)
+- [`eval-report/m5.md`](eval-report/m5.md) — M5 · Engage (published to Gemini Enterprise ✅; registration_results.md gap)
 
 ## Transcript / artifacts
 - `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
