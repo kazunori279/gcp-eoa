@@ -2,11 +2,11 @@
 # Sourced by all local-side scripts (rsh, tunnel_sup.sh, drive.sh, poll.sh, mirror.sh, deploy.sh).
 
 # --- Workstation coordinates (from the Qwiklabs / Cloud Workstations console) ---
-export WS_PROJECT="qwiklabs-gcp-00-a5a738c80d58"
+export WS_PROJECT="qwiklabs-gcp-04-4df18b2e446c"
 export WS_CLUSTER="workstation-cluster"
 export WS_CONFIG="workstation-config"
 export WS_REGION="us-central1"
-export WS_NAME="ws-student-02-5ec1b0aaeb59-qwiklabs-net"
+export WS_NAME="ws-student-00-93442c5d5e8d-qwiklabs-net"
 
 # --- Local tunnel + multiplexed SSH ---
 export WS_LOCAL_PORT="2222"                          # local port the IAP tunnel listens on
