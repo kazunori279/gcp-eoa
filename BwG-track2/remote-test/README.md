@@ -182,6 +182,46 @@ nohup ./mirror.sh >/dev/null 2>&1 &
 tail -f /tmp/agy-local.log
 ```
 
+## Preflight — reset to a clean state (before a from-scratch re-run)
+
+Run this between test runs (and after editing any module HTML) so the next run starts truly
+fresh and actually exercises the current content. **Keep the agy auth** (`antigravity-oauth-token`) —
+do NOT delete it, or you'll need the interactive login again.
+
+```bash
+# 0. RE-EXTRACT prompts — REQUIRED after editing any m*.html (the driver reads all.json)
+python3 extract_prompts.py .. /tmp/agy-prompts/all.json
+
+# 1. stop the agy session + any stray mirror tails
+./rsh "tmux kill-session -t agy 2>/dev/null; pkill -f 'tail -.*agy-session.log' 2>/dev/null; true"
+
+# 2. (DESTRUCTIVE, cloud) delete the deployed Agent Runtime engine, if one exists.
+#    Get PROJECT_NUMBER / REGION / ENGINE_ID from a prior deployment_metadata.json or the console.
+./rsh 'ENG=projects/PROJECT_NUMBER/locations/REGION/reasoningEngines/ENGINE_ID; \
+  curl -s -X DELETE -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  "https://REGION-aiplatform.googleapis.com/v1/${ENG}?force=true"'
+
+# 3. wipe project + plan + harness logs + agy conversation history
+./rsh 'rm -rf ~/transit-* ~/plan.md ~/data ~/agy-session.log ~/.aylogs/* \
+  ~/.gemini/antigravity-cli/conversations/* ~/.gemini/antigravity-cli/brain/*'
+
+# 4. (lab only) reset the DK MCP config to the FRESH-LAB state, so M0 Step 1's overwrite
+#    logic is genuinely exercised: empty mcp_config.json + no allow rule (keep other keys).
+./rsh ': > ~/.gemini/config/mcp_config.json; : > ~/.gemini/antigravity-cli/mcp_config.json; \
+  python3 -c "import json,os; p=os.path.expanduser(chr(126)+\"/.gemini/antigravity-cli/settings.json\"); \
+  d=json.load(open(p)); d.pop(\"permissions\",None); json.dump(d,open(p,\"w\"),indent=2)"'
+
+# 5. verify clean (expect: no agy procs; no transit-*/plan.md; mcp_config 0 bytes; permissions count 0; engine 404)
+./rsh 'pgrep -af agy|grep -v pgrep||echo "no agy"; ls -ld ~/transit-* ~/plan.md 2>&1; \
+  wc -c ~/.gemini/config/mcp_config.json; grep -c permissions ~/.gemini/antigravity-cli/settings.json'
+
+# 6. restart watchers + a fresh agy session
+nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &   # only if not already running
+./rsh "bash ~/agystart.sh"
+nohup ./mirror.sh >/dev/null 2>&1 &
+nohup ./live.sh   >/dev/null 2>&1 &
+```
+
 ## Driving the workshop
 
 ```bash

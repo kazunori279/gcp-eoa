@@ -546,9 +546,10 @@ Module 1 Step 1: scaffold the ADK project (scaffold only).
    its full path) and confirm the active GCP project with
    "gcloud config get-value project".
 2. Scaffold a new ADK agent project for a transit assistant that will
-   answer commuter questions during a service disruption. Use Python,
-   gemini-3.5-flash as the model (this is the correct model ID &mdash; do not
-   change it), and uv for dependency management.
+   answer commuter questions during a service disruption. Name the project
+   exactly "transit-assistant" (so later modules can find it deterministically).
+   Use Python, gemini-3.5-flash as the model (this is the correct model ID
+   &mdash; do not change it), and uv for dependency management.
 3. Move my existing data/ folder (downloaded in M0) into the project root
    so the tools can read it later.
 
@@ -715,6 +716,9 @@ Add three tools to the agent:
 3. compute_reroute &mdash; given origin, destination, and departure_after,
    builds a station graph from GTFS connections, removes disrupted
    services, and finds an alternative path (BFS/shortest-path).
+Define the three tools in a dedicated app/tools.py (not inline in
+app/agent.py) and import them into the agent — later modules refer to
+tools.py for the data-path resolution.
 Write clear docstrings and type hints so the model can call them
 correctly. The critical pattern is reconciliation: joining schedule
 data with disruption data on trip_id and stop_id.
@@ -728,7 +732,7 @@ eval datasets or run evals (that comes later in M4).</div>
 
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>AGY writes the three tools into the tools module (<code>app/tools.py</code>, or inline in <code>app/agent.py</code>), wires them into the agent, runs linting:</p>
+        <p>AGY writes the three tools into <code>app/tools.py</code>, imports them into <code>app/agent.py</code>, runs linting:</p>
         <ul>
           <li><strong><code>get_scheduled_departures</code></strong> &mdash; joins <code>stops.txt</code>, <code>calendar_dates.txt</code>, <code>trips.txt</code>, <code>routes.txt</code>, <code>stop_times.txt</code>; normalizes departures with times and route names</li>
           <li><strong><code>check_disruptions</code></strong> &mdash; parses <code>disruptions.json</code>; filters by <code>station_query</code> (fuzzy) or <code>trip_id</code> (exact)</li>
@@ -803,6 +807,15 @@ Module 1 Step 4: run it locally in the playground.
    intended.
 3. Keep checking the server that's running in the background, and catch and
    fix any errors.</div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:.75rem;">
+        <div class="callout-title">No browser? Test the same scenarios headlessly</div>
+        <p>If you'd rather (or can't open the Dev UI), have the agent run each scenario against the
+        running playground from the terminal &mdash; same agent, no browser:</p>
+        <div class="prompt-block" id="step4-headless"><button class="copy-btn" onclick="copyBlock('step4-headless')">Copy</button><span class="prompt-label">terminal</span>agents-cli run --url http://127.0.0.1:8080 --mode adk "Will my 13:31 St Pancras to Paris train run today?"</div>
+        <p>(Point <code>--url</code> at whatever local URL the playground prints.) The trace shows the tool
+        calls and final answer, so you can verify reconciliation/reroute without the Dev UI.</p>
       </div>
 
       <div class="step-expected">
