@@ -41,8 +41,10 @@ Drive **one module at a time**. After finishing each module, the agent MUST:
 1. **Write the eval report** to `BwG-track2/remote-test/eval-report/m<N>.md` — the per-step
    trajectory table, timings, what worked, and a prioritized plan to improve that module's
    content (`BwG-track2/m<N>.html`). On a re-run, overwrite the existing report.
-2. **Notify** the user (the cc-notify webhook — see the user's notify hook).
-3. **Stop and wait** for the user's instruction. Do **not** auto-advance to the next module.
+2. **Push it immediately** — commit and push `eval-report/m<N>.md` as soon as it's written
+   (don't wait for the next instruction to commit the report).
+3. **Notify** the user (the cc-notify webhook — see the user's notify hook).
+4. **Stop and wait** for the user's instruction. Do **not** auto-advance to the next module.
 
 This keeps the human in the loop: between modules they review the report, edit the workshop
 content, and decide whether to continue, re-run, or change course.
