@@ -634,9 +634,11 @@
       <div class="step-num">1</div>
       <span class="step-time">4 min</span>
       <h3>Prepare the Runtime Entrypoint &mdash; no deploy yet</h3>
-      <p>Get the project deploy-ready and drop in the workshop's <strong>tested</strong> runtime wrapper
-      (<code>app/agent_runtime_app.py</code>). It already handles the handful of things that otherwise make
-      the first cloud deploy fail &mdash; so the single deploy in Step 5 succeeds on the first try.</p>
+      <p>Deploying an ADK agent needs a small <strong>runtime wrapper</strong>
+      (<code>app/agent_runtime_app.py</code>) that adapts your agent to Agent Runtime. Hand-writing it is
+      fiddly and error-prone, so you simply <strong>drop in the workshop's tested, production-ready
+      wrapper</strong> &mdash; you don't write or edit it; treat it as a black box that just works. That's
+      what lets the single deploy in Step 5 succeed on the first try.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
@@ -646,24 +648,26 @@ Module 2 Step 1: prepare the Agent Runtime entrypoint (do NOT deploy yet).
 1. Make the project deploy-ready: copy the data/ directory into app/ so it ships
    with the bundle, and make data-path resolution relative to the file location
    (pathlib.Path(__file__).parent) so it works locally and in the container.
-2. Generate the Agent Runtime entrypoint:
+2. Generate the project's Agent Runtime entrypoint:
      agents-cli scaffold enhance . --deployment-target agent_runtime
-3. Replace the generated app/agent_runtime_app.py with the workshop's TESTED
-   reference. It already handles the things that otherwise break the first deploy
-   (regional sessions/memory, memory fallback, a fresh client per request, and
-   Gemini Enterprise session_id normalization):
+3. The generated app/agent_runtime_app.py is a naive stub that crashes on the
+   deployed runtime. Replace it with the workshop's TESTED wrapper — you do NOT
+   need to write or understand its internals, just drop it in:
      curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
-   Read the file so you understand what it does. It expects this project's shape
-   (app/agent.py exposes `app`, plus app/app_utils/* from the scaffold).
+4. VERIFY the replacement took (re-running scaffold enhance would overwrite it
+   with the broken stub). The tested wrapper contains the marker "TESTED
+   REFERENCE"; confirm it's there, and re-fetch if not:
+     grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
+   Do not proceed until "TESTED REFERENCE" appears in app/agent_runtime_app.py.
 
 Do NOT deploy in this step. Step 4 smoke-tests this entrypoint locally; Step 5
 deploys once.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">What the reference entrypoint handles for you</div>
-        <p>Each of these is a real failure that only shows up <em>in the deployed container</em>, and the
-        reference file already fixes all of them:</p>
+        <div class="callout-title">Under the hood &mdash; optional reading (you don't need this to proceed)</div>
+        <p>You don't have to understand the wrapper to use it. But if you're curious, here's what it
+        handles for you &mdash; each is a real failure that only shows up <em>in the deployed container</em>:</p>
         <ul style="margin-top: .5rem; margin-bottom: .5rem;">
           <li><strong>Regional Session/Memory services</strong> &mdash; a <code>global</code> location makes the regional Sessions API reject the resource name &rarr; empty responses</li>
           <li><strong>Memory Bank fallback</strong> &mdash; falls back to <code>InMemory</code> when there's no engine id (no startup crash)</li>
@@ -862,6 +866,12 @@ Step 5 is the deploy.</div>
         <button class="copy-btn" onclick="copyBlock('step5-instr')">Copy</button>
         <div class="agent-ctx" id="step5-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 5: deploy ONCE.
+
+First, a pre-deploy gate: confirm the tested wrapper is still in place — re-running
+scaffold enhance can silently overwrite it with the broken stub, which would crash
+the deployed agent. Check for the marker and re-fetch if missing:
+  grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
+Do NOT deploy unless "TESTED REFERENCE" is present in app/agent_runtime_app.py.
 
 The local smoke test passes, so deploy to Agent Runtime a single time, shipping
 sessions + Memory Bank + code execution together:
