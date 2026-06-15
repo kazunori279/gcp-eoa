@@ -6,6 +6,10 @@ set -uo pipefail
 tmux kill-session -t agy 2>/dev/null
 sleep 1
 tmux new-session -d -s agy -x 200 -y 50
+# pin the size so a read-only `tmux attach` viewer can't reflow the pane agysend captures
+tmux set-option -t agy window-size manual 2>/dev/null
+tmux set-option -t agy aggressive-resize off 2>/dev/null
+tmux resize-window -t agy -x 200 -y 50 2>/dev/null
 # --dangerously-skip-permissions: auto-approve tool calls (headless, throwaway lab only)
 # --add-dir ~: make agy operate on the project dir, not its internal scratch dir
 tmux send-keys -t agy "cd ~ && agy --dangerously-skip-permissions --add-dir ~" Enter

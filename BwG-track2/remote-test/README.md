@@ -137,7 +137,8 @@ Two independent concerns, solved by two independent mechanisms:
 | `config.sh` | local | **edit this**: workstation coordinates, ports, paths. Sourced by all local scripts. |
 | `tunnel_sup.sh` | local | persistent self-healing IAP tunnel (`localhost:2222` → workstation:22). |
 | `rsh` | local | run a command on the workstation over the multiplexed SSH (~0.3s). |
-| `mirror.sh` | local | stream the remote transcript to `/tmp/agy-local.log` for `tail -f`. |
+| `mirror.sh` | local | stream the per-step transcript to `/tmp/agy-local.log` for `tail -f`. |
+| `live.sh` | local | snapshot the live agy pane to `/tmp/agy-live.txt` (`watch -n 1 cat …`) — live tool calls/streaming. |
 | `extract_prompts.py` | local | parse `BwG-track2/m*.html` → `all.json` (prompt blocks by id). |
 | `drive.sh` | local | send one workshop step (`<module> <blockid> <step>`) to agy, detached. |
 | `poll.sh` | local | one-shot status: live pane + done/running. |
@@ -201,9 +202,28 @@ cmd-dk-tryit, ctx-dk-helper, ctx-combined, cmd-agents-setup, cmd-download-data, 
 pastes collide in the same TUI.
 
 ## Watching live
-- Local file: `tail -f /tmp/agy-local.log` (needs `mirror.sh` running).
-- Real TUI: `gcloud workstations ssh ... $WS_NAME` then `tmux attach -t agy`
-  (read-only-ish; detach with `Ctrl-b d`).
+
+Three views, pick what you need:
+
+1. **Live trajectory** (tool calls + streaming, ~2s fresh) — `live.sh` snapshots the pane:
+   ```bash
+   nohup ./live.sh >/dev/null 2>&1 &   # then:
+   watch -n 1 cat /tmp/agy-live.txt
+   ```
+2. **Per-step transcript** (clean prompt → response) — `mirror.sh`:
+   ```bash
+   nohup ./mirror.sh >/dev/null 2>&1 &  # then:
+   tail -f /tmp/agy-local.log
+   ```
+3. **True live TUI, read-only** (won't disturb the run; size is pinned; `-r` read-only,
+   detach with `Ctrl-b d`):
+   ```bash
+   ssh -p 2222 -i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no \
+     -o UserKnownHostsFile=/dev/null -t user@localhost "tmux attach -t agy -r"
+   ```
+
+> If you read-only attach, the session size is pinned (`window-size manual`) in
+> `agystart.sh`/setup so the attach can't reflow the pane `agysend` captures.
 
 ## Evaluation reports
 
@@ -213,6 +233,7 @@ worked, and a prioritized plan for improving that module's content (`BwG-track2/
 The coding agent should append one report per module as it goes.
 
 - [`eval-report/m0.md`](eval-report/m0.md) — M0 · Setup (all 4 steps ✅)
+- [`eval-report/m1.md`](eval-report/m1.md) — M1 · Build (all 4 steps ✅; agent validated on 3 scenarios)
 
 ## Transcript / artifacts
 - `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
