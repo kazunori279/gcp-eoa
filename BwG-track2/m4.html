@@ -392,9 +392,6 @@ InMemoryMemoryService — so you use current APIs.
    scenario in its own thread or process, which makes aiohttp crash with
    "attached to a different event loop" errors. If you still hit loop errors,
    run them sequentially in that same single loop. Do not deploy — local only.
-   Run the script in the FOREGROUND and wait for it to finish (it's local and
-   only takes a minute or two) — do NOT launch it as a background task and poll
-   it; just run it and read the output directly.
 3. When done, PRINT a final report table: each scenario, what the agent did,
    which tools it used, and whether it resolved sensibly.</div>
     </div>
