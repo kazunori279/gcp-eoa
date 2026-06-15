@@ -636,15 +636,15 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
 
     <!-- Tool 1 detail -->
     <div class="tool-card">
-      <h4><span class="tool-num">1</span> get_scheduled_departures</h4>
+      <h4><span class="tool-num">1</span> <code>get_scheduled_departures</code></h4>
       <p><strong>Purpose:</strong> Look up "what SHOULD be running" from the static GTFS data.</p>
       <code class="tool-sig">get_scheduled_departures(station_name: str, time_window_start: str, time_window_end: str = None) &rarr; list[dict]</code>
       <table class="data">
         <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>station_name</code></td><td>str</td><td>Name or ID of the station (e.g., "St Pancras")</td></tr>
-          <tr><td><code>time_window_start</code></td><td>str</td><td>Start time (HH:MM or ISO)</td></tr>
-          <tr><td><code>time_window_end</code></td><td>str</td><td>End time (optional, default +2h)</td></tr>
+          <tr><td><code>station_name</code></td><td><code>str</code></td><td>Name or ID of the station (e.g., "St Pancras")</td></tr>
+          <tr><td><code>time_window_start</code></td><td><code>str</code></td><td>Start time (HH:MM or ISO)</td></tr>
+          <tr><td><code>time_window_end</code></td><td><code>str</code></td><td>End time (optional, default +2h)</td></tr>
         </tbody>
       </table>
       <p><strong>Returns:</strong> List of departures with <code>trip_id</code>, <code>route_name</code>,
@@ -655,14 +655,14 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
 
     <!-- Tool 2 detail -->
     <div class="tool-card" style="border-color:#dc3545;">
-      <h4 style="color:#dc3545;"><span class="tool-num" style="background:#dc3545;">2</span> check_disruptions</h4>
+      <h4 style="color:#dc3545;"><span class="tool-num" style="background:#dc3545;">2</span> <code>check_disruptions</code></h4>
       <p><strong>Purpose:</strong> Read "what IS happening" from the disruption feed.</p>
       <code class="tool-sig">check_disruptions(station_name: str = None, trip_id: str = None) &rarr; list[dict]</code>
       <table class="data">
         <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>station_name</code></td><td>str</td><td>Filter by affected station (optional)</td></tr>
-          <tr><td><code>trip_id</code></td><td>str</td><td>Check a specific service (optional)</td></tr>
+          <tr><td><code>station_name</code></td><td><code>str</code></td><td>Filter by affected station (optional)</td></tr>
+          <tr><td><code>trip_id</code></td><td><code>str</code></td><td>Check a specific service (optional)</td></tr>
         </tbody>
       </table>
       <p><strong>Returns:</strong> List of disruptions with <code>trip_id</code>, <code>affected_stops</code>,
@@ -672,15 +672,15 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
 
     <!-- Tool 3 detail -->
     <div class="tool-card" style="border-color:#198754;">
-      <h4 style="color:#198754;"><span class="tool-num" style="background:#198754;">3</span> compute_reroute</h4>
+      <h4 style="color:#198754;"><span class="tool-num" style="background:#198754;">3</span> <code>compute_reroute</code></h4>
       <p><strong>Purpose:</strong> Find an alternative path avoiding disrupted services.</p>
       <code class="tool-sig">compute_reroute(origin: str, destination: str, departure_after: str) &rarr; dict</code>
       <table class="data">
         <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>origin</code></td><td>str</td><td>Starting station</td></tr>
-          <tr><td><code>destination</code></td><td>str</td><td>Target station</td></tr>
-          <tr><td><code>departure_after</code></td><td>str</td><td>Earliest acceptable departure</td></tr>
+          <tr><td><code>origin</code></td><td><code>str</code></td><td>Starting station</td></tr>
+          <tr><td><code>destination</code></td><td><code>str</code></td><td>Target station</td></tr>
+          <tr><td><code>departure_after</code></td><td><code>str</code></td><td>Earliest acceptable departure</td></tr>
         </tbody>
       </table>
       <p><strong>Returns:</strong> Recommended route as a list of legs (each with <code>departure_time</code>,
