@@ -10,6 +10,43 @@ box, non-interactively, and watch it" task.
 
 ---
 
+## Evaluation results & reports
+
+Six end-to-end test runs of the BwG-track2 workshop, driven through the real `agy` CLI.
+**All six modules pass** — a single clean deploy, the deployed agent serves correctly, and the
+agent is published to Gemini Enterprise.
+
+| Module | Result | Elapsed\* | What it covers |
+|---|---|---|---|
+| **M0 · Setup** | ✅ | ~3 min | DK MCP install (native grounding) · `plan.md` · `agents-cli setup` · data download |
+| **M1 · Build** | ✅ | ~6 min | scaffold + 3 tools + system instruction; agent validated on 3 scenarios |
+| **M2 · Scale** | ✅ | ~20 min | sessions + Memory Bank + code-exec; **one clean deploy** (tested reference); deployed agent works |
+| **M3 · Govern** | ✅ | ~2 min | registry/identity verify (SPIFFE) + Model Armor blocks jailbreak/PII |
+| **M4 · Optimize** | ✅ | ~13 min | 10-scenario crisis sim + graded eval **4/4** (hallucinations judge) |
+| **M5 · Engage** | ✅ | ~2 min | published to Gemini Enterprise (`explore-ai`); registration confirmed headlessly |
+| **End-to-end** | **✅ all 6** | **~45 min** | one deploy total; deployed agent serves correctly and is published to GE |
+
+\* Elapsed = agy working time per module (from the `agysend` `[done step=…]` markers). Server-side
+deploys (~6–10 min) overlap reading, so wall-clock is close to this.
+
+**Per-module reports** — each has a per-step trajectory table, timings, what worked, and a
+prioritized content-improvement plan with applied/validated updates:
+- [`eval-report/m0.md`](eval-report/m0.md) — M0 · Setup
+- [`eval-report/m1.md`](eval-report/m1.md) — M1 · Build
+- [`eval-report/m2.md`](eval-report/m2.md) — M2 · Scale
+- [`eval-report/m3.md`](eval-report/m3.md) — M3 · Govern
+- [`eval-report/m4.md`](eval-report/m4.md) — M4 · Optimize
+- [`eval-report/m5.md`](eval-report/m5.md) — M5 · Engage
+
+> **Elapsed-time metric.** Each `agysend` run records `elapsed=Ns` in its `[done step=…]` marker
+> (prompt submit → completion detection, incl. the ~stable-s tail). Extract per-module timings with
+> `./rsh "grep -oE '\[done step=[^]]*\]' ~/agy-session.log"`. For long background steps (e.g. the M2
+> deploy) the marker can fire early — cross-check ground truth (`deployment_metadata.json` timestamps).
+
+A report is written/overwritten and pushed after each module (see the **Per-module loop** below).
+
+---
+
 ## Using this WITH a coding agent (the intended workflow)
 
 This harness is meant to be **operated by a coding agent** (Claude Code, etc.) on your
@@ -297,28 +334,6 @@ Three views, pick what you need:
 
 > If you read-only attach, the session size is pinned (`window-size manual`) in
 > `agystart.sh`/setup so the attach can't reflow the pane `agysend` captures.
-
-## Evaluation reports
-
-After each module is driven, the trajectory is evaluated and written to
-`eval-report/m<N>.md` — a per-step table (prompt → tools used → outcome → verdict), a
-**timings** table (elapsed wall-clock per step + module total, from the `agysend` done
-markers), what worked, and a prioritized plan for improving that module's content
-(`BwG-track2/m<N>.html`). The coding agent should append one report per module as it goes.
-
-> **Elapsed-time metric.** Each `agysend` run records `elapsed=Ns` in its `[done step=…]`
-> marker (wall-clock from prompt submit to completion detection, including the ~stable-s
-> idle-confirmation tail). Extract per-module timings with:
-> `./rsh "grep -oE '\[done step=[^]]*\]' ~/agy-session.log"`. For long background steps
-> (e.g. M2 deploy) the marker can fire early — cross-check against ground truth
-> (`deployment_metadata.json` timestamps).
-
-- [`eval-report/m0.md`](eval-report/m0.md) — M0 · Setup (all 4 steps ✅)
-- [`eval-report/m1.md`](eval-report/m1.md) — M1 · Build (all 4 steps ✅; agent validated on 3 scenarios)
-- [`eval-report/m2.md`](eval-report/m2.md) — M2 · Scale (deploy/sessions/code-exec ✅; **deployed agent broken** — 3 stacked runtime bugs, `global`-location is the key one)
-- [`eval-report/m3.md`](eval-report/m3.md) — M3 · Govern (Step 2 verify + Step 3 Model Armor ✅; identity-expectation caveat)
-- [`eval-report/m4.md`](eval-report/m4.md) — M4 · Optimize (10-scenario sim + graded eval 4/4 ✅)
-- [`eval-report/m5.md`](eval-report/m5.md) — M5 · Engage (published to Gemini Enterprise ✅; registration_results.md gap)
 
 ## Transcript / artifacts
 - `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
