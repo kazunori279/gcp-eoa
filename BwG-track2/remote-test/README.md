@@ -228,12 +228,21 @@ Three views, pick what you need:
 ## Evaluation reports
 
 After each module is driven, the trajectory is evaluated and written to
-`eval-report/m<N>.md` — a per-step table (prompt → tools used → outcome → verdict), what
-worked, and a prioritized plan for improving that module's content (`BwG-track2/m<N>.html`).
-The coding agent should append one report per module as it goes.
+`eval-report/m<N>.md` — a per-step table (prompt → tools used → outcome → verdict), a
+**timings** table (elapsed wall-clock per step + module total, from the `agysend` done
+markers), what worked, and a prioritized plan for improving that module's content
+(`BwG-track2/m<N>.html`). The coding agent should append one report per module as it goes.
+
+> **Elapsed-time metric.** Each `agysend` run records `elapsed=Ns` in its `[done step=…]`
+> marker (wall-clock from prompt submit to completion detection, including the ~stable-s
+> idle-confirmation tail). Extract per-module timings with:
+> `./rsh "grep -oE '\[done step=[^]]*\]' ~/agy-session.log"`. For long background steps
+> (e.g. M2 deploy) the marker can fire early — cross-check against ground truth
+> (`deployment_metadata.json` timestamps).
 
 - [`eval-report/m0.md`](eval-report/m0.md) — M0 · Setup (all 4 steps ✅)
 - [`eval-report/m1.md`](eval-report/m1.md) — M1 · Build (all 4 steps ✅; agent validated on 3 scenarios)
+- [`eval-report/m2.md`](eval-report/m2.md) — M2 · Scale (deploy/sessions/code-exec ✅; **deployed agent broken** — 3 stacked runtime bugs, `global`-location is the key one)
 
 ## Transcript / artifacts
 - `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
