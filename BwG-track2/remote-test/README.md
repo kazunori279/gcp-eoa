@@ -24,11 +24,11 @@ laptop, which drives the *remote* `agy` for you. The split of duties:
 
 **Then hand it to your coding agent** — point it at this file:
 
-> "Read `remote-test/README.md`. I've already done `gcloud auth login` (student account)
+> "Read `BwG-track2/remote-test/README.md`. I've already done `gcloud auth login` (student account)
 > and the one-time `agy` OAuth on the workstation. Edit `config.sh` for my workstation,
 > bring up the tunnel + persistent agy session, then drive the BwG-track2 workshop steps
 > (m0…m5) one at a time; after each module, stop and write the agy trajectory eval + an
-> improvement plan for that module's content to `remote-test/eval-report/m<N>.md`."
+> improvement plan for that module's content to `BwG-track2/remote-test/eval-report/m<N>.md`."
 
 The agent then owns everything else: editing `config.sh`, starting `tunnel_sup.sh`,
 `deploy.sh`, `agystart.sh`, and looping `drive.sh` / `poll.sh` per step. You watch live
@@ -158,7 +158,7 @@ $EDITOR config.sh                       # set WS_PROJECT / WS_CLUSTER / WS_CONFI
 gcloud auth login                       # pick student-NN-...@qwiklabs.net
 
 # 2. extract the workshop prompts
-python3 extract_prompts.py ../BwG-track2 /tmp/agy-prompts/all.json
+python3 extract_prompts.py .. /tmp/agy-prompts/all.json   # parent dir = BwG-track2 (the module HTML)
 
 # 3. start the tunnel supervisor (leave running)
 nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &
