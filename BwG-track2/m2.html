@@ -663,12 +663,14 @@ deploys once.</div>
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">What the reference entrypoint handles for you</div>
         <p>Each of these is a real failure that only shows up <em>in the deployed container</em>, and the
-        reference file already fixes all of them: <strong>(a)</strong> regional Session/Memory services (a
-        <code>global</code> location makes the regional Sessions API reject the resource name &rarr; empty
-        responses); <strong>(b)</strong> Memory Bank falls back to <code>InMemory</code> when there's no engine
-        id (no startup crash); <strong>(c)</strong> a fresh GenAI client per request (no
-        <code>Event loop is closed</code>); and <strong>(d)</strong> Gemini Enterprise <code>session_id</code>
-        normalization. Step 4 proves it locally before you deploy.</p>
+        reference file already fixes all of them:</p>
+        <ul style="margin-top: .5rem; margin-bottom: .5rem;">
+          <li><strong>Regional Session/Memory services</strong> &mdash; a <code>global</code> location makes the regional Sessions API reject the resource name &rarr; empty responses</li>
+          <li><strong>Memory Bank fallback</strong> &mdash; falls back to <code>InMemory</code> when there's no engine id (no startup crash)</li>
+          <li><strong>Fresh client</strong> &mdash; a fresh GenAI client per request (no <code>Event loop is closed</code>)</li>
+          <li><strong>Session ID normalization</strong> &mdash; Gemini Enterprise <code>session_id</code> normalization</li>
+        </ul>
+        <p>Step 4 proves it locally before you deploy.</p>
       </div>
 
       <div class="step-expected">
@@ -815,10 +817,10 @@ Module 2 Step 4: local runtime smoke test (catch deploy-blockers before deployin
 
 Run the workshop's tested smoke test, which exercises the SAME code path the
 deployed runtime uses — so we never spend a 10-minute deploy to discover a bug a
-10-second local run can catch. It (1) imports app/agent_runtime_app, (2) asserts
-the session/memory services resolve to a real region (not "global"), and (3) drives
-one query end-to-end through async_stream_query in a single asyncio loop with a
-full-path session_id.
+10-second local run can catch. It:
+- imports app/agent_runtime_app
+- asserts the session/memory services resolve to a real region (not "global")
+- drives one query end-to-end through async_stream_query in a single asyncio loop with a full-path session_id.
 
   mkdir -p scripts && curl -fL -o scripts/runtime_smoke.py https://kazunori279.github.io/gcp-eoa/BwG-track2/runtime_smoke.py
   uv run python scripts/runtime_smoke.py

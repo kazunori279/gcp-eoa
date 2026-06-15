@@ -441,9 +441,11 @@ adk eval fails with a missing-dependencies error.
 1) Build a 4-case evalset in ADK format at
    tests/eval/evalsets/rushhour.evalset.json (eval_cases -> conversation with
    user_content + a reference final_response, plus session_input). Cases:
-   a) cancellation + reroute, b) a delay, c) the offline-feed 503 fallback,
-   d) a grounding trap asking for something no tool returns (e.g. "which
-   platform does the 18:16 to Paris depart from?").
+   - cancellation + reroute
+   - a delay
+   - the offline-feed 503 fallback
+   - a grounding trap asking for something no tool returns (e.g. "which
+     platform does the 18:16 to Paris depart from?").
 2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
