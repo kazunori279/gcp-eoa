@@ -27,8 +27,8 @@ laptop, which drives the *remote* `agy` for you. The split of duties:
 > "Read `remote-test/README.md`. I've already done `gcloud auth login` (student account)
 > and the one-time `agy` OAuth on the workstation. Edit `config.sh` for my workstation,
 > bring up the tunnel + persistent agy session, then drive the BwG-track2 workshop steps
-> (m0…m5) one at a time; after each module, stop and report the agy trajectory + an
-> improvement plan for that module's content."
+> (m0…m5) one at a time; after each module, stop and write the agy trajectory eval + an
+> improvement plan for that module's content to `remote-test/eval-report/m<N>.md`."
 
 The agent then owns everything else: editing `config.sh`, starting `tunnel_sup.sh`,
 `deploy.sh`, `agystart.sh`, and looping `drive.sh` / `poll.sh` per step. You watch live
@@ -144,6 +144,7 @@ Two independent concerns, solved by two independent mechanisms:
 | `deploy.sh` | local | push `remote/*.sh` to the workstation `$HOME`. |
 | `remote/agystart.sh` | workstation | (re)start the persistent `agy` tmux session. |
 | `remote/agysend.sh` | workstation | paste a prompt, wait for completion, log the trajectory. |
+| `eval-report/m*.md` | output | per-module trajectory evaluation + content-improvement plan. |
 
 ---
 
@@ -203,6 +204,15 @@ pastes collide in the same TUI.
 - Local file: `tail -f /tmp/agy-local.log` (needs `mirror.sh` running).
 - Real TUI: `gcloud workstations ssh ... $WS_NAME` then `tmux attach -t agy`
   (read-only-ish; detach with `Ctrl-b d`).
+
+## Evaluation reports
+
+After each module is driven, the trajectory is evaluated and written to
+`eval-report/m<N>.md` — a per-step table (prompt → tools used → outcome → verdict), what
+worked, and a prioritized plan for improving that module's content (`BwG-track2/m<N>.html`).
+The coding agent should append one report per module as it goes.
+
+- [`eval-report/m0.md`](eval-report/m0.md) — M0 · Setup (all 4 steps ✅)
 
 ## Transcript / artifacts
 - `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
