@@ -621,6 +621,15 @@
   <!-- STEPS -->
   <h2>Scale in 6 Steps</h2>
 
+    <div class="callout callout-info">
+      <div class="callout-title">Stuck? Use the reference solution to still deploy</div>
+      <p>If AGY can't produce a working agent (quota, errors, hallucination), you can still finish the
+      deploy: grab the completed project from
+      <a href="https://github.com/kazunori279/gcp-eoa/tree/main/BwG-track2/reference" target="_blank"><code>BwG-track2/reference/</code></a>,
+      copy its <code>app/</code> + <code>scripts/</code> over your project, then run Steps 4&ndash;5
+      (smoke test + deploy). The runtime wrapper there is the same tested one Step 1 fetches.</p>
+    </div>
+
     <div class="callout callout-warning">
       <div class="callout-title">The Leap</div>
       <p>In M1, your agent ran locally. Now you'll deploy it to a <strong>managed cloud service</strong>
@@ -973,7 +982,10 @@ fails, just tell me and I will check the console.</div>
       <p>Confirms the built-in sandbox computes a stat no single tool returns &mdash; the same question AGY verified locally in Step 3, now on the deployed agent.</p>
       <div class="prompt-block" id="step4-s4"><button class="copy-btn" onclick="copyBlock('step4-s4')">Copy</button><span class="prompt-label">prompt</span>Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?</div>
       <p><em>What to watch for:</em> the trace shows the model writing and running Python in the built-in sandbox, returning e.g. average delay <strong>26.25 min</strong> and a <strong>50% cancellation rate</strong>, then one recommended action.</p>
-      <p><em>Cold start:</em> on the <strong>deployed</strong> agent the <strong>first</strong> code-execution call may time out while the sandbox warms up &mdash; just send it again and it returns promptly. This is warmup latency, not a failure.</p>
+      <p><em>Be patient &mdash; this one is slow:</em> code-execution queries run a multi-step
+      write-execute-analyze loop in the sandbox, so on the <strong>deployed</strong> agent this can take
+      <strong>a few minutes</strong>, and the <strong>first</strong> call may even time out while the sandbox
+      warms up &mdash; if it does, just send it again. The latency is normal, not a failure.</p>
 
       <div class="step-expected">
         <h4>Expected Result</h4>

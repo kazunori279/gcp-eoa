@@ -808,13 +808,23 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
      }
    }
 
-3) Pre-allow the tool so calls don't default to "Ask" (an un-answerable Ask
-   in a background/subagent context shows up as "server not allowed in this
-   context"). MERGE this into ~/.gemini/antigravity-cli/settings.json — keep the
-   existing keys (telemetry, trustedWorkspaces), only add the allow rule:
+3) Pre-allow the MCP tool AND the workshop's shell commands so you don't get an
+   "Ask" prompt on every command (an un-answerable Ask in a background/subagent
+   context also shows up as "server not allowed in this context"). MERGE this
+   into ~/.gemini/antigravity-cli/settings.json — keep the existing keys
+   (telemetry, trustedWorkspaces), only add/extend permissions.allow. The
+   command(<prefix>) entries are prefix-matched and pre-approve the exact
+   commands this workshop runs (this is the same format AGY persists when you
+   pick "always allow ... (Persist to settings.json)"):
    {
      "permissions": {
-       "allow": ["mcp(google-developer-knowledge/*)"]
+       "allow": [
+         "mcp(google-developer-knowledge/*)",
+         "command(gcloud)", "command(agents-cli)", "command(uvx)",
+         "command(uv)", "command(adk)", "command(python3)", "command(python)",
+         "command(curl)", "command(mkdir)", "command(unzip)", "command(cat)",
+         "command(ls)", "command(grep)"
+       ]
      }
    }
 
