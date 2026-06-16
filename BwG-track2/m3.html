@@ -250,11 +250,11 @@
     <div class="subtitle">Track 2 &middot; Platform Builders</div>
   </div>
   <nav>
-    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Start Here<span class="nav-sub">10 min &middot; Mission &amp; setup</span></span></a>
-    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span></a>
-    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span></a>
-    <a href="m3.html" class="active"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">25 min &middot; Security</span></span></a>
-    <a href="m4.html"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">20 min &middot; Quality flywheel</span></span></a>
+    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Start Here<span class="nav-sub">12 min &middot; Mission &amp; setup</span></span></a>
+    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">25 min &middot; Agent &amp; tools</span></span></a>
+    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">30 min &middot; Deploy &amp; state</span></span></a>
+    <a href="m3.html" class="active"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">15 min &middot; Security</span></span></a>
+    <a href="m4.html"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">18 min &middot; Quality flywheel</span></span></a>
     <a href="m5.html"><span class="nav-dot" style="background:#b45309;"></span><span class="nav-label">M5 &middot; Engage<span class="nav-sub">10 min &middot; Publish</span></span></a>
   </nav>
   <div class="sidebar-footer">Build with Gemini World Tour</div>
@@ -269,7 +269,7 @@
   <div class="hero-module">Module 3</div>
   <h1>GOVERN <span style="font-weight:600;opacity:.7;">(Optional)</span></h1>
   <p class="hero-sub">Turn an unmanaged script into a governed corporate asset &mdash;<br>discoverable, identity-bound, policy-enforced.</p>
-  <div class="hero-time">25 minutes &middot; 1:05 &ndash; 1:30 &middot; 2 hands-on steps + platform context</div>
+  <div class="hero-time">15 minutes &middot; 1:07 &ndash; 1:22 &middot; 2 hands-on steps + platform context</div>
   <div class="hero-pills">
     <span class="hero-pill">Agent Registry</span>
     <span class="hero-pill">Agent Identity</span>
@@ -339,10 +339,14 @@
     <h4 style="color:#1a73e8;"><span class="gov-num" style="background:#1a73e8;">2</span> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent Identity</a> (IAM) <span class="tag tag-handson">Hands-on</span></h4>
     <p><strong>Threat:</strong> Token theft, privilege escalation, impersonation.</p>
     <p><strong>Protection:</strong> Every agent gets a <strong>runtime identity</strong> you can audit and scope to
-    least-privilege. With <strong>Agent Identity</strong> (opt-in) it gets a SPIFFE-based identity and auto-rotated
-    X.509 cert, and Context-Aware Access enforces mutual TLS + DPoP &mdash; so a stolen token is useless without
+    least-privilege. With <strong>Agent Identity</strong> (opt-in) it gets a
+    <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/agent-identity-overview#core-components" target="_blank">SPIFFE</a>-based
+    identity <em>(a portable, cryptographically verifiable workload identity)</em> and an auto-rotated
+    X.509 cert, and Context-Aware Access enforces mutual TLS +
+    <a href="https://docs.cloud.google.com/access-context-manager/docs/caa-agent-security#dpop" target="_blank">DPoP</a>
+    <em>(proof the caller holds the matching private key)</em> &mdash; so a stolen token is useless without
     the attested context.</p>
-    <p class="doc-cite">Docs: <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent identity</a> &middot; <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">IAM agent identity</a></p>
+    <p class="doc-cite">Docs: <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/agent-identity-overview" target="_blank">Agent Identity overview</a> &middot; <a href="https://docs.cloud.google.com/access-context-manager/docs/caa-agent-security" target="_blank">Context-Aware Access (SPIFFE, mTLS, DPoP)</a> &middot; <a href="https://docs.cloud.google.com/iam/docs/agent-identity-overview" target="_blank">IAM agent identity</a></p>
   </div>
 
   <div class="govern-card" style="border-color:#dc3545;">
@@ -385,7 +389,7 @@
     <!-- Section 2: Verify (Hands-on) -->
     <div class="step">
       <div class="step-num">2</div>
-      <span class="step-time">7 min</span>
+      <span class="step-time">4 min</span>
       <span class="tag tag-handson">Hands-on</span>
       <h3>Verify Your Agent Is a Governed Asset &mdash; Registry + Identity</h3>
       <p>You don't have to <em>make</em> your agent governable. The moment you deployed it to Agent Runtime
@@ -475,7 +479,7 @@ Registry).</div>
     <!-- Section 3: Model Armor (Hands-on) -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">9 min</span>
+      <span class="step-time">5 min</span>
       <span class="tag tag-handson">Hands-on</span>
       <h3>Shield It with Model Armor &mdash; and Break It</h3>
       <p><a href="https://docs.cloud.google.com/model-armor/overview" target="_blank">Model Armor</a> screens
@@ -566,7 +570,7 @@ Model Armor is regional and managed through a regional endpoint, so:
     <!-- Section 4: The Enterprise Control Plane (Context) -->
     <div class="step">
       <div class="step-num">4</div>
-      <span class="step-time">4 min</span>
+      <span class="step-time">3 min</span>
       <span class="tag tag-context">Context</span>
       <h3>The Enterprise Control Plane &mdash; Where Governance Scales</h3>
       <p>Your agent is registered, identified, and shielded. At organization scale, three more controls

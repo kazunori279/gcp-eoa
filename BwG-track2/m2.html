@@ -455,23 +455,23 @@
   <nav>
     <a href="m0.html">
       <span class="nav-dot" style="background:#6c757d;"></span>
-      <span class="nav-label">M0 &middot; Start Here<span class="nav-sub">10 min &middot; Mission &amp; setup</span></span>
+      <span class="nav-label">M0 &middot; Start Here<span class="nav-sub">12 min &middot; Mission &amp; setup</span></span>
     </a>
     <a href="m1.html">
       <span class="nav-dot" style="background:#1a73e8;"></span>
-      <span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span>
+      <span class="nav-label">M1 &middot; Build<span class="nav-sub">25 min &middot; Agent &amp; tools</span></span>
     </a>
     <a href="m2.html" class="active">
       <span class="nav-dot" style="background:#198754;"></span>
-      <span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span>
+      <span class="nav-label">M2 &middot; Scale<span class="nav-sub">30 min &middot; Deploy &amp; state</span></span>
     </a>
     <a href="m3.html">
       <span class="nav-dot" style="background:#7c3aed;"></span>
-      <span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">25 min &middot; Security</span></span>
+      <span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">15 min &middot; Security</span></span>
     </a>
     <a href="m4.html">
       <span class="nav-dot" style="background:#0891b2;"></span>
-      <span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">20 min &middot; Quality flywheel</span></span>
+      <span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">18 min &middot; Quality flywheel</span></span>
     </a>
     <a href="m5.html">
       <span class="nav-dot" style="background:#b45309;"></span>
@@ -490,7 +490,7 @@
   <div class="hero-module">Module 2</div>
   <h1>SCALE</h1>
   <p class="hero-sub">Move from "runs on my laptop" to a managed, stateful, secure cloud service &mdash; by prompting.</p>
-  <div class="hero-time">25 minutes &middot; 0:40 &ndash; 1:05 &middot; Hands-on</div>
+  <div class="hero-time">30 minutes &middot; 0:37 &ndash; 1:07 &middot; Hands-on</div>
   <div class="hero-pills">
     <span class="hero-pill">Agent Runtime</span>
     <span class="hero-pill">Sessions</span>
@@ -515,10 +515,6 @@
     <strong>local smoke test</strong> &mdash; then deploy a <strong>single</strong> time in Step 5.
     A cloud deploy takes ~5&ndash;10 min and only tells you about runtime bugs <em>after</em> the wait,
     so we catch those bugs locally in seconds first.</p>
-    <p>When the deploy runs (Step 5), <strong>kick it off and keep reading or exploring the
-    console while it builds</strong> &mdash; AGY pings you once it's live and the endpoint /
-    Console Playground link is ready. Use the <strong>most recent link AGY prints</strong>, not one
-    you saved earlier.</p>
   </div>
 
   <!-- PLATFORM ARTIFACTS -->
@@ -633,9 +629,7 @@
     <div class="callout callout-warning">
       <div class="callout-title">The Leap</div>
       <p>In M1, your agent ran locally. Now you'll deploy it to a <strong>managed cloud service</strong>
-      that scales from zero to thousands of concurrent users &mdash; without infrastructure management.
-      You'll prepare the runtime entrypoint, add sessions, memory, and code execution, <strong>smoke-test
-      the runtime path locally</strong>, and then deploy <strong>once</strong>.</p>
+      that scales from zero to thousands of concurrent users &mdash; without infrastructure management.</p>
     </div>
 
     <!-- Step 1: Prep runtime entrypoint -->
@@ -821,9 +815,8 @@ exec); next we smoke-test the runtime path locally (Step 4), then deploy ONCE
       <div class="step-num">4</div>
       <span class="step-time">3 min</span>
       <h3>Catch Deploy-Blockers Locally &mdash; Runtime Smoke Test</h3>
-      <p>A cloud deploy takes ~5&ndash;10 min and only reveals runtime bugs <em>after</em> the wait. So before
-      deploying, exercise the <strong>same code path the deployed container uses</strong> on your laptop &mdash;
-      each run is seconds, not minutes. This is what makes a one-shot deploy reliable.</p>
+      <p>Before deploying, exercise the <strong>same code path the deployed container uses</strong> on your
+      laptop &mdash; each run is seconds, so a runtime bug surfaces now instead of after a 5&ndash;10 min deploy.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step4-smoke')">Copy</button>
@@ -901,8 +894,9 @@ fails, just tell me and I will check the console.</div>
 
       <div class="callout callout-success" style="margin-top:.75rem;">
         <div class="callout-title">Don't wait &mdash; overlap the build</div>
-        <p>This deploy takes ~5&ndash;10 min. Kick it off, then (re)read the <strong>Platform Artifacts</strong>
-        above while it builds. AGY pings you when the endpoint is live &mdash; no need to watch it.</p>
+        <p>This deploy takes ~5&ndash;10 min &mdash; kick it off and keep exploring the console (or re-read
+        <strong>Platform Artifacts</strong> above) while it builds. AGY pings you when the endpoint is live.
+        Use the <strong>most recent link AGY prints</strong>, not one you saved earlier.</p>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
@@ -930,7 +924,7 @@ fails, just tell me and I will check the console.</div>
     <!-- Step 6: Test the deployed agent -->
     <div class="step">
       <div class="step-num">6</div>
-      <span class="step-time">5 min</span>
+      <span class="step-time">6 min</span>
       <h3>Test the Deployed Agent &mdash; Run the Scenarios</h3>
       <p>Now that the Step 5 deploy is live, open the <strong>Agent Engine Console Playground</strong> link AGY
       shared and work through these scenarios against the deployed agent &mdash; the same endpoint your users hit.

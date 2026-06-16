@@ -470,23 +470,23 @@
   <nav>
     <a href="m0.html">
       <span class="nav-dot" style="background:#6c757d;"></span>
-      <span class="nav-label">M0 &middot; Start Here<span class="nav-sub">10 min &middot; Mission &amp; setup</span></span>
+      <span class="nav-label">M0 &middot; Start Here<span class="nav-sub">12 min &middot; Mission &amp; setup</span></span>
     </a>
     <a href="m1.html" class="active">
       <span class="nav-dot" style="background:#1a73e8;"></span>
-      <span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span>
+      <span class="nav-label">M1 &middot; Build<span class="nav-sub">25 min &middot; Agent &amp; tools</span></span>
     </a>
     <a href="m2.html">
       <span class="nav-dot" style="background:#198754;"></span>
-      <span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span>
+      <span class="nav-label">M2 &middot; Scale<span class="nav-sub">30 min &middot; Deploy &amp; state</span></span>
     </a>
     <a href="m3.html">
       <span class="nav-dot" style="background:#7c3aed;"></span>
-      <span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">25 min &middot; Security</span></span>
+      <span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">15 min &middot; Security</span></span>
     </a>
     <a href="m4.html">
       <span class="nav-dot" style="background:#0891b2;"></span>
-      <span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">20 min &middot; Quality flywheel</span></span>
+      <span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">18 min &middot; Quality flywheel</span></span>
     </a>
     <a href="m5.html">
       <span class="nav-dot" style="background:#b45309;"></span>
@@ -510,7 +510,7 @@
   <h1>BUILD</h1>
   <p class="hero-sub">Vibe-build a multi-tool transit-crisis agent by prompting,<br>
   then run it locally in the <a href="https://google.github.io/adk-docs/" target="_blank" style="color:#fff;text-decoration:underline;">ADK</a> playground.</p>
-  <div class="hero-time">30 minutes &middot; 0:10 &ndash; 0:40 &middot; Hands-on</div>
+  <div class="hero-time">25 minutes &middot; 0:12 &ndash; 0:37 &middot; Hands-on</div>
   <div class="hero-pills">
     <span class="hero-pill">ADK</span>
     <span class="hero-pill">Agent Garden</span>
@@ -540,7 +540,7 @@
     <!-- Step 1: Scaffold -->
     <div class="step">
       <div class="step-num">1</div>
-      <span class="step-time">7 min</span>
+      <span class="step-time">6 min</span>
       <h3>Scaffold the Project</h3>
       <p>We need a project structure before we can write any agent code. The <a href="https://google.github.io/agents-cli/guide/lifecycle/#1-scaffold" target="_blank">agents-cli scaffold command</a>
       creates a standard layout with <code>pyproject.toml</code>, agent definition, tools module,
@@ -585,6 +585,11 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
   <!-- ─── The 3 Tools Reference ─── -->
   <div class="section-divider">
   <h2>The 3 Tools &mdash; In Detail</h2>
+
+    <div class="callout callout-info">
+      <div class="callout-title">&#x1F4D6; Reference &mdash; skim, don't act yet</div>
+      <p>This is a reference for the three tools you'll add in <strong>Step 2</strong>, not a step itself. Skim it now to understand what each tool does; the hands-on prompt is in Step 2 just below.</p>
+    </div>
 
     <p>Your agent needs three deterministic tools. Each one answers a specific question.
     Together, they implement the <strong>reconciliation pattern</strong>.</p>
@@ -703,7 +708,7 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
     <!-- Step 2: Tools -->
     <div class="step">
       <div class="step-num">2</div>
-      <span class="step-time">12 min</span>
+      <span class="step-time">9 min</span>
       <h3>Give the Agent Its Tools</h3>
       <p>A plain LLM knows timetables but not what's happening <em>right now</em>. Our agent needs
       three deterministic tools to reconcile the published schedule against the live disruption feed.
@@ -758,7 +763,7 @@ eval datasets or run evals (that comes later in M4).</div>
     <!-- Step 3: System Instruction -->
     <div class="step">
       <div class="step-num">3</div>
-      <span class="step-time">4 min</span>
+      <span class="step-time">3 min</span>
       <h3>Write the System Instruction</h3>
       <p>The system instruction defines the agent's behavior as an engineering asset &mdash;
       explicit, reviewable, version-controlled. This is what governance (M3) and
@@ -797,7 +802,7 @@ Write the system instruction for the agent with these five rules:
     <!-- Step 4: Run locally -->
     <div class="step">
       <div class="step-num">4</div>
-      <span class="step-time">5 min</span>
+      <span class="step-time">6 min</span>
       <h3>Run It Locally &mdash; The Playground</h3>
       <p>Time to see the agent in action. Launch the <a href="https://google.github.io/agents-cli/cli/#playground" target="_blank">agents-cli playground</a>
       &mdash; this invokes the <a href="https://github.com/google/adk-web" target="_blank">adk web</a> dev UI under the hood &mdash;

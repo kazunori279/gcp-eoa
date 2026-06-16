@@ -189,7 +189,7 @@
   .check-icon.checked { background: var(--engage); }
   .check-icon.checked::after { content: "\2713"; color: #fff; font-size: .75rem; font-weight: 800; }
 
-  /* BSGO arc cards */
+  /* journey arc cards */
   .arc-card {
     background: var(--surface); border-radius: var(--radius);
     padding: 1rem 1.25rem; margin-bottom: .75rem;
@@ -229,11 +229,11 @@
     <div class="subtitle">Track 2 &middot; Platform Builders</div>
   </div>
   <nav>
-    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Start Here<span class="nav-sub">10 min &middot; Mission &amp; setup</span></span></a>
-    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">30 min &middot; Agent &amp; tools</span></span></a>
-    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">25 min &middot; Deploy &amp; state</span></span></a>
-    <a href="m3.html"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">25 min &middot; Security</span></span></a>
-    <a href="m4.html"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">20 min &middot; Quality flywheel</span></span></a>
+    <a href="m0.html"><span class="nav-dot" style="background:#6c757d;"></span><span class="nav-label">M0 &middot; Start Here<span class="nav-sub">12 min &middot; Mission &amp; setup</span></span></a>
+    <a href="m1.html"><span class="nav-dot" style="background:#1a73e8;"></span><span class="nav-label">M1 &middot; Build<span class="nav-sub">25 min &middot; Agent &amp; tools</span></span></a>
+    <a href="m2.html"><span class="nav-dot" style="background:#198754;"></span><span class="nav-label">M2 &middot; Scale<span class="nav-sub">30 min &middot; Deploy &amp; state</span></span></a>
+    <a href="m3.html"><span class="nav-dot" style="background:#7c3aed;"></span><span class="nav-label">M3 &middot; Govern (Optional)<span class="nav-sub">15 min &middot; Security</span></span></a>
+    <a href="m4.html"><span class="nav-dot" style="background:#0891b2;"></span><span class="nav-label">M4 &middot; Optimize (Optional)<span class="nav-sub">18 min &middot; Quality flywheel</span></span></a>
     <a href="m5.html" class="active"><span class="nav-dot" style="background:#b45309;"></span><span class="nav-label">M5 &middot; Engage<span class="nav-sub">10 min &middot; Publish</span></span></a>
   </nav>
   <div class="sidebar-footer">Build with Gemini World Tour</div>
@@ -248,7 +248,7 @@
   <div class="hero-module">Module 5</div>
   <h1>ENGAGE</h1>
   <p class="hero-sub">Publish your agent to Gemini Enterprise &mdash; the pro-code thing you vibe-built<br>is now a chat anyone in the organization can use.</p>
-  <div class="hero-time">10 minutes &middot; 1:50 &ndash; 2:00 &middot; 1 prompt + console finish</div>
+  <div class="hero-time">10 minutes &middot; 1:40 &ndash; 1:50 &middot; 1 prompt + console finish</div>
   <div class="hero-pills">
     <span class="hero-pill">Gemini Enterprise</span>
     <span class="hero-pill">agents-cli deploy</span>
@@ -291,7 +291,8 @@ identity and its runtime wrapper already normalizes the session_id Gemini
 Enterprise sends, so it's ready to publish as-is.
 1) List the available Gemini Enterprise apps.
 2) Register the existing deployed agent (from deployment_metadata.json) to our
-   app.
+   app, with the display name "Transit-Crisis Agent" (so it's easy to find in
+   the portal's Agents list).
 3) Confirm the registration from the CLI (headless check — don't rely on the
    browser). Run: agents-cli publish gemini-enterprise --list  and show that our
    agent now appears registered to the app (or, if that doesn't list it, do a
@@ -373,14 +374,14 @@ Enterprise sends, so it's ready to publish as-is.
       <p>Now test it as a business user:</p>
       <div class="prompt-block" id="cmd-gemini-test"><button class="copy-btn" onclick="copyBlock('cmd-gemini-test')">Copy</button><span class="prompt-label">gemini enterprise</span>"Trains out of St Pancras are disrupted &mdash; what do I tell travelers heading to Paris?"</div>
 
-      <p>Recap the <strong>BSGO journey</strong> and the artifacts now living in the platform:</p>
+      <p>Recap the <strong>full journey</strong> &mdash; Build &rarr; Scale &rarr; Govern &rarr; Optimize &rarr; Engage &mdash; and the artifacts now living in the platform:</p>
       <table class="data">
         <thead><tr><th>Phase</th><th>What you did</th><th>Platform artifact</th></tr></thead>
         <tbody>
           <tr><td><strong>M1 &middot; Build</strong></td><td>Vibe-built agent + 3 tools by prompting</td><td>ADK project, reasoning trace</td></tr>
           <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td>Agent Runtime, Sessions, Memory Bank, Sandbox</td></tr>
           <tr><td><strong>M3 &middot; Govern</strong></td><td>Verified registry + identity, attack-shielded with Model Armor</td><td>Agent Registry, SPIFFE Identity, Model Armor</td></tr>
-          <tr><td><strong>M4 &middot; Optimize</strong></td><td>Local eval-fix loop: graded eval, one targeted fix, before/after</td><td>Eval scores, before/after compare, pytest</td></tr>
+          <tr><td><strong>M4 &middot; Optimize</strong></td><td>Local eval loop: graded eval with an LLM judge, flagged ungrounded sentences</td><td>Eval scores, judge-flagged sentences</td></tr>
           <tr><td><strong>M5 &middot; Engage</strong></td><td>Published for business users</td><td>Gemini Enterprise agent</td></tr>
         </tbody>
       </table>
@@ -404,7 +405,7 @@ Enterprise sends, so it's ready to publish as-is.
     </div>
 
   <div class="section-divider">
-    <h2>The Full BSGO Arc</h2>
+    <h2>The Full Build &rarr; Scale &rarr; Govern &rarr; Optimize &rarr; Engage Arc</h2>
 
     <p>Here's everything you built in 2 hours, from empty console to a governed, optimized, published agent:</p>
 
@@ -420,7 +421,7 @@ Enterprise sends, so it's ready to publish as-is.
         <rect x="10" y="90" width="100" height="60" rx="8" fill="#f1f3f5" stroke="#6c757d" stroke-width="1.5"/>
         <text x="60" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="#6c757d">M0 &middot; Setup</text>
         <text x="60" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#666">Cockpit + data</text>
-        <text x="60" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">10 min</text>
+        <text x="60" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">12 min</text>
 
         <line x1="115" y1="120" x2="140" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
 
@@ -428,7 +429,7 @@ Enterprise sends, so it's ready to publish as-is.
         <rect x="145" y="90" width="115" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
         <text x="202" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#1a73e8">M1 &middot; BUILD</text>
         <text x="202" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Agent + 3 tools</text>
-        <text x="202" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">30 min</text>
+        <text x="202" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">25 min</text>
 
         <line x1="265" y1="120" x2="290" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
 
@@ -436,7 +437,7 @@ Enterprise sends, so it's ready to publish as-is.
         <rect x="295" y="90" width="115" height="60" rx="8" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
         <text x="352" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#198754">M2 &middot; SCALE</text>
         <text x="352" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Deploy + state</text>
-        <text x="352" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">25 min</text>
+        <text x="352" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">30 min</text>
 
         <line x1="415" y1="120" x2="440" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
 
@@ -444,7 +445,7 @@ Enterprise sends, so it's ready to publish as-is.
         <rect x="445" y="90" width="115" height="60" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
         <text x="502" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#7c3aed">M3 &middot; GOVERN</text>
         <text x="502" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Security layers</text>
-        <text x="502" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">25 min</text>
+        <text x="502" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">15 min</text>
 
         <line x1="565" y1="120" x2="590" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
 
@@ -452,7 +453,7 @@ Enterprise sends, so it's ready to publish as-is.
         <rect x="595" y="90" width="115" height="60" rx="8" fill="#e0f7fa" stroke="#0891b2" stroke-width="2"/>
         <text x="652" y="112" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="800" fill="#0891b2">M4 &middot; OPTIMIZE</text>
         <text x="652" y="128" text-anchor="middle" font-family="system-ui" font-size="8" fill="#333">Quality flywheel</text>
-        <text x="652" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">20 min</text>
+        <text x="652" y="142" text-anchor="middle" font-family="system-ui" font-size="7" fill="#999">18 min</text>
 
         <!-- Arrow down to M5 -->
         <line x1="652" y1="155" x2="652" y2="175" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
@@ -509,8 +510,8 @@ Enterprise sends, so it's ready to publish as-is.
     <div class="arc-card" style="border-color:#0891b2;">
       <div class="arc-module" style="color:#0891b2;">M4 &middot; Optimize</div>
       <div>
-        <div class="arc-detail">Evaluated and improved locally with the eval-fix loop</div>
-        <div class="arc-artifacts">Graded eval (agents-cli eval) &middot; before/after compare &middot; grounding fix + pytest</div>
+        <div class="arc-detail">Measured agent quality locally with a graded eval</div>
+        <div class="arc-artifacts">Graded eval (adk eval) &middot; <code>hallucinations_v1</code> judge &middot; flagged ungrounded sentences</div>
       </div>
     </div>
 
@@ -524,7 +525,7 @@ Enterprise sends, so it's ready to publish as-is.
 
     <div class="callout callout-success" style="margin-top:1rem;">
       <div class="callout-title">The Thesis &mdash; Confirmed</div>
-      <p>You traversed the entire Build &rarr; Scale &rarr; Govern &rarr; Optimize lifecycle almost entirely by
+      <p>You traversed the entire Build &rarr; Scale &rarr; Govern &rarr; Optimize &rarr; Engage lifecycle almost entirely by
       <strong>prompting</strong> inside Antigravity &mdash; and at every stage you left the IDE to see the
       <strong>real enterprise artifact</strong> the platform created for you.</p>
     </div>
