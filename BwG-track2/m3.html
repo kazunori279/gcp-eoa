@@ -443,6 +443,7 @@ leftover *.json files). Then:
    bundled locally, so it needs none. If you find broad admin roles (e.g.
    storage.admin, bigquery.*, secretmanager.*), say so plainly and name the
    minimal role set this agent actually needs — but do not change anything.
+
 Do NOT query the Agent Registry or a SPIFFE principal via gcloud, and do NOT
 describe what the console shows — just tell me to open it myself to view the
 Registry entry, its 5 tools, and the agent's identity (Govern → Agent

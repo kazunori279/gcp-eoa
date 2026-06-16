@@ -318,6 +318,7 @@
     word-break: break-word;
   }
   .agent-ctx .cmd { color: #7ee787; }
+  .prompt-block .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -825,8 +826,8 @@ deployed runtime uses — so we never spend a 10-minute deploy to discover a bug
 - asserts the session/memory services resolve to a real region (not "global")
 - drives one query end-to-end through async_stream_query in a single asyncio loop with a full-path session_id.
 
-  mkdir -p scripts && curl -fL -o scripts/runtime_smoke.py https://kazunori279.github.io/gcp-eoa/BwG-track2/runtime_smoke.py
-  uv run python scripts/runtime_smoke.py
+  <span class="cmd">mkdir -p scripts && curl -fL -o scripts/runtime_smoke.py https://kazunori279.github.io/gcp-eoa/BwG-track2/runtime_smoke.py</span>
+  <span class="cmd">uv run python scripts/runtime_smoke.py</span>
 
 It should print "Smoke query executed successfully" with NO "Invalid Session
 resource name" and NO "Event loop is closed". If it fails, fix
@@ -897,7 +898,7 @@ fails, just tell me and I will check the console.</div>
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Fallback &mdash; if deploy fails with an auth error</div>
         <p>This is an intermittent Cloud Shell issue. Try the deploy again from your project directory:</p>
-        <div class="prompt-block" id="step5-retry"><button class="copy-btn" onclick="copyBlock('step5-retry')">Copy</button><span class="prompt-label">terminal</span>cd "$(dirname "$(find ~ -name deployment_metadata.json -o -name pyproject.toml | head -1)")" && agents-cli deploy --agent-identity --no-confirm-project</div>
+        <div class="prompt-block" id="step5-retry"><button class="copy-btn" onclick="copyBlock('step5-retry')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">cd "$(dirname "$(find ~ -name deployment_metadata.json -o -name pyproject.toml | head -1)")" && agents-cli deploy --agent-identity --no-confirm-project</span></div>
         <p>If it still fails, open the
         <strong><a href="https://console.cloud.google.com/agent-platform/runtimes" target="_blank">Agent Platform console</a></strong>
         to check whether the deployment actually went through. Don't let AGY spin on retries.</p>

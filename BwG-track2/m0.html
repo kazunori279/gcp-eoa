@@ -330,6 +330,7 @@
     word-break: break-word;
   }
   .agent-ctx .cmd { color: #7ee787; }
+  .prompt-block .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -762,8 +763,8 @@
       <p>Set your <strong>Qwiklabs Project ID</strong> as the active project in the terminal. Otherwise
       Cloud Shell / AGY can default to the wrong project (e.g. <code>cloudshell-gca</code>), and the
       <code>enable</code> / <code>deploy</code> commands in later modules fail:</p>
-      <div class="prompt-block" id="cmd-set-project"><button class="copy-btn" onclick="copyBlock('cmd-set-project')">Copy</button><span class="prompt-label">terminal</span>export GOOGLE_CLOUD_PROJECT=&lt;your qwiklabs project id&gt;
-gcloud config set project "$GOOGLE_CLOUD_PROJECT"</div>
+      <div class="prompt-block" id="cmd-set-project"><button class="copy-btn" onclick="copyBlock('cmd-set-project')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">export GOOGLE_CLOUD_PROJECT=&lt;your qwiklabs project id&gt;
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"</span></div>
       <p>Replace <code>&lt;your qwiklabs project id&gt;</code> with the Project ID from the Qwiklabs lab panel.
       Step 1 below also pins this into AGY's own settings so it can't switch projects mid-run.</p>
     </div>
@@ -924,17 +925,20 @@ and 2 are already done (you installed the MCP, and creating this plan IS Step
 2), so leave them checked:
 
 # Rush Hour Workshop — Plan
+
 ## M0 Setup
 - [x] Step 1: Install Developer Knowledge MCP  (agy)
 - [x] Step 2: Brief the agent + create this plan  (agy)
 - [ ] Step 3: Verify cockpit (agents-cli setup)  (agy)
 - [ ] Step 4: Download the data  (agy)
 - [ ] Step 5: Open the "before" shot  (user)
+
 ## M1 Build
 - [ ] Step 1: Scaffold the ADK project  (agy)
 - [ ] Step 2: Add the three tools  (agy)
 - [ ] Step 3: Write the system instruction  (agy)
 - [ ] Step 4: Run locally in the playground  (agy)
+
 ## M2 Scale
 - [ ] Step 1: Prepare the runtime entrypoint (no deploy)  (agy)
 - [ ] Step 2: Add session state + Memory Bank (code only)  (agy)
@@ -942,15 +946,18 @@ and 2 are already done (you installed the MCP, and creating this plan IS Step
 - [ ] Step 4: Local runtime smoke test  (agy)
 - [ ] Step 5: Deploy once  (agy)
 - [ ] Step 6: Test the deployed agent in the Console Playground  (user)
+
 ## M3 Govern
 - [ ] Step 1: Why govern (read)  (user)
 - [ ] Step 2: Verify Registry + identity + least-privilege  (agy)
 - [ ] Step 3: Shield with Model Armor  (agy)
 - [ ] Step 4: Enterprise control plane (read)  (user)
+
 ## M4 Optimize
 - [ ] Step 1: The local eval-fix loop (read)  (user)
 - [ ] Step 2: Simulate the crisis at scale  (agy)
 - [ ] Step 3: Grade and read the score table  (agy)
+
 ## M5 Engage
 - [ ] Step 1: Deploy fresh + publish to Gemini Enterprise  (agy)
 - [ ] Step 2: Unified finish line  (user)
@@ -988,7 +995,7 @@ Do NOT start building yet — this is context and your plan only.</div>
       </div>
 
       <p>Confirm that <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a></code> and its skills are installed:</p>
-      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 3: run this command in the shell for me and show me the output — uvx google-agents-cli setup</div>
+      <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 3: run this command in the shell for me and show me the output — <span class="cmd">uvx google-agents-cli setup</span></div>
       <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
       <table class="data">
         <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
@@ -1023,7 +1030,7 @@ Do NOT start building yet — this is context and your plan only.</div>
       <p>Download the <strong>Eurostar <a href="https://gtfs.org/" target="_blank">GTFS</a> bundle</strong> (official public feed from
       <a href="https://transport.data.gouv.fr/datasets/eurostar-gtfs" target="_blank">transport.data.gouv.fr</a>)
       and the <strong>disruption file</strong> into your project:</p>
-      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this in the shell for me and show me the output. It tries the official Eurostar GTFS feed first and automatically falls back to the workshop repo mirror if that download fails, then fetches the disruption file — mkdir -p data/gtfs && { curl -fL -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip || curl -fL -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip; } && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</div>
+      <div class="prompt-block" id="cmd-download-data"><button class="copy-btn" onclick="copyBlock('cmd-download-data')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 4: run this in the shell for me and show me the output. It tries the official Eurostar GTFS feed first and automatically falls back to the workshop repo mirror if that download fails, then fetches the disruption file — <span class="cmd">mkdir -p data/gtfs && { curl -fL -o /tmp/gtfs.zip https://integration-storage.dm.eurostar.com/gtfs-prod/gtfs_static_commercial_v2.zip || curl -fL -o /tmp/gtfs.zip https://kazunori279.github.io/gcp-eoa/BwG-track2/data/gtfs.zip; } && unzip -o /tmp/gtfs.zip -d data/gtfs/ && curl -L -o data/disruptions.json https://kazunori279.github.io/gcp-eoa/BwG-track2/data/disruptions.json</span></div>
       <p>Quick orientation (no deep analysis yet):</p>
       <ul>
         <li><code>stops.txt</code> &mdash; 17 stations across UK/FR/BE/NL/DE</li>

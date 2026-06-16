@@ -139,6 +139,7 @@
     font-family: var(--mono); font-size: .82rem; line-height: 1.6;
     white-space: pre-wrap; word-break: break-word;
   }
+  .agent-ctx .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block; background: #2d4a6f; color: #e0f0ff;
     font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
@@ -289,12 +290,13 @@ Publish the agent I already deployed to Agent Runtime in M2 to business users
 — do NOT redeploy and do NOT change its logic. It was deployed with agent
 identity and its runtime wrapper already normalizes the session_id Gemini
 Enterprise sends, so it's ready to publish as-is.
+
 1) List the available Gemini Enterprise apps.
 2) Register the existing deployed agent (from deployment_metadata.json) to our
    app, with the display name "Transit-Crisis Agent" (so it's easy to find in
    the portal's Agents list).
 3) Confirm the registration from the CLI (headless check — don't rely on the
-   browser). Run: agents-cli publish gemini-enterprise --list  and show that our
+   browser). Run: <span class="cmd">agents-cli publish gemini-enterprise --list</span>  and show that our
    agent now appears registered to the app (or, if that doesn't list it, do a
    discoveryengine GET on the registered agent resource name and show it exists).
 4) Create a file named registration_results.md in the project root (write it

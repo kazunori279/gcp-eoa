@@ -319,6 +319,8 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .agent-ctx .cmd { color: #7ee787; }
+  .prompt-block .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -553,7 +555,7 @@ Module 1 Step 1: scaffold the ADK project (scaffold only).
 
 1. Make sure agents-cli is runnable: add $HOME/.local/bin to PATH (or use
    its full path) and confirm the active GCP project with
-   "gcloud config get-value project".
+   "<span class="cmd">gcloud config get-value project</span>".
 2. Scaffold a new ADK agent project for a transit assistant that will
    answer commuter questions during a service disruption. Name the project
    exactly "transit-assistant" (so later modules can find it deterministically).
@@ -725,15 +727,19 @@ Add three tools to the agent:
 3. compute_reroute &mdash; given origin, destination, and departure_after,
    builds a station graph from GTFS connections, removes disrupted
    services, and finds an alternative path (BFS/shortest-path).
+
 Define the three tools in a dedicated app/tools.py (not inline in
 app/agent.py) and import them into the agent — later modules refer to
 tools.py for the data-path resolution.
+
 Write clear docstrings and type hints so the model can call them
 correctly. The critical pattern is reconciliation: joining schedule
 data with disruption data on trip_id and stop_id.
+
 Keep tool return values compact &mdash; return only what the model needs
 (trip_id, route, destination, departure/arrival time); do not dump full
 per-stop lists, so large queries don't overflow the model's context window.
+
 Scope: only add the tools and wire them into the agent &mdash; do not write
 the system instruction yet (that's the next step), and do not modify the
 eval datasets or run evals (that comes later in M4).</div>
@@ -822,7 +828,7 @@ Module 1 Step 4: run it locally in the playground.
         <div class="callout-title">No browser? Test the same scenarios headlessly</div>
         <p>If you'd rather (or can't open the Dev UI), have the agent run each scenario against the
         running playground from the terminal &mdash; same agent, no browser:</p>
-        <div class="prompt-block" id="step4-headless"><button class="copy-btn" onclick="copyBlock('step4-headless')">Copy</button><span class="prompt-label">terminal</span>agents-cli run --url http://127.0.0.1:8080 --mode adk "Will my 13:31 St Pancras to Paris train run today?"</div>
+        <div class="prompt-block" id="step4-headless"><button class="copy-btn" onclick="copyBlock('step4-headless')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">agents-cli run --url http://127.0.0.1:8080 --mode adk "Will my 13:31 St Pancras to Paris train run today?"</span></div>
         <p>(Point <code>--url</code> at whatever local URL the playground prints.) The trace shows the tool
         calls and final answer, so you can verify reconciliation/reroute without the Dev UI.</p>
       </div>
