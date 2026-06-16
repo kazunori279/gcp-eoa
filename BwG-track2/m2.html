@@ -812,29 +812,32 @@ exec); next we smoke-test the runtime path locally (Step 4), then deploy ONCE
       <div class="step-num">4</div>
       <span class="step-time">3 min</span>
       <h3>Catch Deploy-Blockers Locally &mdash; Runtime Smoke Test</h3>
-      <p>Before deploying, exercise the <strong>same code path the deployed container uses</strong> on your
-      laptop &mdash; each run is seconds, so a runtime bug surfaces now instead of after a 5&ndash;10 min deploy.</p>
+      <p>Before deploying, run <strong>your actual agent</strong> through the <strong>same code path the deployed
+      container uses</strong> on your laptop &mdash; each run is seconds, so a bug in your tools, session/memory
+      wiring, or the runtime wrapper surfaces now instead of after a 5&ndash;10 min deploy.</p>
 
-      <p>The smoke test guards against the <strong>three issues that almost always bite on the first deploy</strong>.
-      Each one is invisible in the M1 local playground and only appears in the cloud runtime &mdash; here's what
-      you'd see, why it happens, and how the tested wrapper handles it:</p>
+      <p>The smoke test <strong>imports and runs the agent you built</strong> &mdash; your tools, instruction, and the
+      session / Memory Bank / code-exec wiring from Steps 2&ndash;3 &mdash; through the <strong>exact entrypoint Agent
+      Runtime uses</strong>, and confirms the tested wrapper is still in place (a re-run of <code>scaffold enhance</code>
+      can silently overwrite it). That deployed code path never runs in the M1 <code>adk web</code> playground, so this
+      is your first chance to catch <strong>cloud-only failures</strong> locally. Three classic ones it surfaces:</p>
       <table class="data">
-        <thead><tr><th>What you'd see on deploy</th><th>Why it happens</th><th>How the tested wrapper handles it</th></tr></thead>
+        <thead><tr><th>What you'd see on deploy</th><th>Why it happens</th><th>How the smoke test catches it</th></tr></thead>
         <tbody>
           <tr>
             <td>Agent never starts, or every reply is empty &mdash; an <strong>import / init error</strong></td>
-            <td>Module-level setup in <code>app/agent_runtime_app.py</code> runs the moment the container loads it; a bad import or initialization that the playground tolerated now throws on startup</td>
-            <td>Imports the module and builds the app exactly as the runtime does, so any startup error shows up locally in seconds</td>
+            <td>Module-level setup in your <code>app/</code> code (agent, tools, or the wrapper) runs the moment the container loads it; a bad import or initialization the playground tolerated now throws on startup</td>
+            <td>Imports <code>app/agent_runtime_app</code> and builds the app exactly as the runtime does, so any startup error throws locally in seconds</td>
           </tr>
           <tr>
             <td><code>Invalid Session resource name</code></td>
             <td>Vertex AI Session &amp; Memory services must be pinned to a real region; left at the default <code>global</code> location, the session resource path the runtime constructs is malformed and rejected</td>
-            <td>Pins Session/Memory to the engine's region and asserts the resolved location is never <code>global</code></td>
+            <td>Forces a <code>global</code> location, then asserts the services still resolve to a real region &mdash; failing loudly if the wrapper's region-pinning is missing</td>
           </tr>
           <tr>
             <td><code>Event loop is closed</code></td>
             <td>An async client created once and reused gets bound to an event loop that's already closed by the next request, so the second query onward crashes</td>
-            <td>Uses a fresh per-request client and drives a real query through <code>async_stream_query</code> in a single asyncio loop to prove it holds up</td>
+            <td>Drives a real query through <code>async_stream_query</code> in a single asyncio loop, exercising the per-request client path end to end</td>
           </tr>
         </tbody>
       </table>
