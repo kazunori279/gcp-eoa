@@ -996,21 +996,23 @@ Do NOT start building yet — this is context and your plan only.</div>
 
       <p>Confirm that <code><a href="https://github.com/google/agents-cli" target="_blank">agents-cli</a></code> and its skills are installed:</p>
       <div class="prompt-block" id="cmd-agents-setup"><button class="copy-btn" onclick="copyBlock('cmd-agents-setup')">Copy</button><span class="prompt-label">prompt</span>Module 0 Step 3: run this command in the shell for me and show me the output — <span class="cmd">uvx google-agents-cli setup</span></div>
-      <p>Verify skills are available &mdash; the coding agent should understand these commands:</p>
+      <p><code>setup</code> installs four skills that cover the full agent lifecycle &mdash; here's what each one does
+      and where you'll use it (no need to run these now; the later modules drive them for you):</p>
       <table class="data">
-        <thead><tr><th>Skill</th><th>Verify with</th></tr></thead>
+        <thead><tr><th>Skill</th><th>What it does</th><th>Used in</th></tr></thead>
         <tbody>
-          <tr><td><code>scaffold</code></td><td>Ask: <em>"Can you scaffold an <a href="https://google.github.io/adk-docs/" target="_blank">ADK</a> project?"</em></td></tr>
-          <tr><td><code>deploy</code></td><td>Ask: <em>"Can you deploy to Agent Runtime?"</em></td></tr>
-          <tr><td><code>eval</code></td><td>Ask: <em>"Can you run evaluations?"</em></td></tr>
-          <tr><td><code>publish</code></td><td>Ask: <em>"Can you publish to Gemini Enterprise?"</em></td></tr>
+          <tr><td><code>scaffold</code></td><td>Generates a deployable <a href="https://google.github.io/adk-docs/" target="_blank">ADK</a> project structure (agent, tools, configs) from a plain-language description</td><td>M1</td></tr>
+          <tr><td><code>deploy</code></td><td>Packages your agent and ships it to Agent Runtime on the platform</td><td>M2</td></tr>
+          <tr><td><code>eval</code></td><td>Builds an evaluation suite and scores the agent's answers</td><td>M4</td></tr>
+          <tr><td><code>publish</code></td><td>Registers the deployed agent to Gemini Enterprise for business users</td><td>M5</td></tr>
         </tbody>
       </table>
       <p style="margin-top:.5rem;">The mantra: <strong>"Describe the outcome; let the skills do the wiring."</strong></p>
       <div class="step-expected">
         <h4>Expected Result</h4>
-        <p>All 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>, <code>publish</code>) are recognized
-        by the coding agent. Your cockpit is ready.</p>
+        <p><code>setup</code> completes and installs all 4 skills (<code>scaffold</code>, <code>deploy</code>, <code>eval</code>,
+        <code>publish</code>) into your coding agent. Your cockpit is ready &mdash; you'll put these skills to work
+        starting in M1.</p>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
