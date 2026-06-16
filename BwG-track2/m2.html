@@ -671,8 +671,8 @@ deploys once.</div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Why the tested wrapper (not the scaffold stub)</div>
-        <p>The generated stub crashes in the deployed container. The tested wrapper fixes
-        <strong>three deploy-time bugs</strong> that only surface in the cloud &mdash; region-pinned
+        <p>The generated stub is a minimal starting point. To make it run smoothly in the cloud, the
+        tested wrapper adds <strong>three deploy-time essentials</strong> the deployed runtime needs &mdash; region-pinned
         Session/Memory services, a Memory Bank fallback, and a fresh per-request client (no
         <code>Event loop is closed</code>) &mdash; which <strong>Step 4's smoke test verifies locally</strong>
         before you deploy. It also normalizes the <code>session_id</code> Gemini Enterprise sends, which is
