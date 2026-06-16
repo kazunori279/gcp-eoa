@@ -162,6 +162,7 @@
     white-space: pre-wrap; word-break: break-word;
   }
   .agent-ctx .cmd { color: #7ee787; }
+  .agent-ctx .kw, .prompt-block .kw { background: rgba(255,255,255,.09); padding: .05rem .35rem; border-radius: 4px; color: #e8eef5; }
   .agent-ctx-label {
     display: inline-block; background: #2d4a6f; color: #e0f0ff;
     font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
@@ -404,14 +405,14 @@
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 3 Step 2: verify Registry, identity, and least-privilege.
 
-First, use the google-developer-knowledge MCP to read up on the Agent Registry,
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on the Agent Registry,
 Agent Identity (is it opt-in?), and reasoning-engine IAM, so you check the right
 things the right way.
 
 My "Rush Hour" agent was deployed to Agent Runtime in M2 (a reasoningEngine
 in us-east1). Verify it's a governed, least-privilege asset — do not create,
 publish, or change anything, and do not touch Gemini Enterprise. Read the
-project/region/engine id from deployment_metadata.json (don't read other
+project/region/engine id from <span class="kw">deployment_metadata.json</span> (don't read other
 leftover *.json files). Then:
 1) Describe the engine. gcloud may not have the reasoning-engines command
    group, so use the REST API (ENGINE_RESOURCE_NAME is the full
@@ -420,10 +421,10 @@ leftover *.json files). Then:
        "https://REGION-aiplatform.googleapis.com/v1/ENGINE_RESOURCE_NAME"</span>
    Show its resource name, that it's platform-managed (agentFramework=
    google-adk), and its effectiveIdentity. NOTE: in M2 you deployed with
-   --agent-identity, so Agent Identity is ON and the effectiveIdentity is a
+   <span class="kw">--agent-identity</span>, so Agent Identity is ON and the effectiveIdentity is a
    SPIFFE-attested principal (an ...system.id.goog/... path), NOT a bare
    service account — that attested identity is exactly the governed outcome we
-   want. (Deploying WITHOUT --agent-identity would instead show a default
+   want. (Deploying WITHOUT <span class="kw">--agent-identity</span> would instead show a default
    service agent like service-PROJECT_NUMBER@gcp-sa-aiplatform-re
    .iam.gserviceaccount.com.)
 2) Audit least-privilege on the service account the engine RUNS AS for IAM —
@@ -493,12 +494,12 @@ Registry).</div>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 3 Step 3: shield with Model Armor.
 
-First, use the google-developer-knowledge MCP to read up on Model Armor
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on Model Armor
 (templates, regional endpoints, and the sanitize API), so you use current
 commands.
 
 Add an attack shield with Model Armor and prove it works in the terminal —
-no gateway, no Gemini Enterprise. Read PROJECT_ID from deployment_metadata.json.
+no gateway, no Gemini Enterprise. Read PROJECT_ID from <span class="kw">deployment_metadata.json</span>.
 Model Armor is regional and managed through a regional endpoint, so:
 - Use location us-central1 (it need NOT match the agent's region — this just
   proves the detection engine).
@@ -506,7 +507,7 @@ Model Armor is regional and managed through a regional endpoint, so:
     <span class="cmd">gcloud config set api_endpoint_overrides/modelarmor "https://modelarmor.us-central1.rep.googleapis.com/"</span>
 - If the API is off: <span class="cmd">gcloud services enable modelarmor.googleapis.com</span>
 
-1) Create a template named transit-shield (reuse it if it already exists):
+1) Create a template named <span class="kw">transit-shield</span> (reuse it if it already exists):
      <span class="cmd">gcloud model-armor templates create transit-shield \
        --location=us-central1 --project=PROJECT_ID \
        --pi-and-jailbreak-filter-settings-enforcement=enabled \

@@ -331,6 +331,7 @@
   }
   .agent-ctx .cmd { color: #7ee787; }
   .prompt-block .cmd { color: #7ee787; }
+  .agent-ctx .kw, .prompt-block .kw { background: rgba(255,255,255,.09); padding: .05rem .35rem; border-radius: 4px; color: #e8eef5; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -801,8 +802,8 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
    disables EVERY MCP tool — "tool ... is not enabled" / "server ... not allowed
    in this context"), so a plain overwrite is correct here — there's nothing to
    preserve:
-     ~/.gemini/config/mcp_config.json
-     ~/.gemini/antigravity-cli/mcp_config.json
+     <span class="kw">~/.gemini/config/mcp_config.json</span>
+     <span class="kw">~/.gemini/antigravity-cli/mcp_config.json</span>
    <span class="cmd">{
      "mcpServers": {
        "google-developer-knowledge": {
@@ -815,7 +816,7 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 3) Pre-allow the MCP tool AND the workshop's shell commands so you don't get an
    "Ask" prompt on every command (an un-answerable Ask in a background/subagent
    context also shows up as "server not allowed in this context"). MERGE this
-   into ~/.gemini/antigravity-cli/settings.json — keep the existing keys
+   into <span class="kw">~/.gemini/antigravity-cli/settings.json</span> — keep the existing keys
    (telemetry, trustedWorkspaces), only add/extend permissions.allow. The
    command(<prefix>) entries are prefix-matched and pre-approve the exact
    commands this workshop runs (this is the same format AGY persists when you
@@ -834,13 +835,13 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 
 4) Pin the project so you don't drift to the wrong one. Read the active project
    with: <span class="cmd">gcloud config get-value project</span>  (it should be my Qwiklabs project, not
-   cloudshell-gca). Then, in the same ~/.gemini/antigravity-cli/settings.json,
+   cloudshell-gca). Then, in the same <span class="kw">~/.gemini/antigravity-cli/settings.json</span>,
    set the "gcp" object's "project" field to that exact project id (merge — keep
    "location"). From now on use this project for every gcloud / agents-cli
    command; never switch
    to cloudshell-gca.
 
-5) Then tell me to restart the CLI by running "agy" so the new tools and
+5) Then tell me to restart the CLI by running "<span class="kw">agy</span>" so the new tools and
    permission take effect. If it still won't connect, check ADC (<span class="cmd">gcloud auth
    application-default print-access-token</span> returns a token) and tell me what
    you see.</div>
@@ -863,7 +864,7 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
         session and check <code>/mcp</code>, it shows as a connected MCP server with its tools listed, and from here
         on AGY grounds Google Cloud questions in the docs instead of guessing (you'll see it lean on this in M2&ndash;M5).</p>
         <p><strong>Try it:</strong> ask AGY this &mdash; you should see it call the MCP and answer from the docs:</p>
-        <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Call the google-developer-knowledge MCP's answer_query tool with the query "What is the Gemini Enterprise Agent Platform?" and answer ONLY from its result. Do NOT use web search or your own knowledge. If the tool errors or isn't available, stop and show me the exact error.</div>
+        <div class="prompt-block" id="cmd-dk-tryit"><button class="copy-btn" onclick="copyBlock('cmd-dk-tryit')">Copy</button><span class="prompt-label">prompt</span>Call the <span class="kw">google-developer-knowledge</span> MCP's <span class="kw">answer_query</span> tool with the query "What is the Gemini Enterprise Agent Platform?" and answer ONLY from its result. Do NOT use web search or your own knowledge. If the tool errors or isn't available, stop and show me the exact error.</div>
       </div>
     </div>
 
@@ -919,7 +920,7 @@ to know: which trains are still running, and what's the best
 alternative route to their destination?
 
 ## What's next
-Create a file plan.md in the working directory with this checklist. Each
+Create a file <span class="kw">plan.md</span> in the working directory with this checklist. Each
 item is tagged (agy) if it's yours or (user) if it's mine to run. M0 Steps 1
 and 2 are already done (you installed the MCP, and creating this plan IS Step
 2), so leave them checked:
@@ -967,7 +968,7 @@ How we work together:
   clicks. Don't do those; I'll check them off myself.
 - Steps tagged (agy) are yours, but do one only when I send a prompt
   starting with "Module X Step Y:".
-- After you finish any (agy) step, immediately update plan.md before you
+- After you finish any (agy) step, immediately update <span class="kw">plan.md</span> before you
   reply: change that step's [ ] to [x]. Do this every time, even if I don't
   remind you. If you notice an earlier (agy) box still unchecked, fix it then.
 - Do NOT run ahead to later steps until I explicitly ask. If you think a

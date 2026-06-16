@@ -140,6 +140,7 @@
     white-space: pre-wrap; word-break: break-word;
   }
   .agent-ctx .cmd { color: #7ee787; }
+  .agent-ctx .kw, .prompt-block .kw { background: rgba(255,255,255,.09); padding: .05rem .35rem; border-radius: 4px; color: #e8eef5; }
   .agent-ctx-label {
     display: inline-block; background: #2d4a6f; color: #e0f0ff;
     font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
@@ -283,7 +284,7 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 5 Step 1: publish to Gemini Enterprise.
 
-First, use the google-developer-knowledge MCP to read up on publishing agents
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on publishing agents
 to Gemini Enterprise, so you use the current flow.
 
 Publish the agent I already deployed to Agent Runtime in M2 to business users
@@ -292,14 +293,14 @@ identity and its runtime wrapper already normalizes the session_id Gemini
 Enterprise sends, so it's ready to publish as-is.
 
 1) List the available Gemini Enterprise apps.
-2) Register the existing deployed agent (from deployment_metadata.json) to our
+2) Register the existing deployed agent (from <span class="kw">deployment_metadata.json</span>) to our
    app, with the display name "Transit-Crisis Agent" (so it's easy to find in
    the portal's Agents list).
 3) Confirm the registration from the CLI (headless check — don't rely on the
    browser). Run: <span class="cmd">agents-cli publish gemini-enterprise --list</span>  and show that our
    agent now appears registered to the app (or, if that doesn't list it, do a
    discoveryengine GET on the registered agent resource name and show it exists).
-4) Create a file named registration_results.md in the project root (write it
+4) Create a file named <span class="kw">registration_results.md</span> in the project root (write it
    with your file tools — this is a required deliverable, do NOT just print it).
    It must contain: the registered agent resource name, the app it was
    registered to, the Agent Engine console link, and the Gemini Enterprise

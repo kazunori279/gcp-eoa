@@ -319,6 +319,7 @@
   }
   .agent-ctx .cmd { color: #7ee787; }
   .prompt-block .cmd { color: #7ee787; }
+  .agent-ctx .kw, .prompt-block .kw { background: rgba(255,255,255,.09); padding: .05rem .35rem; border-radius: 4px; color: #e8eef5; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -649,12 +650,12 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 1: prepare the Agent Runtime entrypoint (do NOT deploy yet).
 
-1. Make the project deploy-ready: copy the data/ directory into app/ so it ships
+1. Make the project deploy-ready: copy the <span class="kw">data/</span> directory into <span class="kw">app/</span> so it ships
    with the bundle, and make data-path resolution relative to the file location
-   (pathlib.Path(__file__).parent) so it works locally and in the container.
+   (<span class="kw">pathlib.Path(__file__).parent</span>) so it works locally and in the container.
 2. Generate the project's Agent Runtime entrypoint:
      <span class="cmd">agents-cli scaffold enhance . --deployment-target agent_runtime</span>
-3. The generated app/agent_runtime_app.py is a naive stub that crashes on the
+3. The generated <span class="kw">app/agent_runtime_app.py</span> is a naive stub that crashes on the
    deployed runtime. Replace it with the workshop's TESTED wrapper — you do NOT
    need to write or understand its internals, just drop it in:
      <span class="cmd">curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
@@ -662,7 +663,7 @@ Module 2 Step 1: prepare the Agent Runtime entrypoint (do NOT deploy yet).
    with the broken stub). The tested wrapper contains the marker "TESTED
    REFERENCE"; confirm it's there, and re-fetch if not:
      <span class="cmd">grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
-   Do not proceed until "TESTED REFERENCE" appears in app/agent_runtime_app.py.
+   Do not proceed until "TESTED REFERENCE" appears in <span class="kw">app/agent_runtime_app.py</span>.
 
 Do NOT deploy in this step. Step 4 smoke-tests this entrypoint locally; Step 5
 deploys once.</div>
@@ -704,7 +705,7 @@ deploys once.</div>
         <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 2: add session state + Memory Bank (code only, NO deploy).
 
-First, use the google-developer-knowledge MCP to read up on ADK Sessions and
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on ADK Sessions and
 Memory Bank (including how memory generation is triggered), so you use current
 APIs and defaults.
 
@@ -712,7 +713,7 @@ APIs and defaults.
    agent remembers my home station across visits. Use ADK's session service
    for short-term state and Memory Bank for cross-session personalization.
 2. Make the code changes and verify short-term session state LOCALLY using
-   InMemorySessionService / InMemoryMemoryService (set the home station, then
+   <span class="kw">InMemorySessionService</span> / <span class="kw">InMemoryMemoryService</span> (set the home station, then
    recall it in the same session).
 
 Do NOT deploy &mdash; we make all the code changes first and deploy ONCE at the
@@ -751,17 +752,17 @@ end (Step 5), after the local smoke test in Step 4.</div>
         <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 2 Step 3: add code execution (code only, NO deploy).
 
-First, use the google-developer-knowledge MCP to read up on ADK code execution
-(code executors / BuiltInCodeExecutor), so you use the current API.
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on ADK code execution
+(code executors / <span class="kw">BuiltInCodeExecutor</span>), so you use the current API.
 
 1. Add a code execution sandbox so the agent can write and run Python on the
    fly for ad-hoc math the tools don't already return &mdash; like the average
    delay across delayed trains, the cancellation ratio, or the peak
-   bottleneck hour. Use BuiltInCodeExecutor from google.adk.code_executors
+   bottleneck hour. Use <span class="kw">BuiltInCodeExecutor</span> from <span class="kw">google.adk.code_executors</span>
    (the model's built-in sandbox, no external infra). Run the math over the
    data the existing tools return.
 2. Update the system instruction to mention the sandbox.
-3. Test it LOCALLY with agents-cli run using a question that needs this math,
+3. Test it LOCALLY with <span class="kw">agents-cli</span> run using a question that needs this math,
    and show me from the trace that the built-in code execution actually ran
    (not a hardcoded tool).
 
@@ -822,16 +823,16 @@ Module 2 Step 4: local runtime smoke test (catch deploy-blockers before deployin
 Run the workshop's tested smoke test, which exercises the SAME code path the
 deployed runtime uses — so we never spend a 10-minute deploy to discover a bug a
 10-second local run can catch. It:
-- imports app/agent_runtime_app
+- imports <span class="kw">app/agent_runtime_app</span>
 - asserts the session/memory services resolve to a real region (not "global")
-- drives one query end-to-end through async_stream_query in a single asyncio loop with a full-path session_id.
+- drives one query end-to-end through <span class="kw">async_stream_query</span> in a single asyncio loop with a full-path session_id.
 
   <span class="cmd">mkdir -p scripts && curl -fL -o scripts/runtime_smoke.py https://kazunori279.github.io/gcp-eoa/BwG-track2/runtime_smoke.py</span>
   <span class="cmd">uv run python scripts/runtime_smoke.py</span>
 
 It should print "Smoke query executed successfully" with NO "Invalid Session
 resource name" and NO "Event loop is closed". If it fails, fix
-app/agent_runtime_app.py and re-run (each run is seconds). Do NOT deploy yet —
+<span class="kw">app/agent_runtime_app.py</span> and re-run (each run is seconds). Do NOT deploy yet —
 Step 5 is the deploy.</div>
       </div>
 
@@ -871,12 +872,12 @@ First, a pre-deploy gate: confirm the tested wrapper is still in place — re-ru
 scaffold enhance can silently overwrite it with the broken stub, which would crash
 the deployed agent. Check for the marker and re-fetch if missing:
   <span class="cmd">grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
-Do NOT deploy unless "TESTED REFERENCE" is present in app/agent_runtime_app.py.
+Do NOT deploy unless "TESTED REFERENCE" is present in <span class="kw">app/agent_runtime_app.py</span>.
 
 The local smoke test passes, so deploy to Agent Runtime a single time, shipping
 sessions + Memory Bank + code execution together:
   <span class="cmd">agents-cli deploy --agent-identity</span>
-(--agent-identity gives the agent a per-user identity for personalization; more
+(<span class="kw">--agent-identity</span> gives the agent a per-user identity for personalization; more
 in M5.)
 
 After deploy completes (~5-10 min), verify the deployed endpoint by running:
@@ -1000,7 +1001,7 @@ The deployed agent called some tools then returned an empty response. Read the
 Agent Runtime logs from Cloud Logging and identify the cause &mdash; do NOT
 change code yet, just diagnose and tell me the root cause and the smallest fix.
 
-Read project/region/engine id from deployment_metadata.json, then pull the
+Read project/region/engine id from <span class="kw">deployment_metadata.json</span>, then pull the
 recent stdout + stderr (stderr has the tracebacks):
   <span class="cmd">gcloud logging read 'resource.type="aiplatform.googleapis.com/ReasoningEngine" AND resource.labels.reasoning_engine_id="ENGINE_ID" AND (logId("reasoning_engine_stdout") OR logId("reasoning_engine_stderr"))' --project=PROJECT_ID --freshness=1h --order=desc --limit=100</span>
 

@@ -142,6 +142,7 @@
     white-space: pre-wrap; word-break: break-word;
   }
   .agent-ctx .cmd { color: #7ee787; }
+  .agent-ctx .kw, .prompt-block .kw { background: rgba(255,255,255,.09); padding: .05rem .35rem; border-radius: 4px; color: #e8eef5; }
   .agent-ctx-label {
     display: inline-block; background: #2d4a6f; color: #e0f0ff;
     font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
@@ -380,17 +381,17 @@
       <div class="agent-ctx" id="step2-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 4 Step 2: simulate the crisis at scale.
 
-First, use the google-developer-knowledge MCP to read up on running an ADK
-agent programmatically — the Runner with InMemorySessionService /
-InMemoryMemoryService — so you use current APIs.
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on running an ADK
+agent programmatically — the <span class="kw">Runner</span> with <span class="kw">InMemorySessionService</span> /
+<span class="kw">InMemoryMemoryService</span> — so you use current APIs.
 
 1. Generate 10 commuter scenarios during a St Pancras signal failure,
    including a case where the disruption feed is unavailable (HTTP 503).
 2. Run all 10 against my agent LOCALLY using ADK's in-memory session and
-   memory services (InMemorySessionService / InMemoryMemoryService) so the
+   memory services (<span class="kw">InMemorySessionService</span> / <span class="kw">InMemoryMemoryService</span>) so the
    memory callback doesn't error outside Agent Runtime. Drive them from ONE
-   asyncio event loop (use asyncio.gather for concurrency) — do NOT run each
-   scenario in its own thread or process, which makes aiohttp crash with
+   asyncio event loop (use <span class="kw">asyncio.gather</span> for concurrency) — do NOT run each
+   scenario in its own thread or process, which makes <span class="kw">aiohttp</span> crash with
    "attached to a different event loop" errors. If you still hit loop errors,
    run them sequentially in that same single loop. Do not deploy — local only.
 3. When done, PRINT a final report table: each scenario, what the agent did,
@@ -427,12 +428,12 @@ InMemoryMemoryService — so you use current APIs.
       <div class="agent-ctx" id="step3-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 4 Step 3: grade the agent locally.
 
-First, use the google-developer-knowledge MCP to read up on ADK evaluation
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on ADK evaluation
 (adk eval, the evalset format, and the eval config criteria), so you build the
 graded eval the current way.
 
 Build a small graded eval and score my agent once. Keep it fast, do not deploy.
-Do NOT modify the agent's code (app/agent.py, app/tools.py, etc.) — grade the
+Do NOT modify the agent's code (<span class="kw">app/agent.py</span>, <span class="kw">app/tools.py</span>, etc.) — grade the
 real agent as-is, with no mocking or tweaks, or the score is meaningless.
 
 Before the steps below, install the eval dependencies so adk eval can run:
@@ -440,23 +441,23 @@ Before the steps below, install the eval dependencies so adk eval can run:
 adk eval fails with a missing-dependencies error.
 
 1) Build a 4-case evalset in ADK format at
-   tests/eval/evalsets/rushhour.evalset.json. The file needs a top-level
-   "eval_set_id" field plus eval_cases (each a conversation with user_content +
+   <span class="kw">tests/eval/evalsets/rushhour.evalset.json</span>. The file needs a top-level
+   "<span class="kw">eval_set_id</span>" field plus eval_cases (each a conversation with user_content +
    a reference final_response, plus session_input) — adk eval fails without
-   eval_set_id. Cases:
+   <span class="kw">eval_set_id</span>. Cases:
    - cancellation + reroute
    - a delay
    - the offline-feed 503 fallback
    - a grounding trap asking for something no tool returns (e.g. "which
      platform does the 18:16 to Paris depart from?").
-2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge
+2) Write <span class="kw">tests/eval/eval_config.json</span> gating on the hallucinations LLM judge
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
    <span class="cmd">{ "criteria": { "hallucinations_v1": { "threshold": 0.8,
        "judge_model_options": { "judge_model": "gemini-2.5-flash",
                                 "num_samples": 1 } } } }</span>
-   (gemini-2.5-flash is reliably enabled in lab projects; if you want a faster
-   judge and it's enabled, you can switch to gemini-2.5-flash-lite.)
+   (<span class="kw">gemini-2.5-flash</span> is reliably enabled in lab projects; if you want a faster
+   judge and it's enabled, you can switch to <span class="kw">gemini-2.5-flash-lite</span>.)
 3) Finish writing BOTH files above before you run anything. Then run the eval
    once in the FOREGROUND and wait for it to finish — do NOT run it as a
    background task, or you'll lose the stdout score table. Use adk eval directly:
