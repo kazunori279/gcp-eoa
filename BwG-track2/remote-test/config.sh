@@ -1,6 +1,16 @@
 # remote-test configuration — EDIT THESE for your lab/workstation.
 # Sourced by all local-side scripts (rsh, tunnel_sup.sh, drive.sh, poll.sh, mirror.sh, deploy.sh).
 
+# --- Isolated gcloud profile ---
+# Point gcloud at a separate config dir so this lab's account, project, and ADC are
+# fully isolated from your personal ~/.config/gcloud. Kept OUTSIDE the repo so creds
+# never get committed. Override per-shell by exporting CLOUDSDK_CONFIG before sourcing.
+# One-time setup in this profile:
+#   export CLOUDSDK_CONFIG="$HOME/.config/gcloud-qwiklabs"
+#   gcloud auth login                      # the student-NN-...@qwiklabs.net account
+#   gcloud auth application-default login   # isolated ADC (only if you run client libs locally)
+export CLOUDSDK_CONFIG="${CLOUDSDK_CONFIG:-$HOME/.config/gcloud-qwiklabs}"
+
 # --- Workstation coordinates (from the Qwiklabs / Cloud Workstations console) ---
 export WS_PROJECT="qwiklabs-gcp-04-95d0ebf317cc"
 export WS_CLUSTER="workstation-cluster"

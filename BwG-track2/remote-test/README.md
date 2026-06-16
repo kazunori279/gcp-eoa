@@ -122,6 +122,12 @@ Two independent concerns, solved by two independent mechanisms:
 ### Authentication is TWO separate logins
 1. **gcloud** must be the Qwiklabs **student** account (`gcloud auth login`), or
    `workstations.*` calls 403. The student email looks like `student-NN-...@qwiklabs.net`.
+   Run it under an **isolated `CLOUDSDK_CONFIG`** (config.sh sets one, default
+   `~/.config/gcloud-qwiklabs`) so the lab account, project, and ADC stay separate from
+   your personal `~/.config/gcloud` — switching labs or accounts never clobbers your
+   day-to-day gcloud. All harness scripts source `config.sh`, so they inherit it
+   automatically; for ad-hoc `gcloud`/`./rsh` calls, run them from a shell where you've
+   sourced `config.sh` (or exported the same `CLOUDSDK_CONFIG`).
 2. **`agy` has its OWN Antigravity OAuth**, separate from gcloud. It must be done **once,
    interactively, by a human** on the workstation (`agy` prints a URL with a ~30s wait —
    too short to complete through slow tool round-trips). After that, `agy` silent-auths
@@ -185,7 +191,7 @@ Two independent concerns, solved by two independent mechanisms:
 
 | File | Runs on | Purpose |
 |---|---|---|
-| `config.sh` | local | **edit this**: workstation coordinates, ports, paths. Sourced by all local scripts. |
+| `config.sh` | local | **edit this**: workstation coordinates, ports, paths, and `CLOUDSDK_CONFIG` (isolated gcloud profile). Sourced by all local scripts. |
 | `tunnel_sup.sh` | local | persistent self-healing IAP tunnel (`localhost:2222` → workstation:22). |
 | `rsh` | local | run a command on the workstation over the multiplexed SSH (~0.3s). |
 | `mirror.sh` | local | stream the per-step transcript to `/tmp/agy-local.log` for `tail -f`. |
@@ -207,8 +213,13 @@ Two independent concerns, solved by two independent mechanisms:
 cd remote-test
 $EDITOR config.sh                       # set WS_PROJECT / WS_CLUSTER / WS_CONFIG / WS_REGION / WS_NAME
 
-# 1. gcloud as the STUDENT account (interactive)
+# 1. gcloud as the STUDENT account (interactive) — in an ISOLATED profile so the
+#    lab account/project/ADC never touch your personal ~/.config/gcloud.
+#    config.sh already exports CLOUDSDK_CONFIG (default ~/.config/gcloud-qwiklabs);
+#    source it (or export the same var) before the login so it lands in that profile:
+source config.sh                        # sets CLOUDSDK_CONFIG (isolated gcloud dir)
 gcloud auth login                       # pick student-NN-...@qwiklabs.net
+gcloud auth application-default login    # only if you run client libs locally (isolated ADC)
 
 # 2. extract the workshop prompts
 python3 extract_prompts.py .. /tmp/agy-prompts/all.json   # parent dir = BwG-track2 (the module HTML)
@@ -280,9 +291,13 @@ Qwiklabs labs are time-boxed — when one expires, the student account is delete
 workstation is gone. To repoint at a fresh lab, do the two human logins, then one command:
 
 ```bash
+source config.sh                        # isolated CLOUDSDK_CONFIG (lab profile)
 gcloud auth login                       # the NEW student-NN-...@qwiklabs.net (interactive)
 ./setlab.sh <new-project-id> [student-NN-...@qwiklabs.net]
 ```
+
+`setlab.sh` sources `config.sh` itself, so its gcloud calls already run in the isolated
+profile; the `source` above is only so your own `gcloud auth login` lands in the same dir.
 
 `setlab.sh` sets the gcloud account+project, **auto-discovers** the workstation
 (`gcloud workstations list` → `config.sh`), provisions the SSH key, restarts the tunnel

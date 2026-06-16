@@ -12,6 +12,9 @@
 # workstation (this script tells you if it's missing).
 set -uo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Pick up CLOUDSDK_CONFIG (isolated gcloud profile) so this script's gcloud
+# auth/config/workstations calls hit the lab profile, not your personal one.
+source "$DIR/config.sh"
 PROJECT="${1:?usage: setlab.sh <project-id> [student-account@qwiklabs.net]}"
 ACCOUNT="${2:-}"
 
