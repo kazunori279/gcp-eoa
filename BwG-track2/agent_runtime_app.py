@@ -15,19 +15,29 @@
 # ──────────────────────────────────────────────────────────────────────────
 # TESTED REFERENCE — BwG-track2 "Rush Hour" workshop (M2).
 # Drop-in replacement for the file `agents-cli scaffold enhance
-# --deployment-target agent_runtime` generates. It already handles the three
-# things that otherwise break the first Agent Runtime deploy, plus the Gemini
-# Enterprise session_id contract:
-#   • regional Session/Memory services (never "global" → no "Invalid Session
-#     resource name")
-#   • Memory Bank falls back to InMemory when no engine id is set (no init crash)
-#   • a fresh GenAI client per request (no "Event loop is closed")
-#   • session_id normalization across streaming + structured methods
+# --deployment-target agent_runtime` generates. The three deploy-time issues below
+# are limitations of the file that command produces in the agents-cli version this
+# workshop was validated against (see "Reference version" date) — they are NOT bugs
+# in the participant's own agent code, and are expected to be fixed upstream (see the
+# TODO), at which point this drop-in becomes unnecessary. Until then this file handles
+# all three — search for the matching "ISSUE #n" markers to see where — plus the
+# Gemini Enterprise session_id contract:
+#   • ISSUE #1 (import / init crash): Session/Memory services fall back to the
+#     InMemory implementations when no engine id is set, so importing this module
+#     and running set_up() never crash off-cloud (local runs + runtime_smoke.py).
+#   • ISSUE #2 ("Invalid Session resource name"): Session/Memory are pinned to a
+#     concrete region — never "global" — so the session resource path is valid.
+#   • ISSUE #3 ("Event loop is closed"): a fresh GenAI client is built per request
+#     so a client bound to an already-closed event loop is never reused.
+#   • session_id normalization across streaming + structured methods (M5 portal).
 # Validated locally via runtime_smoke.py (import + region assert + end-to-end
 # async_stream_query). Assumes this workshop's project shape: app/agent.py
 # exposes `app`, and app/app_utils/{telemetry,typing}.py exist (from scaffold).
 #
-# Reference version: 2026-06-15 (validated against agents-cli scaffold of that date).
+# Reference version: validated 2026-06-15. agents-cli is installed unpinned (the M0
+#   `uvx google-agents-cli setup` pulls latest), so there is no fixed version; the
+#   most recent resolved build was agents-cli 0.4.0 (2026-06-17). If a newer release
+#   fixes the three issues below, re-verify and retire this drop-in.
 # MAINTENANCE: this file is a drop-in over what `scaffold enhance` generates. If the
 #   scaffold's project shape changes (e.g. app/agent.py stops exposing `app`, or
 #   app/app_utils/* moves), refresh this file from a fresh scaffold, re-apply the four
@@ -59,11 +69,15 @@ def _normalize_session_id(sid: str | None) -> str | None:
 
 
 def build_session_service():
+    # On Agent Runtime an engine id is present → use the managed Vertex AI service.
     engine_id = os.environ.get("GOOGLE_CLOUD_AGENT_ENGINE_ID")
     if engine_id:
         from google.adk.sessions.vertex_ai_session_service import VertexAiSessionService
         project = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("PROJECT_ID")
         region = os.environ.get("GOOGLE_CLOUD_AGENT_ENGINE_LOCATION") or os.environ.get("GOOGLE_CLOUD_REGION") or "us-east1"
+        # ISSUE #2 ("Invalid Session resource name"): the service MUST resolve to a
+        # concrete region. A "global" (or empty) location yields a malformed session
+        # resource path that the deployed runtime rejects — clamp it to a real region.
         if not region or region.lower() == "global":
             region = "us-east1"
         return VertexAiSessionService(
@@ -71,6 +85,9 @@ def build_session_service():
             location=region,
             agent_engine_id=engine_id,
         )
+    # ISSUE #1 (import / init crash): no engine id locally (and in runtime_smoke.py),
+    # so fall back to the in-memory service instead of constructing a Vertex client
+    # with no engine — this keeps import + set_up() from crashing off-cloud.
     from google.adk.sessions.in_memory_session_service import InMemorySessionService
     return InMemorySessionService()
 
@@ -81,6 +98,8 @@ def build_memory_service():
         from google.adk.memory.vertex_ai_memory_bank_service import VertexAiMemoryBankService
         project = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("PROJECT_ID")
         region = os.environ.get("GOOGLE_CLOUD_AGENT_ENGINE_LOCATION") or os.environ.get("GOOGLE_CLOUD_REGION") or "us-east1"
+        # ISSUE #2 ("Invalid Session resource name"): Memory Bank is regional too —
+        # never let the location be "global"/empty or the resource path is invalid.
         if not region or region.lower() == "global":
             region = "us-east1"
         return VertexAiMemoryBankService(
@@ -88,6 +107,8 @@ def build_memory_service():
             location=region,
             agent_engine_id=engine_id,
         )
+    # ISSUE #1 (import / init crash): fall back to the in-memory Memory Bank when no
+    # engine id is set, so local runs / runtime_smoke.py import and initialize cleanly.
     from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
     return InMemoryMemoryService()
 
@@ -121,6 +142,11 @@ class AgentEngineApp(AdkApp):
 
     def _clear_cached_clients(self) -> None:
         """Clears cached GenAI clients to ensure a fresh client is used per request/thread."""
+        # ISSUE #3 ("Event loop is closed"): the GenAI client caches a connection bound
+        # to the asyncio loop that created it. Agent Runtime serves each request on a
+        # fresh loop, so a reused client raises "Event loop is closed" on the 2nd+
+        # request. Dropping the cached clients forces a new client (and loop binding)
+        # per request. This is called at the top of every streaming entrypoint below.
         adk_app = self._tmpl_attrs.get("app")
         if adk_app and hasattr(adk_app, "root_agent"):
             model = getattr(adk_app.root_agent, "model", None)
