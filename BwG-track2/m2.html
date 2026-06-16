@@ -317,6 +317,7 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .agent-ctx .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block;
     background: #2d4a6f;
@@ -503,8 +504,8 @@
 
   <div class="callout callout-info">
     <div class="callout-title">Objective</div>
-    <p>Deploy your working agent to <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime" target="_blank">Agent Runtime</a></strong>, add <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/agents" target="_blank">Sessions</a></strong> for conversation continuity,
-    <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/setup" target="_blank">Memory Bank</a></strong> for long-term personalization, and a <strong>Code Execution sandbox</strong> for safe computation.
+    <p>Deploy your working agent to <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime" target="_blank">Agent Runtime</a></strong>, add <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sessions" target="_blank">Sessions</a></strong> for conversation continuity,
+    <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank" target="_blank">Memory Bank</a></strong> for long-term personalization, and a <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview" target="_blank">Code Execution</a> sandbox</strong> for safe computation.
     All by prompting in Antigravity.</p>
   </div>
 
@@ -640,8 +641,7 @@
       <p>Deploying an ADK agent needs a small <strong>runtime wrapper</strong>
       (<code>app/agent_runtime_app.py</code>) that adapts your agent to Agent Runtime. Hand-writing it is
       fiddly and error-prone, so you simply <strong>drop in the workshop's tested, production-ready
-      wrapper</strong> &mdash; you don't write or edit it; treat it as a black box that just works. That's
-      what lets the single deploy in Step 5 succeed on the first try.</p>
+      wrapper</strong> &mdash; you don't write or edit it.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
@@ -652,15 +652,15 @@ Module 2 Step 1: prepare the Agent Runtime entrypoint (do NOT deploy yet).
    with the bundle, and make data-path resolution relative to the file location
    (pathlib.Path(__file__).parent) so it works locally and in the container.
 2. Generate the project's Agent Runtime entrypoint:
-     agents-cli scaffold enhance . --deployment-target agent_runtime
+     <span class="cmd">agents-cli scaffold enhance . --deployment-target agent_runtime</span>
 3. The generated app/agent_runtime_app.py is a naive stub that crashes on the
    deployed runtime. Replace it with the workshop's TESTED wrapper — you do NOT
    need to write or understand its internals, just drop it in:
-     curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
+     <span class="cmd">curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
 4. VERIFY the replacement took (re-running scaffold enhance would overwrite it
    with the broken stub). The tested wrapper contains the marker "TESTED
    REFERENCE"; confirm it's there, and re-fetch if not:
-     grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
+     <span class="cmd">grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
    Do not proceed until "TESTED REFERENCE" appears in app/agent_runtime_app.py.
 
 Do NOT deploy in this step. Step 4 smoke-tests this entrypoint locally; Step 5
@@ -668,18 +668,13 @@ deploys once.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">What the wrapper does &mdash; and why it's required</div>
-        <p>You drop it in rather than write it, but it isn't boilerplate to ignore: each item below is a
-        real failure that only shows up <em>in the deployed container</em>, and the last one is what makes
-        your agent <strong>publishable to Gemini Enterprise in Module 5</strong>. Without it, deploy
-        succeeds but M5 can't talk to the agent.</p>
-        <ul style="margin-top: .5rem; margin-bottom: .5rem;">
-          <li><strong>Regional Session/Memory services</strong> &mdash; a <code>global</code> location makes the regional Sessions API reject the resource name &rarr; empty responses</li>
-          <li><strong>Memory Bank fallback</strong> &mdash; falls back to <code>InMemory</code> when there's no engine id (no startup crash)</li>
-          <li><strong>Fresh client</strong> &mdash; a fresh GenAI client per request (no <code>Event loop is closed</code>)</li>
-          <li><strong>Session ID normalization</strong> &mdash; rewrites the <code>session_id</code> Gemini Enterprise sends into the form Agent Runtime accepts. <strong>This is the M5 enabler</strong> &mdash; we'll come back to it when you publish.</li>
-        </ul>
-        <p>Step 4 proves it locally before you deploy.</p>
+        <div class="callout-title">Why the tested wrapper (not the scaffold stub)</div>
+        <p>The generated stub crashes in the deployed container. The tested wrapper fixes
+        <strong>three deploy-time bugs</strong> that only surface in the cloud &mdash; region-pinned
+        Session/Memory services, a Memory Bank fallback, and a fresh per-request client (no
+        <code>Event loop is closed</code>) &mdash; which <strong>Step 4's smoke test verifies locally</strong>
+        before you deploy. It also normalizes the <code>session_id</code> Gemini Enterprise sends, which is
+        what makes the agent <strong>publishable in M5</strong> &mdash; we'll revisit that detail when you publish.</p>
       </div>
 
       <div class="step-expected">
@@ -874,17 +869,17 @@ Module 2 Step 5: deploy ONCE.
 First, a pre-deploy gate: confirm the tested wrapper is still in place — re-running
 scaffold enhance can silently overwrite it with the broken stub, which would crash
 the deployed agent. Check for the marker and re-fetch if missing:
-  grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py
+  <span class="cmd">grep -q "TESTED REFERENCE" app/agent_runtime_app.py || curl -fL -o app/agent_runtime_app.py https://kazunori279.github.io/gcp-eoa/BwG-track2/agent_runtime_app.py</span>
 Do NOT deploy unless "TESTED REFERENCE" is present in app/agent_runtime_app.py.
 
 The local smoke test passes, so deploy to Agent Runtime a single time, shipping
 sessions + Memory Bank + code execution together:
-  agents-cli deploy --agent-identity
+  <span class="cmd">agents-cli deploy --agent-identity</span>
 (--agent-identity gives the agent a per-user identity for personalization; more
 in M5.)
 
 After deploy completes (~5-10 min), verify the deployed endpoint by running:
-  agents-cli run --url ENDPOINT_URL --mode adk
+  <span class="cmd">agents-cli run --url ENDPOINT_URL --mode adk</span>
 with a test question about the 13:31 St Pancras to Paris train, and share the
 Console Playground link.
 
@@ -1006,7 +1001,7 @@ change code yet, just diagnose and tell me the root cause and the smallest fix.
 
 Read project/region/engine id from deployment_metadata.json, then pull the
 recent stdout + stderr (stderr has the tracebacks):
-  gcloud logging read 'resource.type="aiplatform.googleapis.com/ReasoningEngine" AND resource.labels.reasoning_engine_id="ENGINE_ID" AND (logId("reasoning_engine_stdout") OR logId("reasoning_engine_stderr"))' --project=PROJECT_ID --freshness=1h --order=desc --limit=100
+  <span class="cmd">gcloud logging read 'resource.type="aiplatform.googleapis.com/ReasoningEngine" AND resource.labels.reasoning_engine_id="ENGINE_ID" AND (logId("reasoning_engine_stdout") OR logId("reasoning_engine_stderr"))' --project=PROJECT_ID --freshness=1h --order=desc --limit=100</span>
 
 Quote the traceback/error lines around the failing request and tell me the
 root cause.</div>

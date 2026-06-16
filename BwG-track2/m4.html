@@ -141,6 +141,7 @@
     font-family: var(--mono); font-size: .82rem; line-height: 1.6;
     white-space: pre-wrap; word-break: break-word;
   }
+  .agent-ctx .cmd { color: #7ee787; }
   .agent-ctx-label {
     display: inline-block; background: #2d4a6f; color: #e0f0ff;
     font-size: .7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
@@ -246,7 +247,7 @@
 
   <div class="callout callout-optimize">
     <div class="callout-title">Objective</div>
-    <p>Run the local <strong>eval loop</strong>: simulate the crisis at scale, then turn the scenarios into a
+    <p>Run the local <strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/evaluation/agent-evaluation" target="_blank">eval loop</a></strong>: simulate the crisis at scale, then turn the scenarios into a
     <strong>graded eval suite</strong> and score the agent with an LLM judge &mdash; reading exactly where it's
     grounded and where it slips, all <strong>locally, no deployment</strong>. This is the difference
     between a demo and a production agent.</p>
@@ -435,7 +436,7 @@ Do NOT modify the agent's code (app/agent.py, app/tools.py, etc.) — grade the
 real agent as-is, with no mocking or tweaks, or the score is meaningless.
 
 Before the steps below, install the eval dependencies so adk eval can run:
-uv sync --extra eval  (or: uv pip install "google-adk[eval]"). Without them,
+<span class="cmd">uv sync --extra eval</span>  (or: <span class="cmd">uv pip install "google-adk[eval]"</span>). Without them,
 adk eval fails with a missing-dependencies error.
 
 1) Build a 4-case evalset in ADK format at
@@ -451,16 +452,16 @@ adk eval fails with a missing-dependencies error.
 2) Write tests/eval/eval_config.json gating on the hallucinations LLM judge
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
-   { "criteria": { "hallucinations_v1": { "threshold": 0.8,
+   <span class="cmd">{ "criteria": { "hallucinations_v1": { "threshold": 0.8,
        "judge_model_options": { "judge_model": "gemini-2.5-flash",
-                                "num_samples": 1 } } } }
+                                "num_samples": 1 } } } }</span>
    (gemini-2.5-flash is reliably enabled in lab projects; if you want a faster
    judge and it's enabled, you can switch to gemini-2.5-flash-lite.)
 3) Finish writing BOTH files above before you run anything. Then run the eval
    once in the FOREGROUND and wait for it to finish — do NOT run it as a
    background task, or you'll lose the stdout score table. Use adk eval directly:
-   uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
-     --config_file_path tests/eval/eval_config.json
+   <span class="cmd">uv run adk eval app tests/eval/evalsets/rushhour.evalset.json \
+     --config_file_path tests/eval/eval_config.json</span>
 4) STOP and PRINT the per-case score table exactly as adk eval prints it to
    stdout — do NOT hand-parse the *.evalset_result.json files to compute scores.
    For any case scoring below the 0.8 threshold, open its *.evalset_result.json

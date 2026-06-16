@@ -544,7 +544,7 @@
       <h3>Scaffold the Project</h3>
       <p>We need a project structure before we can write any agent code. The <a href="https://google.github.io/agents-cli/guide/lifecycle/#1-scaffold" target="_blank">agents-cli scaffold command</a>
       creates a standard layout with <code>pyproject.toml</code>, agent definition, tools module,
-      and environment config &mdash; the same shape that later deploys cleanly to Agent Runtime in M2.</p>
+      and environment config &mdash; the same shape that later deploys cleanly to <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime" target="_blank">Agent Runtime</a> in M2.</p>
 
       <div class="card agent-section">
         <button class="copy-btn" onclick="copyBlock('step1-instr')">Copy</button>
@@ -585,11 +585,6 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
   <!-- ─── The 3 Tools Reference ─── -->
   <div class="section-divider">
   <h2>The 3 Tools &mdash; In Detail</h2>
-
-    <div class="callout callout-info">
-      <div class="callout-title">&#x1F4D6; Reference &mdash; skim, don't act yet</div>
-      <p>This is a reference for the three tools you'll add in <strong>Step 2</strong>, not a step itself. Skim it now to understand what each tool does; the hands-on prompt is in Step 2 just below.</p>
-    </div>
 
     <p>Your agent needs three deterministic tools. Each one answers a specific question.
     Together, they implement the <strong>reconciliation pattern</strong>.</p>

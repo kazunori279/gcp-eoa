@@ -316,8 +316,8 @@ Enterprise sends, so it's ready to publish as-is.
           resource path (<code>projects/&hellip;/sessions/&lt;id&gt;</code>); ADK's session service rejects an id
           containing <code>/</code>. The wrapper you patched in M2 normalizes it to the bare id, so live portal
           chats don't fail with <code>REMOTE_AGENT_FAILURE</code>.</li>
-          <li><strong>Agent identity</strong> &mdash; deploying with <code>--agent-identity</code> in M2 gave the
-          agent a per-user identity, so personalization (home-station recall via Memory Bank) is scoped to each
+          <li><strong><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank">Agent identity</a></strong> &mdash; deploying with <code>--agent-identity</code> in M2 gave the
+          agent a per-user identity, so personalization (home-station recall via <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank" target="_blank">Memory Bank</a>) is scoped to each
           business user in the portal, not shared across everyone.</li>
         </ul>
       </div>
@@ -379,8 +379,8 @@ Enterprise sends, so it's ready to publish as-is.
         <thead><tr><th>Phase</th><th>What you did</th><th>Platform artifact</th></tr></thead>
         <tbody>
           <tr><td><strong>M1 &middot; Build</strong></td><td>Vibe-built agent + 3 tools by prompting</td><td>ADK project, reasoning trace</td></tr>
-          <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td>Agent Runtime, Sessions, Memory Bank, Sandbox</td></tr>
-          <tr><td><strong>M3 &middot; Govern</strong></td><td>Verified registry + identity, attack-shielded with Model Armor</td><td>Agent Registry, SPIFFE Identity, Model Armor</td></tr>
+          <tr><td><strong>M2 &middot; Scale</strong></td><td>Deployed to cloud with state management</td><td><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime" target="_blank">Agent Runtime</a>, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sessions" target="_blank">Sessions</a>, Memory Bank, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview" target="_blank">Sandbox</a></td></tr>
+          <tr><td><strong>M3 &middot; Govern</strong></td><td>Verified registry + identity, attack-shielded with Model Armor</td><td><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/agent-registry" target="_blank">Agent Registry</a>, SPIFFE Identity, <a href="https://docs.cloud.google.com/model-armor/overview" target="_blank">Model Armor</a></td></tr>
           <tr><td><strong>M4 &middot; Optimize</strong></td><td>Local eval loop: graded eval with an LLM judge, flagged ungrounded sentences</td><td>Eval scores, judge-flagged sentences</td></tr>
           <tr><td><strong>M5 &middot; Engage</strong></td><td>Published for business users</td><td>Gemini Enterprise agent</td></tr>
         </tbody>
