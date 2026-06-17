@@ -12,22 +12,26 @@ box, non-interactively, and watch it" task.
 
 ## Evaluation results & reports
 
-Six end-to-end test runs of the BwG-track2 workshop, driven through the real `agy` CLI.
-**All six modules pass** — a single clean deploy, the deployed agent serves correctly, and the
-agent is published to Gemini Enterprise.
+**Latest run: 2026-06-17** — fresh Qwiklabs lab (`student-02-c253a240c8cc`, project
+`qwiklabs-gcp-04-ebb916b610fa`), driven end-to-end through the real `agy` CLI
+(Antigravity CLI, Gemini 3.5 Flash). **All six modules pass** — one clean deploy
+(`reasoningEngines/3116103914047406080`, us-east1), the deployed agent serves correctly,
+and the agent is published to Gemini Enterprise (`explore-ai`).
 
-| Module | Result | Elapsed\* | What it covers |
+| Module | Result | Elapsed\* | What it covers (latest run) |
 |---|---|---|---|
-| **M0 · Setup** | ✅ | ~3 min | DK MCP install (native grounding) · `plan.md` · `agents-cli setup` · data download |
-| **M1 · Build** | ✅ | ~6 min | scaffold + 3 tools + system instruction; agent validated on 3 scenarios |
-| **M2 · Scale** | ✅ | ~20 min | sessions + Memory Bank + code-exec; **one clean deploy** (tested reference); deployed agent works |
-| **M3 · Govern** | ✅ | ~2 min | registry/identity verify (SPIFFE) + Model Armor blocks jailbreak/PII |
-| **M4 · Optimize** | ✅ | ~13 min | 10-scenario crisis sim + graded eval **4/4** (hallucinations judge) |
-| **M5 · Engage** | ✅ | ~2 min | published to Gemini Enterprise (`explore-ai`); registration confirmed headlessly |
-| **End-to-end** | **✅ all 6** | **~45 min** | one deploy total; deployed agent serves correctly and is published to GE |
+| **M0 · Setup** | ✅ | ~3 min | DK MCP install + overwrite from real 0-byte config · project pin · `plan.md` · `agents-cli setup` (7 skills) · data download. **AGY restart after Step 1 confirmed load-bearing on a fresh lab.** |
+| **M1 · Build** | ✅ | ~7.5 min | scaffold + 3 tools + 5-rule instruction; **3/3 scenarios pass** — headless test caught & fixed a real `compute_reroute` priority-queue bug |
+| **M2 · Scale** | ✅ | ~18 min | sessions + Memory Bank + code-exec; smoke test green pre-deploy → **one clean deploy**; **4/4 deployed scenarios**; Memory Bank persistence verified via API |
+| **M3 · Govern** | ✅ | ~2 min | registry/identity verify (**SPIFFE** + honest not-least-privilege audit) + Model Armor blocks jailbreak/PII, passes benign |
+| **M4 · Optimize** | ✅ | ~25 min† | 10/10 crisis sim (agent self-fixed a session-reuse bug) + graded eval **4/4 PASSED** (0.87/1.00/0.81/0.93, `gemini-2.5-flash` judge) |
+| **M5 · Engage** | ✅ | ~2 min | published to Gemini Enterprise (`explore-ai`); `registration_results.md` written; registration confirmed headlessly via the discoveryengine API |
+| **End-to-end** | **✅ all 6** | **~55 min** | one deploy total; deployed agent serves correctly and is published to GE |
 
 \* Elapsed = agy working time per module (from the `agysend` `[done step=…]` markers). Server-side
 deploys (~6–10 min) overlap reading, so wall-clock is close to this.
+† M4's `agysend` markers fire **very** early (the sim + `adk eval` run as agy background tasks it
+poll-waits on); ~25 min is the observed wall-clock incl. the agent's self-correction and re-runs.
 
 **Per-module reports** — each has a per-step trajectory table, timings, what worked, and a
 prioritized content-improvement plan with applied/validated updates:
@@ -80,8 +84,11 @@ Drive **one module at a time**. After finishing each module, the agent MUST:
    content (`BwG-track2/m<N>.html`). On a re-run, overwrite the existing report.
 2. **Push it immediately** — commit and push `eval-report/m<N>.md` as soon as it's written
    (don't wait for the next instruction to commit the report).
-3. **Notify** the user (the cc-notify webhook — see the user's notify hook).
-4. **Stop and wait** for the user's instruction. Do **not** auto-advance to the next module.
+3. **Update this README's results table** — refresh that module's row in the
+   **Evaluation results & reports** table (date/lab in the intro line, ✅/❌, elapsed, and a
+   one-line "what it covers" reflecting *this* run's findings). Keep it current every run.
+4. **Notify** the user (the cc-notify webhook — see the user's notify hook).
+5. **Stop and wait** for the user's instruction. Do **not** auto-advance to the next module.
 
 This keeps the human in the loop: between modules they review the report, edit the workshop
 content, and decide whether to continue, re-run, or change course.
