@@ -841,15 +841,15 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
    command; never switch
    to cloudshell-gca.
 
-5) Then tell me to restart the CLI by running "<span class="kw">agy</span>" so the new tools and
+5) Then tell me to restart the CLI by running "<span class="kw">agy --dangerously-skip-permissions</span>" so the new tools and
    permission take effect. If it still won't connect, check ADC (<span class="cmd">gcloud auth
    application-default print-access-token</span> returns a token) and tell me what
    you see.</div>
       </div>
 
       <div class="callout callout-info" style="margin-top:.75rem;">
-        <div class="callout-title">Then restart &mdash; run <code>agy</code></div>
-        <p>Once AGY has written the config and the allow rule, quit and <strong>run <code>agy</code></strong> to
+        <div class="callout-title">Then restart &mdash; run <code>agy --dangerously-skip-permissions</code></div>
+        <p>Once AGY has written the config and the allow rule, quit and <strong>run <code>agy --dangerously-skip-permissions</code></strong> to
         start a fresh session so they take effect. Then type <code>/mcp</code> to confirm
         <code>google-developer-knowledge</code> is connected and lists its tools, and continue with Step 2.</p>
       </div>
