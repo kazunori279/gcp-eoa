@@ -306,6 +306,7 @@ def compute_reroute(origin: str, destination: str, departure_after: str, date: s
         A dictionary containing the recommended itinerary or alternative routes.
     """
     import collections
+    import heapq
     
     try:
         cache = load_gtfs_data()
@@ -408,13 +409,14 @@ def compute_reroute(origin: str, destination: str, departure_after: str, date: s
                     "arrival_time": adjusted_stops[j]["arrival_time"]
                 })
                 
-    queue = collections.deque([(origin_base, start_time, [])])
+    counter = 0
+    queue = [(start_time, counter, origin_base, None, [])]
     
     best_arrival = {origin_base: start_time}
     best_paths = {origin_base: []}
     
     while queue:
-        curr_station, curr_time, curr_path = queue.popleft()
+        curr_time, _, curr_station, last_trip_id, curr_path = heapq.heappop(queue)
         
         if best_arrival.get(curr_station, "99:99:99") < curr_time:
             continue
@@ -422,7 +424,7 @@ def compute_reroute(origin: str, destination: str, departure_after: str, date: s
         for conn in connections:
             if conn["from_station"] == curr_station:
                 min_wait = 0
-                if curr_path and curr_path[-1]["trip_id"] != conn["trip_id"]:
+                if last_trip_id is not None and last_trip_id != conn["trip_id"]:
                     min_wait = 5
                     
                 allowed_dep_time = add_minutes(curr_time, min_wait)
@@ -442,7 +444,8 @@ def compute_reroute(origin: str, destination: str, departure_after: str, date: s
                             "arrival_time": conn["arrival_time"]
                         }
                         best_paths[dest] = curr_path + [new_segment]
-                        queue.append((dest, arr_time, best_paths[dest]))
+                        counter += 1
+                        heapq.heappush(queue, (arr_time, counter, dest, conn["trip_id"], best_paths[dest]))
                         
     if dest_base not in best_arrival:
         return {
