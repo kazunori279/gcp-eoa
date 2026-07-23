@@ -33,7 +33,7 @@ and the agent is published to Gemini Enterprise (`explore-ai`).
 
 | Module | Result | Elapsed\* | What it covers (latest run) |
 |---|---|---|---|
-| **M0 · Setup** (Cloud Shell 2026-07-23, re-run 2) | ✅ | ~3.5 min | DK MCP install (overwrite from 0-byte) · project pin · `plan.md` · `agents-cli setup` (7 skills) · data download. **Fix now in `m0.html`:** the MCP config includes `X-Goog-User-Project` (agy substitutes the active project) → try-it passes with no manual patch. AGY restart after Step 1 still load-bearing. |
+| **M0 · Setup** (Cloud Shell 2026-07-24, re-run 3) | ✅ | ~3.5 min | DK MCP install (overwrite from 0-byte, now with the `X-Goog-User-Project` header) · project pin · `plan.md` · `agents-cli` + 7 skills · data. Try-it passes with **no manual patch**. (This run also caught + fixed an `agysend` busy-guard false-match on reasoning text.) |
 | **M1 · Build** (Cloud Shell 2026-07-23, re-run 2) | ✅ | ~6 min | scaffold + 3 tools + 5-rule instruction; playground on :8080; **3/3 headless scenarios pass, zero tool errors** (S1→9038 reroute, S2 delay 9148, S3 on-time 9024) |
 | **M2 · Scale** (Cloud Shell 2026-07-23, re-run 2) | ✅\* | ~17 min | sessions + Memory Bank + code-exec (Step 3 added `BuiltInCodeExecutor` first-try this run); smoke green → **one clean deploy** of a fresh engine `7824…` (~2.5 min); **4/4 deployed scenarios pass**. **\*Caveat:** Memory Bank `…/memories` API showed **0 rows** this run (1 on run 1) — cross-session persistence not independently confirmed on re-run 2 |
 | **M3 · Govern** (Cloud Shell 2026-07-23, re-run 2) | ✅ | ~1.5 min | **SPIFFE** identity for the new engine `7824…` + least-privilege PASS; fresh Model Armor `transit-shield` blocks exact DAN jailbreak (`MATCH_FOUND` HIGH) + credit-card PII, passes benign |
