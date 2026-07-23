@@ -797,21 +797,29 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 1) Enable the API:
    <span class="cmd">gcloud services enable developerknowledge.googleapis.com</span>
 
-2) Write this server config to BOTH paths below, OVERWRITING each file. In this
-   lab they ship empty (a 0-byte file the CLI can't parse, which silently
-   disables EVERY MCP tool — "tool ... is not enabled" / "server ... not allowed
-   in this context"), so a plain overwrite is correct here — there's nothing to
-   preserve:
+2) Write this server config to BOTH paths below, OVERWRITING each file (create it
+   if it doesn't exist). It often ships empty (a 0-byte file the CLI can't parse,
+   which silently disables EVERY MCP tool — "tool ... is not enabled" / "server ...
+   not allowed in this context"), so a plain overwrite is correct here — there's
+   nothing to preserve. Replace <span class="kw">YOUR_PROJECT_ID</span> with my
+   active project (<span class="cmd">gcloud config get-value project</span>):
      <span class="kw">~/.gemini/config/mcp_config.json</span>
      <span class="kw">~/.gemini/antigravity-cli/mcp_config.json</span>
    <span class="cmd">{
      "mcpServers": {
        "google-developer-knowledge": {
          "serverUrl": "https://developerknowledge.googleapis.com/mcp",
-         "authProviderType": "google_credentials"
+         "authProviderType": "google_credentials",
+         "headers": { "X-Goog-User-Project": "YOUR_PROJECT_ID" }
        }
      }
    }</span>
+   The <span class="kw">X-Goog-User-Project</span> header sets the quota project the
+   Developer Knowledge API requires. Without it, <code>answer_query</code> fails with
+   <em>403 "requires a quota project"</em> whenever the CLI authenticates via ambient
+   Application Default Credentials (as on <strong>Cloud Shell</strong>, whose ADC has no
+   quota project and where <code>gcloud auth application-default set-quota-project</code>
+   can't help — there's no ADC file). It's harmless when a quota project is already set.
 
 3) Pre-allow the MCP tool AND the workshop's shell commands so you don't get an
    "Ask" prompt on every command (an un-answerable Ask in a background/subagent

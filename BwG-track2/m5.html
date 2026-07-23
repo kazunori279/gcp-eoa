@@ -299,7 +299,9 @@ Enterprise sends, so it's ready to publish as-is.
 3) Confirm the registration from the CLI (headless check — don't rely on the
    browser). Run: <span class="cmd">agents-cli publish gemini-enterprise --list</span>  and show that our
    agent now appears registered to the app (or, if that doesn't list it, do a
-   discoveryengine GET on the registered agent resource name and show it exists).
+   discoveryengine GET on the registered agent resource name and show it exists —
+   add <span class="kw">-H "X-Goog-User-Project: PROJECT_ID"</span> to that curl, or it
+   returns 403 on Cloud Shell where the ambient ADC has no quota project).
 4) Create a file named <span class="kw">registration_results.md</span> in the project root (write it
    with your file tools — this is a required deliverable, do NOT just print it).
    It must contain: the registered agent resource name, the app it was

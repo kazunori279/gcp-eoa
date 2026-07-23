@@ -270,6 +270,7 @@ re-discovered by `shell_keeper.sh` whenever the connection drops.
 | `setshell.sh` | local | **Cloud Shell:** point the harness at a Cloud Shell in one command (set project → start+authorize → discover coords → `TARGET=cloudshell` → keeper → tmux/deploy → agy-auth check). |
 | `shell_keeper.sh` | local | **Cloud Shell:** keep the direct SSH warm; re-authorize + re-discover ephemeral coords on drop. |
 | `cs_discover.sh` | local | **Cloud Shell:** shared helper — parse `gcloud cloud-shell ssh --dry-run` → rewrite `CS_HOST/PORT/USER` in `config.sh`. |
+| `cleanup.sh` | local | **preflight:** safely remove workshop remnants (deployed engine, GE agent, Model Armor template, local files, backups) + reset DK MCP config. Targets workshop-named resources only. |
 | `setlab.sh` | local | **Workstation:** point the harness at a new Qwiklabs lab in one command (discover workstation → rewrite `config.sh` → provision key → tunnel → tmux/deploy → agy-auth check). |
 | `tunnel_sup.sh` | local | **Workstation:** persistent self-healing IAP tunnel (`localhost:2222` → workstation:22). |
 | `mirror.sh` | local | stream the per-step transcript to `/tmp/agy-local.log` for `tail -f`. |
@@ -363,36 +364,29 @@ tail -f /tmp/agy-local.log
 
 Run this between test runs (and after editing any module HTML) so the next run starts truly
 fresh and actually exercises the current content. **Keep the agy auth** (`antigravity-oauth-token`) —
-do NOT delete it, or you'll need the interactive login again.
+`cleanup.sh` never touches it, so you won't need the interactive login again.
+
+**Why a dedicated cleanup:** the Cloud Shell target can be **any project**, which may carry
+remnants from a prior run — a deployed **Agent Engine**, a **Gemini Enterprise** agent
+registration, a **Model Armor** template, local files/dirs, backups, and a populated DK MCP
+config. Leftovers make the next run non-representative (M0 Step 1's overwrite isn't
+exercised; M5 registers a duplicate agent). `cleanup.sh` removes them all — **safely**: it
+deletes only workshop-named resources (reasoning engine `displayName=="transit-assistant"`,
+GE agent `"Transit-Crisis Agent"`, Model Armor `transit-shield`) and **never blanket-deletes**
+(shared projects often hold unrelated engines/apps).
 
 ```bash
 # 0. RE-EXTRACT prompts — REQUIRED after editing any m*.html (the driver reads all.json)
 python3 extract_prompts.py .. /tmp/agy-prompts/all.json
 
-# 1. stop the agy session + any stray mirror tails
-./rsh "tmux kill-session -t agy 2>/dev/null; pkill -f 'tail -.*agy-session.log' 2>/dev/null; true"
+# 1. one-shot cleanup: cloud remnants (engine, GE agent, Model Armor) + local files +
+#    backups + DK MCP reset to fresh. Prints a verify block at the end (expect engine=0,
+#    local=0, backups=0, mcp_config 0 bytes, permissions 0).
+./cleanup.sh
+#    ./cleanup.sh --apps          # also delete workshop-named GE app engines (transit-crisis*)
+#    ./cleanup.sh --keep-backups  # keep ~/preflight-backup-* dirs
 
-# 2. (DESTRUCTIVE, cloud) delete the deployed Agent Runtime engine, if one exists.
-#    Get PROJECT_NUMBER / REGION / ENGINE_ID from a prior deployment_metadata.json or the console.
-./rsh 'ENG=projects/PROJECT_NUMBER/locations/REGION/reasoningEngines/ENGINE_ID; \
-  curl -s -X DELETE -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  "https://REGION-aiplatform.googleapis.com/v1/${ENG}?force=true"'
-
-# 3. wipe project + plan + harness logs + agy conversation history
-./rsh 'rm -rf ~/transit-* ~/plan.md ~/data ~/agy-session.log ~/.aylogs/* \
-  ~/.gemini/antigravity-cli/conversations/* ~/.gemini/antigravity-cli/brain/*'
-
-# 4. (lab only) reset the DK MCP config to the FRESH-LAB state, so M0 Step 1's overwrite
-#    logic is genuinely exercised: empty mcp_config.json + no allow rule (keep other keys).
-./rsh ': > ~/.gemini/config/mcp_config.json; : > ~/.gemini/antigravity-cli/mcp_config.json; \
-  python3 -c "import json,os; p=os.path.expanduser(chr(126)+\"/.gemini/antigravity-cli/settings.json\"); \
-  d=json.load(open(p)); d.pop(\"permissions\",None); json.dump(d,open(p,\"w\"),indent=2)"'
-
-# 5. verify clean (expect: no agy procs; no transit-*/plan.md; mcp_config 0 bytes; permissions count 0; engine 404)
-./rsh 'pgrep -af agy|grep -v pgrep||echo "no agy"; ls -ld ~/transit-* ~/plan.md 2>&1; \
-  wc -c ~/.gemini/config/mcp_config.json; grep -c permissions ~/.gemini/antigravity-cli/settings.json'
-
-# 6. restart watchers + a fresh agy session
+# 2. restart watchers + a fresh agy session
 #    keeper: Cloud Shell -> ./shell_keeper.sh ;  workstation -> ./tunnel_sup.sh  (only if not already running)
 nohup ./shell_keeper.sh >/tmp/shell_keeper.log 2>&1 &   # (workstation: nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &)
 ./rsh "bash ~/agystart.sh"
@@ -400,9 +394,13 @@ nohup ./mirror.sh >/dev/null 2>&1 &
 nohup ./live.sh   >/dev/null 2>&1 &
 ```
 
-> **Cloud Shell note:** step 4's "lab only" DK-MCP reset applies to the workshop's fresh-lab
-> state — run it the same way on Cloud Shell to genuinely exercise M0 Step 1's overwrite. All
-> `./rsh` commands above are target-agnostic.
+> **What `cleanup.sh` deletes** (all workshop-scoped): the deployed Agent Engine(s) named
+> `transit-assistant` (across regions), any GE registered agent named `Transit-Crisis Agent`,
+> the Model Armor `transit-shield` template, local `~/transit-*` / `~/plan.md` / `~/data` /
+> harness logs / agy conversation+brain, `~/preflight-backup-*`, and it resets both
+> `mcp_config.json` to 0 bytes + drops `permissions` from `settings.json`. It leaves GE **app
+> containers** in place (M5 re-registers into them) unless you pass `--apps`, and never
+> touches the agy OAuth token or unrelated cloud resources.
 
 ## Switching labs (new Qwiklabs account / project)
 
