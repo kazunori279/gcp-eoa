@@ -34,7 +34,7 @@ and the agent is published to Gemini Enterprise (`explore-ai`).
 | Module | Result | Elapsed\* | What it covers (latest run) |
 |---|---|---|---|
 | **M0 · Setup** (Cloud Shell 2026-07-23) | ✅\* | ~3.2 min | DK MCP install (overwrite from 0-byte) · project pin · `plan.md` · `agents-cli setup` (7 skills) · data download. **\*P1 finding:** DK MCP try-it 403s on Cloud Shell (ambient user ADC has no quota project) — fixed by adding `X-Goog-User-Project` header to the MCP config. AGY restart after Step 1 still load-bearing. |
-| **M1 · Build** | ✅ | ~7.5 min | scaffold + 3 tools + 5-rule instruction; **3/3 scenarios pass** — headless test caught & fixed a real `compute_reroute` priority-queue bug |
+| **M1 · Build** (Cloud Shell 2026-07-23) | ✅ | ~7 min | scaffold + 3 tools + 5-rule instruction; playground on :8080; **3/3 headless scenarios pass** (S1 cancel+reroute, S2 delay, S3 on-time); agent edited `tools.py` mid-validation |
 | **M2 · Scale** | ✅ | ~18 min | sessions + Memory Bank + code-exec; smoke test green pre-deploy → **one clean deploy**; **4/4 deployed scenarios**; Memory Bank persistence verified via API |
 | **M3 · Govern** | ✅ | ~2 min | registry/identity verify (**SPIFFE** + honest not-least-privilege audit) + Model Armor blocks jailbreak/PII, passes benign |
 | **M4 · Optimize** | ✅ | ~25 min† | 10/10 crisis sim (agent self-fixed a session-reuse bug) + graded eval **4/4 PASSED** (0.87/1.00/0.81/0.93, `gemini-2.5-flash` judge) |
