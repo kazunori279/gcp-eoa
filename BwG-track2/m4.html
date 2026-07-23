@@ -386,15 +386,22 @@ agent programmatically — the <span class="kw">Runner</span> with <span class="
 
 1. Generate 10 commuter scenarios during a St Pancras signal failure,
    including a case where the disruption feed is unavailable (HTTP 503).
-2. Run all 10 against my agent LOCALLY using ADK's in-memory session and
-   memory services (<span class="kw">InMemorySessionService</span> / <span class="kw">InMemoryMemoryService</span>) so the
-   memory callback doesn't error outside Agent Runtime. Drive them from ONE
-   asyncio event loop (use <span class="kw">asyncio.gather</span> for concurrency) — do NOT run each
-   scenario in its own thread or process, which makes <span class="kw">aiohttp</span> crash with
-   "attached to a different event loop" errors. If you still hit loop errors,
-   run them sequentially in that same single loop. Do not deploy — local only.
-3. When done, PRINT a final report table: each scenario, what the agent did,
-   which tools it used, and whether it resolved sensibly.</div>
+2. Run all 10 against my agent LOCALLY. <strong>Drive each scenario through the ADK
+   <span class="kw">Runner</span></strong> (<span class="kw">runner.run_async(...)</span>, consuming its
+   event stream) with <span class="kw">InMemorySessionService</span> / <span class="kw">InMemoryMemoryService</span>
+   so the memory callback doesn't error outside Agent Runtime. <strong>Do NOT call the model
+   directly</strong> (e.g. <span class="kw">generate_content</span> / a raw google-genai loop): the agent
+   has a <span class="kw">BuiltInCodeExecutor</span> (added in M2), which <strong>disables Automatic
+   Function Calling</strong> — only the ADK Runner's own event loop will actually invoke the
+   function tools, so a raw-genai path will hang or return no tool calls.
+3. Run the scenarios <strong>sequentially in one asyncio event loop</strong>, and wrap each
+   scenario in a <strong>per-scenario timeout</strong> (<span class="kw">asyncio.wait_for</span>, e.g. 90s)
+   as a hang guard: if one scenario times out, record it as TIMED&#8209;OUT and continue so the
+   run always finishes. (Don't run each scenario in its own thread/process — that makes
+   <span class="kw">aiohttp</span> crash with "attached to a different event loop" errors.) Do not
+   deploy — local only.
+4. When done, PRINT a final report table: each scenario, what the agent did,
+   which tools it used, and whether it resolved sensibly (or TIMED-OUT).</div>
     </div>
 
     <div class="step-expected">

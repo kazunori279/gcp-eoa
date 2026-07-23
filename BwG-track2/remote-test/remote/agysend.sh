@@ -16,7 +16,7 @@
 #
 # Usage: agysend.sh <promptfile> <stepid> [max_seconds] [stable_seconds]
 set -uo pipefail
-PFILE="$1"; STEP="$2"; MAX="${3:-900}"; STABLE="${4:-12}"
+PFILE="$1"; STEP="$2"; MAX="${3:-900}"; STABLE="${4:-20}"
 LOG="$HOME/agy-session.log"
 clean(){ sed -e 's/\x1b\[[0-9;?]*[a-zA-Z]//g' -e 's/\r//g'; }
 
@@ -28,12 +28,16 @@ tmux paste-buffer -p -b agyp -t agy
 sleep 1
 tmux send-keys -t agy Enter
 
-# wait for the rendered frame to stop changing (agy idle)
+# Wait for the rendered frame to stop changing (agy idle). Guard against premature completion
+# on deployed/background steps: agy goes IDLE while a background task runs (deploy, sim, eval),
+# so screen-stability alone fires early. Also require NO active/background indicator in the
+# frame — "esc to cancel", a spinner (Working…/Generating), or an "N task(s)" status segment.
 last=""; stable=0; elapsed=0; iv=5
 sleep 4; elapsed=4
 while [ $elapsed -lt $MAX ]; do
   cur=$(tmux capture-pane -t agy -p | clean)
-  if [ "$cur" = "$last" ]; then
+  busy=$(printf '%s' "$cur" | grep -cE 'esc to cancel|Working\.\.\.|Generating|[0-9]+ task\(s\)')
+  if [ "$cur" = "$last" ] && [ "$busy" -eq 0 ]; then
     stable=$((stable+iv)); [ $stable -ge $STABLE ] && break
   else stable=0; last="$cur"; fi
   sleep $iv; elapsed=$((elapsed+iv))

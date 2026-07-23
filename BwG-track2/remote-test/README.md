@@ -456,6 +456,14 @@ cmd-dk-tryit, ctx-dk-helper, ctx-combined, cmd-agents-setup, cmd-download-data, 
 `[done step=...]` marker (poll.sh / mirror) before sending the next, or two `agysend`
 pastes collide in the same TUI.
 
+**Between modules, wait until agy is genuinely idle before driving the next one.** Confirm the
+status bar shows `? for shortcuts` with **no `N task(s)`** segment (a background step — deploy,
+sim, eval — can keep running after its early marker) and that the pane isn't mid-render. Driving
+a new module while the previous one is still wrapping up can collide with a late background step
+or an **auto context-compaction** and silently swallow the prompt (seen when M5 was sent during
+M4's wrap-up). `agysend` now also refuses to mark a step done while a background task or spinner
+is showing, so trust the marker — but still eyeball the pane before the next module.
+
 ## Watching live
 
 Three views, pick what you need:

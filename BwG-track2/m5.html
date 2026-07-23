@@ -283,16 +283,23 @@
         <div class="agent-ctx" id="step1-instr"><span class="agent-ctx-label">Paste into AGY</span>
 Module 5 Step 1: publish to Gemini Enterprise.
 
-First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on publishing agents
-to Gemini Enterprise, so you use the current flow.
+First, use the <span class="kw">google-developer-knowledge</span> MCP to read up on <strong>creating a
+Gemini Enterprise app</strong> AND publishing agents to it, so you use the current flow/API.
 
 Publish the agent I already deployed to Agent Runtime in M2 to business users
 — do NOT redeploy and do NOT change its logic. It was deployed with agent
 identity and its runtime wrapper already normalizes the session_id Gemini
 Enterprise sends, so it's ready to publish as-is.
 
-1) List the available Gemini Enterprise apps.
-2) Register the existing deployed agent (from <span class="kw">deployment_metadata.json</span>) to our
+1) List the available Gemini Enterprise apps. <strong>If none exists, create one.</strong>
+   (A fresh project — e.g. plain Cloud Shell — ships no Gemini Enterprise app; only some
+   lab environments pre-provision one.) Look up the current <em>create-app</em> method via the
+   <span class="kw">google-developer-knowledge</span> MCP, then create a Gemini Enterprise app
+   with id <span class="kw">transit-crisis</span> in location <span class="kw">global</span>, and
+   wait until it's ready before continuing. On any raw <span class="kw">discoveryengine</span>
+   call, pass <span class="kw">-H "X-Goog-User-Project: PROJECT_ID"</span> (the ambient ADC on
+   Cloud Shell has no quota project, so the call 403s without it).
+2) Register the existing deployed agent (from <span class="kw">deployment_metadata.json</span>) to that
    app, with the display name "Transit-Crisis Agent" (so it's easy to find in
    the portal's Agents list).
 3) Confirm the registration from the CLI (headless check — don't rely on the

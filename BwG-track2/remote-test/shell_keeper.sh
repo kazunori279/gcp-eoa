@@ -30,9 +30,20 @@ heal(){
   cs_discover || echo "[keeper $(date +%T)] re-discover failed; will retry"
 }
 
+reauth(){
+  # Refresh the in-Cloud-Shell gcloud/ADC token even while SSH is healthy. On long runs the
+  # ambient token expires (gcloud auth print-access-token returns empty) though SSH stays up,
+  # which breaks gcloud/API calls mid-session; --authorize-session re-pushes the creds.
+  echo "[keeper $(date +%T)] periodic re-authorize (refresh gcloud token)"
+  gcloud cloud-shell ssh --project="$CS_PROJECT" --authorize-session --command=true >/dev/null 2>&1
+}
+
 # ensure we have coords + an open channel on startup
 healthy || heal
+i=0
 while true; do
   if ! healthy; then heal; fi
+  i=$((i+1))
+  [ $((i % 20)) -eq 0 ] && reauth   # ~ every 10 min (20 × 30s)
   sleep 30
 done

@@ -777,7 +777,8 @@ Module 1 Step 3: write the system instruction.
 Write the system instruction for the agent with these five rules:
 1. Stay calm and factual.
 2. Always reconcile schedule against disruptions before answering.
-3. Never invent a train.
+3. Never invent a train, platform, time, or any detail a tool did not return — if the
+   information isn't available (for example platform assignments), say you don't have it.
 4. Proactively compute reroutes when services are disrupted.
 5. End every response with one clear recommended action.</div>
       </div>
@@ -788,7 +789,7 @@ Write the system instruction for the agent with these five rules:
         <ol>
           <li><strong>Calm and factual demeanor</strong> &mdash; reassuring tone, no speculation</li>
           <li><strong>Mandatory reconciliation</strong> &mdash; always call <code>get_scheduled_departures</code> AND <code>check_disruptions</code>, join on <code>trip_id</code>/<code>stop_id</code> before answering</li>
-          <li><strong>No hallucinated trains</strong> &mdash; only reference trips from the GTFS data and disruption feed</li>
+          <li><strong>No hallucinated details</strong> &mdash; only reference trips, times, and facts the tools return; if data (e.g. platform assignments) isn't available, say so instead of guessing</li>
           <li><strong>Proactive rerouting</strong> &mdash; automatically call <code>compute_reroute</code> when any service is disrupted</li>
           <li><strong>Actionable conclusion</strong> &mdash; end every response with exactly one clear recommended action</li>
         </ol>
