@@ -708,12 +708,22 @@ First, use the <span class="kw">google-developer-knowledge</span> MCP to read up
 Memory Bank (including how memory generation is triggered), so you use current
 APIs and defaults.
 
-1. Add session state for the current conversation and long-term memory so the
+1. Add session state for the current conversation AND long-term memory so the
    agent remembers my home station across visits. Use ADK's session service
    for short-term state and Memory Bank for cross-session personalization.
 2. Make the code changes and verify short-term session state LOCALLY using
    <span class="kw">InMemorySessionService</span> / <span class="kw">InMemoryMemoryService</span> (set the home station, then
    recall it in the same session).
+3. <strong>Self-check before you say done</strong> (session state alone is NOT enough &mdash;
+   Memory Bank is what makes recall work in a NEW session, and it's easy to skip). Do NOT
+   report completion until <span class="cmd">grep -nE "PreloadMemoryTool|generate_memories|after_agent_callback" app/agent.py</span>
+   shows BOTH: (a) a way to <strong>write</strong> long-term memory &mdash; a
+   <span class="kw">generate_memories</span>/<span class="kw">add_session_to_memory</span> call wired as the
+   agent's <span class="kw">after_agent_callback</span>; and (b) a way to <strong>read</strong> it back &mdash;
+   <span class="kw">PreloadMemoryTool</span> in the agent's <span class="kw">tools</span> (or an equivalent
+   preload). If either is missing, add it and re-check. (Session-state <code>set_home_station</code>
+   gives same-session recall only; without the Memory Bank write+read the deployed agent will
+   store zero memories and Step 6's cross-session recall will silently fall back to session context.)
 
 Do NOT deploy &mdash; we make all the code changes first and deploy ONCE at the
 end (Step 5), after the local smoke test in Step 4.</div>
