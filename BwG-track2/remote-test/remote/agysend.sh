@@ -28,17 +28,20 @@ tmux paste-buffer -p -b agyp -t agy
 sleep 1
 tmux send-keys -t agy Enter
 
-# Wait for the rendered frame to stop changing (agy idle). Guard against premature completion
-# on deployed/background steps: agy goes IDLE while a background task runs (deploy, sim, eval),
-# so screen-stability alone fires early. Also require NO active/background indicator in the
-# STATUS BAR — "esc to cancel" (foreground work) or an "N task(s)" segment (pending background
-# tasks). NB: match only these status-bar tokens, NOT words like "Generating"/"Working" which
-# also appear in agy's reasoning text (e.g. "Generating Plan File") and cause false busy.
+# Wait for the rendered frame to stop changing (agy idle). Busy-guard: don't declare done while
+# agy is actively generating — detected by "esc to cancel" in the status bar (present only during
+# a live turn; it becomes "? for shortcuts" when agy returns to the prompt). Deliberately NOT
+# matching:
+#   * "Generating"/"Working" — these appear in agy's reasoning text ("Generating Plan File").
+#   * "N task(s)" — agy's background-task tracker keeps STALE entries (e.g. after a killed
+#     playground), which would pin the step busy forever. For genuine background steps
+#     (deploy/sim/eval) the marker can still fire early; cross-check ground truth externally
+#     (Vertex operation, task logs, API) — the harness does this.
 last=""; stable=0; elapsed=0; iv=5
 sleep 4; elapsed=4
 while [ $elapsed -lt $MAX ]; do
   cur=$(tmux capture-pane -t agy -p | clean)
-  busy=$(printf '%s' "$cur" | grep -cE 'esc to cancel|[0-9]+ task\(s\)')
+  busy=$(printf '%s' "$cur" | grep -c 'esc to cancel')
   if [ "$cur" = "$last" ] && [ "$busy" -eq 0 ]; then
     stable=$((stable+iv)); [ $stable -ge $STABLE ] && break
   else stable=0; last="$cur"; fi
