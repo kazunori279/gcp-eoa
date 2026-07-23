@@ -37,7 +37,7 @@ and the agent is published to Gemini Enterprise (`explore-ai`).
 | **M1 · Build** (Cloud Shell 2026-07-23) | ✅ | ~7 min | scaffold + 3 tools + 5-rule instruction; playground on :8080; **3/3 headless scenarios pass** (S1 cancel+reroute, S2 delay, S3 on-time); agent edited `tools.py` mid-validation |
 | **M2 · Scale** (Cloud Shell 2026-07-23) | ✅\* | ~15 min | sessions + Memory Bank + code-exec; **\*Step 3 (code exec) no-op'd on first run — needed a re-run** to add `BuiltInCodeExecutor`. Then smoke green → **one clean deploy** (~3 min, updates existing engine `4834…`); **4/4 deployed scenarios**; Memory Bank row confirmed via API |
 | **M3 · Govern** (Cloud Shell 2026-07-23) | ✅ | ~1.7 min | registry/identity verify (**SPIFFE** `…system.id.goog/…` + least-privilege PASS) + Model Armor `transit-shield` blocks DAN jailbreak + credit-card PII, passes benign |
-| **M4 · Optimize** | ✅ | ~25 min† | 10/10 crisis sim (agent self-fixed a session-reuse bug) + graded eval **4/4 PASSED** (0.87/1.00/0.81/0.93, `gemini-2.5-flash` judge) |
+| **M4 · Optimize** (Cloud Shell 2026-07-23) | ⚠️ | — | **Step 2 crisis sim HUNG** on Scenario 8 (code-executor disables AFC → agy's custom sim harness stalls; ADK-Runner paths are unaffected). **Step 3 `adk eval` ran: 3/4** — grounding-trap case failed (agent hallucinated a platform). |
 | **M5 · Engage** | ✅ | ~2 min | published to Gemini Enterprise (`explore-ai`); `registration_results.md` written; registration confirmed headlessly via the discoveryengine API |
 | **End-to-end** | **✅ all 6** | **~55 min** | one deploy total; deployed agent serves correctly and is published to GE |
 
