@@ -291,11 +291,12 @@ Publish the agent I already deployed to Agent Runtime in M2 to business users
 identity and its runtime wrapper already normalizes the session_id Gemini
 Enterprise sends, so it's ready to publish as-is.
 
-1) List the available Gemini Enterprise apps. <strong>If none exists, create one.</strong>
-   (A fresh project — e.g. plain Cloud Shell — ships no Gemini Enterprise app; only some
-   lab environments pre-provision one.) Look up the current <em>create-app</em> method via the
-   <span class="kw">google-developer-knowledge</span> MCP, then create a Gemini Enterprise app
-   with id <span class="kw">transit-crisis</span> in location <span class="kw">global</span>, and
+1) List the available Gemini Enterprise apps, then <strong>make sure an app with id
+   <span class="kw">transit-crisis</span> exists — if it doesn't, create it.</strong> (A fresh
+   project — e.g. plain Cloud Shell — ships no Gemini Enterprise app; only some lab
+   environments pre-provision one.) Look up the current <em>create-app</em> method via the
+   <span class="kw">google-developer-knowledge</span> MCP, then create the Gemini Enterprise app
+   <span class="kw">transit-crisis</span> in location <span class="kw">global</span> and
    wait until it's ready before continuing. On any raw <span class="kw">discoveryengine</span>
    call, pass <span class="kw">-H "X-Goog-User-Project: PROJECT_ID"</span> (the ambient ADC on
    Cloud Shell has no quota project, so the call 403s without it).

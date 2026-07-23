@@ -31,12 +31,14 @@ tmux send-keys -t agy Enter
 # Wait for the rendered frame to stop changing (agy idle). Guard against premature completion
 # on deployed/background steps: agy goes IDLE while a background task runs (deploy, sim, eval),
 # so screen-stability alone fires early. Also require NO active/background indicator in the
-# frame — "esc to cancel", a spinner (Working…/Generating), or an "N task(s)" status segment.
+# STATUS BAR — "esc to cancel" (foreground work) or an "N task(s)" segment (pending background
+# tasks). NB: match only these status-bar tokens, NOT words like "Generating"/"Working" which
+# also appear in agy's reasoning text (e.g. "Generating Plan File") and cause false busy.
 last=""; stable=0; elapsed=0; iv=5
 sleep 4; elapsed=4
 while [ $elapsed -lt $MAX ]; do
   cur=$(tmux capture-pane -t agy -p | clean)
-  busy=$(printf '%s' "$cur" | grep -cE 'esc to cancel|Working\.\.\.|Generating|[0-9]+ task\(s\)')
+  busy=$(printf '%s' "$cur" | grep -cE 'esc to cancel|[0-9]+ task\(s\)')
   if [ "$cur" = "$last" ] && [ "$busy" -eq 0 ]; then
     stable=$((stable+iv)); [ $stable -ge $STABLE ] && break
   else stable=0; last="$cur"; fi
