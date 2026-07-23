@@ -1,21 +1,23 @@
 #!/bin/bash
-# rsh — run a command on the workstation over the persistent, multiplexed SSH.
-# Reuses one ControlMaster connection through the IAP tunnel (started by tunnel_sup.sh),
-# so each call is ~0.3s instead of ~10-15s for a fresh `gcloud workstations ssh`.
+# rsh — run a command on the remote box over a persistent, multiplexed SSH.
+# Reuses one ControlMaster connection so each call is ~0.3s instead of ~10-15s for a fresh
+# `gcloud ... ssh`. Target-agnostic: it consumes the resolved RSH_* vars from config.sh —
+#   cloudshell  → Cloud Shell's public endpoint (kept warm by shell_keeper.sh)
+#   workstation → localhost:2222 through the IAP tunnel (kept warm by tunnel_sup.sh)
 # Usage: ./rsh "remote shell command"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$DIR/config.sh"
 
 _ssh(){
-  ssh -p "$WS_LOCAL_PORT" -i "$WS_SSH_KEY" \
+  ssh -p "$RSH_PORT" -i "$RSH_KEY" \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    -o ControlMaster=auto -o ControlPath="$WS_CTRL_SOCK" -o ControlPersist=600 \
+    -o ControlMaster=auto -o ControlPath="$RSH_SOCK" -o ControlPersist=600 \
     -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
     -o ConnectTimeout=8 -o LogLevel=ERROR \
-    "$WS_REMOTE_USER@localhost" "$@"
+    "$RSH_USER@$RSH_HOST" "$@"
 }
 
 _ssh "$@"; rc=$?
-# one auto-retry: if the tunnel was mid-restart, give the supervisor a moment then retry
+# one auto-retry: if the connection was mid-restart, give the supervisor a moment then retry
 if [ $rc -ne 0 ]; then sleep 6; _ssh "$@"; rc=$?; fi
 exit $rc

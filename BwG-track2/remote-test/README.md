@@ -1,12 +1,20 @@
-# remote-test — driving the `agy` (Antigravity) CLI on a Cloud Workstation, headless
+# remote-test — driving the `agy` (Antigravity) CLI on a remote box, headless
 
 A small harness for **running the BwG-track2 workshop prompts through the real `agy` CLI
-on a remote Google Cloud Workstation**, capturing the agent's full *trajectory* (tool
-calls + reasoning + output) for each step so the workshop content can be QA'd /
-trajectory-evaluated.
+on a remote box**, capturing the agent's full *trajectory* (tool calls + reasoning +
+output) for each step so the workshop content can be QA'd / trajectory-evaluated.
 
-The same harness is reusable for any "drive an interactive coding-agent CLI on a remote
-box, non-interactively, and watch it" task.
+**Two targets are supported** (see [Targets](#targets)):
+- **Cloud Shell** on **any GCP project** — reached over its public SSH endpoint
+  (`gcloud cloud-shell ssh`). Set up with `./setshell.sh`. **This is the default** and the
+  lightest way to run: no lab provisioning, works on your own project.
+- **Cloud Workstation** on **Qwiklabs** — reached over an IAP TCP tunnel. Set up with
+  `./setlab.sh`.
+
+The driving layer (tmux + `agy`, and everything the `drive.sh`/`poll.sh`/`mirror.sh` loops
+do) is **identical for both** — only the connection differs. The same harness is reusable
+for any "drive an interactive coding-agent CLI on a remote box, non-interactively, and
+watch it" task.
 
 ---
 
@@ -17,6 +25,9 @@ box, non-interactively, and watch it" task.
 (Antigravity CLI, Gemini 3.5 Flash). **All six modules pass** — one clean deploy
 (`reasoningEngines/3116103914047406080`, us-east1), the deployed agent serves correctly,
 and the agent is published to Gemini Enterprise (`explore-ai`).
+
+> This run was on the Cloud Workstation target. The harness now defaults to the **Cloud Shell**
+> target (`./setshell.sh`) on any GCP project; the next run's table will note which target it used.
 
 | Module | Result | Elapsed\* | What it covers (latest run) |
 |---|---|---|---|
@@ -57,23 +68,26 @@ This harness is meant to be **operated by a coding agent** (Claude Code, etc.) o
 laptop, which drives the *remote* `agy` for you. The split of duties:
 
 **You (human), once — the parts an agent can't do:**
-1. `gcloud auth login` as the **Qwiklabs student** account (interactive browser).
-2. **Authenticate `agy` itself** on the workstation (interactive browser, ~30s OAuth
-   window — too fast for an agent to round-trip). Open a normal shell to the workstation,
-   run `agy`, complete the login, then exit. *(See Setup step 5 below.)*
+1. `gcloud auth login` as the account that owns the target (for Cloud Shell: your own
+   Google account; for a Qwiklabs workstation: the **student** account). Interactive browser.
+2. **Authenticate `agy` itself** on the remote box (interactive browser, ~30s OAuth window —
+   too fast for an agent to round-trip). For **Cloud Shell**: open Cloud Shell from the
+   Console, run `agy`, complete the login, then exit — `~/.gemini` lives under the persistent
+   `$HOME`, so it survives VM restarts. For a **workstation**: open a normal shell to it and
+   do the same. *(See Setup below.)*
 3. Make sure no other interactive `agy` session is left open (it blocks headless runs).
 
 **Then hand it to your coding agent** — point it at this file:
 
-> "Read `BwG-track2/remote-test/README.md`. I've already done `gcloud auth login` (student account)
-> and the one-time `agy` OAuth on the workstation. Edit `config.sh` for my workstation,
-> bring up the tunnel + persistent agy session, then drive the BwG-track2 workshop steps
-> (m0…m5) one module at a time, following the **Per-module loop** below."
+> "Read `BwG-track2/remote-test/README.md`. I've already done `gcloud auth login` and the
+> one-time `agy` OAuth on the target. Set `CS_PROJECT` in `config.sh` and run `./setshell.sh`
+> (Cloud Shell), then drive the BwG-track2 workshop steps (m0…m5) one module at a time,
+> following the **Per-module loop** below."
 
-The agent then owns everything else: editing `config.sh`, starting `tunnel_sup.sh`,
-`deploy.sh`, `agystart.sh`, and looping `drive.sh` / `poll.sh` per step. You watch live
-with `tail -f /tmp/agy-local.log` (after the agent starts `mirror.sh`) or
-`tmux attach -t agy` on the workstation.
+The agent then owns everything else: running `setshell.sh` (or `setlab.sh`), starting the
+connection keeper, `deploy.sh`, `agystart.sh`, and looping `drive.sh` / `poll.sh` per step.
+You watch live with `tail -f /tmp/agy-local.log` (after the agent starts `mirror.sh`) or a
+read-only `tmux attach -t agy` on the box.
 
 ### Per-module loop (required)
 
@@ -101,6 +115,24 @@ credentials are cached, every subsequent step is non-interactive and agent-driva
 
 ## TL;DR architecture
 
+**Cloud Shell (default)** — direct public SSH, no tunnel:
+
+```
+   your laptop                                 Cloud Shell (any GCP project)
+ ┌───────────────┐  direct public SSH        ┌─────────────────────────────┐
+ │ shell_keeper  │══ user@<ephemeral-ip> ════│ sshd (public endpoint)      │
+ │ (keepalive +  │   :port  (discovered by   │                             │
+ │  re-discover) │    gcloud cloud-shell     │  tmux session "agy"         │
+ │   rsh ────────┼──── ssh --dry-run) ──────►│   └─ agy (interactive TUI)  │
+ │ drive.sh      │   multiplexed ssh         │        = ONE conversation   │
+ │ poll.sh       │   (ControlMaster)         │                             │
+ │ mirror.sh ◄───┼──── tail -F ──────────────│  ~/agy-session.log          │
+ └───────────────┘                           │  ~/agysend.sh ~/agystart.sh │
+   tail -f /tmp/agy-local.log                └─────────────────────────────┘
+```
+
+**Cloud Workstation (Qwiklabs)** — same driving layer, reached through an IAP tunnel:
+
 ```
    your laptop                              Cloud Workstation
  ┌──────────────┐   gcloud IAP tunnel     ┌─────────────────────────────┐
@@ -108,19 +140,25 @@ credentials are cached, every subsequent step is non-interactive and agent-driva
  │  (keepalive  │                         │                             │
  │   + restart) │   multiplexed ssh       │  tmux session "agy"         │
  │   rsh ───────┼──── (ControlMaster) ───►│   └─ agy (interactive TUI)  │
- │ drive.sh     │                         │        = ONE conversation   │
- │ poll.sh      │                         │                             │
- │ mirror.sh ◄──┼──── tail -F ────────────│  ~/agy-session.log          │
- └──────────────┘                         │  ~/agysend.sh ~/agystart.sh │
-   tail -f /tmp/agy-local.log             └─────────────────────────────┘
+ └──────────────┘                         └─────────────────────────────┘
 ```
 
 Two independent concerns, solved by two independent mechanisms:
 
 | Concern | Solution | Why |
 |---|---|---|
-| Per-command SSH latency | **persistent IAP tunnel + SSH ControlMaster** (`tunnel_sup.sh` + `rsh`) | a fresh `gcloud workstations ssh` is ~10–15s; multiplexed reuse is ~0.3s |
-| Keeping the agent alive + a single conversation | **`agy` interactive inside `tmux`** (`agystart.sh`) | `agy` is a TUI (needs a PTY); tmux also survives tunnel/SSH drops so the conversation isn't lost |
+| Per-command SSH latency | **SSH ControlMaster** over the target's endpoint (`rsh`); a keeper holds it warm — `shell_keeper.sh` (Cloud Shell, direct) or `tunnel_sup.sh` (workstation, IAP tunnel) | a fresh `gcloud ... ssh` is ~10–15s; multiplexed reuse is ~0.3s |
+| Keeping the agent alive + a single conversation | **`agy` interactive inside `tmux`** (`agystart.sh`) | `agy` is a TUI (needs a PTY); tmux also survives SSH drops so the conversation isn't lost |
+
+### Targets
+
+`config.sh` has a `TARGET` switch — `cloudshell` (default) or `workstation`. It resolves a
+single set of generic connection vars (`RSH_HOST`/`RSH_PORT`/`RSH_USER`/`RSH_KEY`/`RSH_SOCK`)
+that `rsh` consumes, so `rsh` and everything above it are **target-agnostic**. You normally
+don't set `TARGET` by hand: `./setshell.sh` flips it to `cloudshell` and `./setlab.sh` uses
+`workstation`. Cloud Shell's public IP + port are **ephemeral** (they change on VM restart),
+so they're discovered via `gcloud cloud-shell ssh --dry-run` (see `cs_discover.sh`) and
+re-discovered by `shell_keeper.sh` whenever the connection drops.
 
 ---
 
@@ -155,15 +193,27 @@ Two independent concerns, solved by two independent mechanisms:
 - **Single-instance contention**: a human's interactive `agy` can block a headless one.
   Close other `agy` sessions before driving.
 
-### Reading the trajectory
+### Reading the trajectory — capture the frame, don't diff scrollback
 - In the TUI pane, tool calls render as `● Bash(pwd)`, `● Create(/home/user/plan.md)`,
   `● google-developer-knowledge/answer_query(...)`; reasoning as `▸ Thought for 3s, 393 tokens`.
-  Capture with `tmux capture-pane -pS -32000` and strip ANSI. This is the cleanest
-  trajectory source.
+- **agy repaints in place** on the *normal* buffer (no alternate screen). It only spills into
+  tmux scrollback when a step's output exceeds the pane height — and that scroll-during-
+  streaming interleaves partial spinner frames into history, so a scrollback diff
+  (`capture-pane -pS -32000` sliced by line-count growth) yields a garbled, duplicated
+  transcript, and captures **nothing** for a short step that fits the viewport (no scroll →
+  no history growth). Two fixes, both in `agystart.sh`/`agysend.sh`:
+  1. **Tall pane** (`AGY_ROWS`, default 1000): a step almost never scrolls, so it renders as
+     ONE clean final frame.
+  2. **Frame capture + prompt-echo anchor**: at completion grab the current frame
+     (`capture-pane -p`), strip ANSI + the trailing input-box/status chrome, and slice from
+     the echoed `> <prompt>` line to the end. Falls back to full scrollback only if the step
+     was long enough to scroll off the top of even the tall pane.
 - `agy --log-file X` is a **diagnostic server log** (model label, MCP load errors,
   conversation IDs) — useful for debugging, **not** a clean trajectory.
 - Full conversations are stored as protobuf at
   `~/.gemini/antigravity-cli/conversations/*.pb` (not easily parsed; the pane is better).
+- Tool *output* is collapsed by agy (`(ctrl+o to expand)`); the captured trajectory shows the
+  tool call + result summary as rendered, same as a human sees.
 
 ### Injecting multi-line prompts into a TUI
 - `tmux send-keys "text" Enter` **submits on every embedded newline**. Instead:
@@ -176,21 +226,36 @@ Two independent concerns, solved by two independent mechanisms:
   spinner keep the screen changing while it works, so this is reliable. Use a generous
   stable window (15s+) and a per-step max for long ops (deploys).
 
-### The IAP tunnel is flaky — supervise it
+### Cloud Shell: public SSH, but ephemeral + idle-stopped — supervise it too
+- Cloud Shell has a **public SSH endpoint**, so there's **no IAP tunnel** for that target.
+  Reach it directly with `gcloud cloud-shell ssh` (auto-starts the VM if stopped;
+  `--authorize-session` pushes your OAuth creds in and opens SSH access from this machine).
+- Its public **IP + port are ephemeral** — they change on VM restart. `--dry-run` prints the
+  exact ssh command gcloud would run; `cs_discover.sh` parses host/port/user from it into
+  `config.sh`. `shell_keeper.sh` health-checks (`ssh true`, doubling as idle keepalive) and,
+  on failure, **re-authorizes + re-discovers** (restarts a stopped VM, re-opens the SSH ACL,
+  rewrites the coords).
+- `$HOME` (5 GB) **persists** across sessions, so the `agy` OAuth (`~/.gemini/...`) and your
+  project files survive an idle-stop; anything installed **outside** `$HOME` (apt packages)
+  does not.
+
+### The IAP tunnel is flaky — supervise it (workstation target)
 - `gcloud workstations start-tcp-tunnel` **idle-times-out (~2 min)**, and on death it
   sometimes **keeps the local port open while dead** — so a restart-on-exit loop hangs.
   `tunnel_sup.sh` instead **health-checks by SSHing `true` every 12s** (doubles as
   keepalive) and force-restarts on failure. `rsh` also sets `ServerAliveInterval=15` and
   does one auto-retry.
 - Run each step's `agysend.sh` **detached (`nohup`) on the remote** (drive.sh does this),
-  so a tunnel drop never interrupts a running step — it keeps going inside tmux; you just
-  reconnect and read `~/agy-session.log`.
+  so a connection drop never interrupts a running step — it keeps going inside tmux; you just
+  reconnect and read `~/agy-session.log`. (Same benefit on Cloud Shell.)
 
 ### Misc
-- `tmux` is **not preinstalled** on the workstation; install with `sudo apt-get install -y
-  tmux` (passwordless sudo is available in the lab).
-- gcloud generates `~/.ssh/google_compute_engine` on the first `workstations ssh`; the
-  manual tunnel + `rsh` reuse that key.
+- `tmux` on the workstation is **not preinstalled**; install with `sudo apt-get install -y
+  tmux` (passwordless sudo is available in the lab). Cloud Shell usually has `tmux`
+  preinstalled, but note apt installs there don't persist outside `$HOME` across VM restarts.
+  `setshell.sh`/`setlab.sh` both run the install-if-missing guard.
+- gcloud generates `~/.ssh/google_compute_engine` on the first `workstations ssh` /
+  `cloud-shell ssh`; both `rsh` (direct or tunneled) and the keepers reuse that same key.
 
 ---
 
@@ -198,31 +263,68 @@ Two independent concerns, solved by two independent mechanisms:
 
 | File | Runs on | Purpose |
 |---|---|---|
-| `config.sh` | local | **edit this**: workstation coordinates, ports, paths, and `CLOUDSDK_CONFIG` (isolated gcloud profile). Sourced by all local scripts. |
-| `tunnel_sup.sh` | local | persistent self-healing IAP tunnel (`localhost:2222` → workstation:22). |
-| `rsh` | local | run a command on the workstation over the multiplexed SSH (~0.3s). |
+| `config.sh` | local | **edit this**: `TARGET` switch, Cloud Shell (`CS_*`) + workstation (`WS_*`) coordinates, paths, and optional `CLOUDSDK_CONFIG`. Resolves the generic `RSH_*` vars. Sourced by all local scripts. |
+| `rsh` | local | run a command on the remote over the multiplexed SSH (~0.3s). Target-agnostic (consumes `RSH_*`). |
+| `setshell.sh` | local | **Cloud Shell:** point the harness at a Cloud Shell in one command (set project → start+authorize → discover coords → `TARGET=cloudshell` → keeper → tmux/deploy → agy-auth check). |
+| `shell_keeper.sh` | local | **Cloud Shell:** keep the direct SSH warm; re-authorize + re-discover ephemeral coords on drop. |
+| `cs_discover.sh` | local | **Cloud Shell:** shared helper — parse `gcloud cloud-shell ssh --dry-run` → rewrite `CS_HOST/PORT/USER` in `config.sh`. |
+| `setlab.sh` | local | **Workstation:** point the harness at a new Qwiklabs lab in one command (discover workstation → rewrite `config.sh` → provision key → tunnel → tmux/deploy → agy-auth check). |
+| `tunnel_sup.sh` | local | **Workstation:** persistent self-healing IAP tunnel (`localhost:2222` → workstation:22). |
 | `mirror.sh` | local | stream the per-step transcript to `/tmp/agy-local.log` for `tail -f`. |
 | `live.sh` | local | snapshot the live agy pane to `/tmp/agy-live.txt` (`watch -n 1 cat …`) — live tool calls/streaming. |
 | `extract_prompts.py` | local | parse `BwG-track2/m*.html` → `all.json` (prompt blocks by id). |
 | `drive.sh` | local | send one workshop step (`<module> <blockid> <step>`) to agy, detached. |
 | `poll.sh` | local | one-shot status: live pane + done/running. |
-| `deploy.sh` | local | push `remote/*.sh` to the workstation `$HOME`. |
-| `setlab.sh` | local | **point the harness at a new lab in one command** (account/project → discover workstation → rewrite `config.sh` → provision key → tunnel → tmux/deploy → agy-auth check). |
-| `remote/agystart.sh` | workstation | (re)start the persistent `agy` tmux session. |
-| `remote/agysend.sh` | workstation | paste a prompt, wait for completion, log the trajectory. |
+| `deploy.sh` | local | push `remote/*.sh` to the remote `$HOME`. |
+| `remote/agystart.sh` | remote | (re)start the persistent `agy` tmux session. |
+| `remote/agysend.sh` | remote | paste a prompt, wait for completion, log the trajectory. |
 | `eval-report/m*.md` | output | per-module trajectory evaluation + content-improvement plan. |
 
 ---
 
-## Setup (one time)
+## Setup — Cloud Shell (default, one time)
+
+The lightest path: your own GCP project, no lab to provision. `setshell.sh` does the
+connection setup in one command; you only do the two interactive logins.
 
 ```bash
 cd remote-test
-$EDITOR config.sh                       # set WS_PROJECT / WS_CLUSTER / WS_CONFIG / WS_REGION / WS_NAME
+$EDITOR config.sh                       # set CS_PROJECT="<your-gcp-project>"
+                                        # (CLOUDSDK_CONFIG is optional for your own project —
+                                        #  comment it out to use your normal gcloud config)
+
+# 1. authenticate agy ONCE, interactively (human) — open Cloud Shell from the Console:
+#    https://console.cloud.google.com  → select your project → "Activate Cloud Shell" →
+#    run `agy`, complete the OAuth, then exit. ~/.gemini persists in $HOME across restarts.
+
+# 2. gcloud as the account that owns the project (interactive), then one command:
+gcloud auth login                       # your Google account
+./setshell.sh                           # start+authorize Cloud Shell → discover coords →
+                                        # TARGET=cloudshell → keeper → tmux/deploy → agy check
+#   (or: ./setshell.sh <project-id> [account@example.com] to override config.sh)
+
+# 3. extract the workshop prompts
+python3 extract_prompts.py .. /tmp/agy-prompts/all.json   # parent dir = BwG-track2 (the module HTML)
+
+# 4. start the persistent agy session + (optional) mirror the transcript locally
+./rsh "bash ~/agystart.sh"
+nohup ./mirror.sh >/dev/null 2>&1 &
+tail -f /tmp/agy-local.log
+```
+
+`setshell.sh` starts the Cloud Shell VM if it's stopped and re-opens SSH access, so you can
+re-run it any time to reconnect. Everything after it (`drive.sh`/`poll.sh`/…) is identical to
+the workstation flow.
+
+## Setup — Cloud Workstation / Qwiklabs (one time)
+
+```bash
+cd remote-test
+$EDITOR config.sh                       # set TARGET="workstation" + WS_PROJECT / WS_CLUSTER / WS_CONFIG / WS_REGION / WS_NAME
 
 # 1. gcloud as the STUDENT account (interactive) — in an ISOLATED profile so the
 #    lab account/project/ADC never touch your personal ~/.config/gcloud.
-#    config.sh already exports CLOUDSDK_CONFIG (default ~/.config/gcloud-qwiklabs);
+#    config.sh exports CLOUDSDK_CONFIG (default ~/.config/gcloud-qwiklabs);
 #    source it (or export the same var) before the login so it lands in that profile:
 source config.sh                        # sets CLOUDSDK_CONFIG (isolated gcloud dir)
 gcloud auth login                       # pick student-NN-...@qwiklabs.net
@@ -251,6 +353,9 @@ gcloud workstations ssh --project=$WS_PROJECT --cluster=$WS_CLUSTER \
 nohup ./mirror.sh >/dev/null 2>&1 &
 tail -f /tmp/agy-local.log
 ```
+
+> **Tip:** `./setlab.sh <project-id> [student@qwiklabs.net]` automates steps 3–4 (+ tmux,
+> deploy, agy-auth check) for the workstation target — see [Switching labs](#switching-labs-new-qwiklabs-account--project).
 
 ## Preflight — reset to a clean state (before a from-scratch re-run)
 
@@ -286,11 +391,16 @@ python3 extract_prompts.py .. /tmp/agy-prompts/all.json
   wc -c ~/.gemini/config/mcp_config.json; grep -c permissions ~/.gemini/antigravity-cli/settings.json'
 
 # 6. restart watchers + a fresh agy session
-nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &   # only if not already running
+#    keeper: Cloud Shell -> ./shell_keeper.sh ;  workstation -> ./tunnel_sup.sh  (only if not already running)
+nohup ./shell_keeper.sh >/tmp/shell_keeper.log 2>&1 &   # (workstation: nohup ./tunnel_sup.sh >/tmp/tunnel_sup.log 2>&1 &)
 ./rsh "bash ~/agystart.sh"
 nohup ./mirror.sh >/dev/null 2>&1 &
 nohup ./live.sh   >/dev/null 2>&1 &
 ```
+
+> **Cloud Shell note:** step 4's "lab only" DK-MCP reset applies to the workshop's fresh-lab
+> state — run it the same way on Cloud Shell to genuinely exercise M0 Step 1's overwrite. All
+> `./rsh` commands above are target-agnostic.
 
 ## Switching labs (new Qwiklabs account / project)
 
@@ -313,6 +423,19 @@ needs its one-time OAuth. Then start the session + watchers as it prints.
 
 > Everything lab-specific lives in `config.sh`; `setlab.sh` is just the automated way to
 > rewrite it. You can still edit `config.sh` by hand for non-Qwiklabs targets.
+
+## Reconnecting a Cloud Shell (new project, or after an idle-stop)
+
+Cloud Shell coords are ephemeral, but reconnecting is the same one command — it restarts a
+stopped VM, re-opens SSH access, and re-discovers the coords:
+
+```bash
+gcloud auth login                       # only if the account changed
+./setshell.sh [new-project-id]          # defaults to CS_PROJECT in config.sh
+```
+
+`shell_keeper.sh` also re-discovers automatically mid-run if the connection drops, so you
+usually don't need to re-run `setshell.sh` unless you're switching projects.
 
 ## Driving the workshop
 
@@ -348,27 +471,38 @@ Three views, pick what you need:
    tail -f /tmp/agy-local.log
    ```
 3. **True live TUI, read-only** (won't disturb the run; size is pinned; `-r` read-only,
-   detach with `Ctrl-b d`):
+   detach with `Ctrl-b d`). Target-agnostic — it reuses the resolved `RSH_*` coords:
    ```bash
-   ssh -p 2222 -i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no \
-     -o UserKnownHostsFile=/dev/null -t user@localhost "tmux attach -t agy -r"
+   source config.sh
+   ssh -p "$RSH_PORT" -i "$RSH_KEY" -o StrictHostKeyChecking=no \
+     -o UserKnownHostsFile=/dev/null -t "$RSH_USER@$RSH_HOST" "tmux attach -t agy -r"
    ```
+   (On Cloud Shell you can also just `gcloud cloud-shell ssh --command="tmux attach -t agy -r"`.)
 
 > If you read-only attach, the session size is pinned (`window-size manual`) in
-> `agystart.sh`/setup so the attach can't reflow the pane `agysend` captures.
+> `agystart.sh` so the attach can't reflow the pane `agysend` captures. **Caveat:** old tmux
+> (e.g. Cloud Shell's 2.1) doesn't support `window-size`/`resize-window` — the tall `-y` at
+> creation still holds while detached, but **attaching from a smaller terminal can reflow the
+> pane** and disturb capture. Prefer `live.sh` (which only `capture-pane`s, never attaches).
 
 ## Transcript / artifacts
-- `~/agy-session.log` on the workstation (mirrored to `/tmp/agy-local.log`): every
+- `~/agy-session.log` on the remote (mirrored to `/tmp/agy-local.log`): every
   prompt + the new pane content (trajectory) + a `[done step=... elapsed=Ns]` marker.
-- The agent's project files land in the workstation `$HOME` (e.g. `~/plan.md`,
-  `~/data/`, `~/transit-assistant/`).
+- The agent's project files land in the remote `$HOME` (e.g. `~/plan.md`,
+  `~/data/`, `~/transit-assistant/`). On Cloud Shell this `$HOME` is the 5 GB persistent disk.
 
 ## Troubleshooting
-- `rsh` hangs / empty output → tunnel dropped; check `tail /tmp/tunnel_sup.log` and
-  `/tmp/tunnel_raw.log`. The supervisor restarts within ~12–18s; retry.
+- `rsh` hangs / empty output → connection dropped. **Cloud Shell:** `tail /tmp/shell_keeper.log`;
+  the keeper re-authorizes + re-discovers within a ~30s cycle — retry, or re-run `./setshell.sh`.
+  **Workstation:** `tail /tmp/tunnel_sup.log` and `/tmp/tunnel_raw.log`; the supervisor restarts
+  within ~12–18s; retry.
+- Cloud Shell coords look stale after a restart → the keeper rewrites `CS_HOST/PORT/USER` in
+  `config.sh`; confirm with `grep '^export CS_' config.sh`, or force it with
+  `source config.sh && source cs_discover.sh && cs_discover`.
 - A step seems stuck → `./poll.sh <step>`; if the pane shows an idle `>` but no done
   marker, `agysend` is just finishing its stability wait. If agy is asking a question,
   it needs input you can send with `./rsh "tmux send-keys -t agy 'answer' Enter"`.
-- agy "not logged in" in logs → redo step 5 (agy OAuth) interactively.
+- agy "not logged in" in logs → redo the one-time agy OAuth interactively (for Cloud Shell,
+  in a Console-opened Cloud Shell).
 - Want a clean conversation → `./rsh "bash ~/agystart.sh"` restarts the session
   (continuity then relies on `plan.md` on disk, by workshop design).
