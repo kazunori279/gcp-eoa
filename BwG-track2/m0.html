@@ -792,17 +792,42 @@ exec -l $SHELL          # reload your shell so ~/.local/bin/agy is on PATH</span
     <p>The installer drops <code>agy</code> into <code>~/.local/bin</code>. Confirm it with
     <span class="cmd">agy --version</span>.</p>
 
-    <p style="font-weight:700; margin-top:1rem;">4. First launch &amp; sign in</p>
+    <p style="font-weight:700; margin-top:1rem;" id="prereqs-launch">4. First launch &amp; sign in</p>
     <p>Start the CLI from your home directory so it operates on the workshop files:</p>
-    <div class="prompt-block" id="cmd-launch-agy"><button class="copy-btn" onclick="copyBlock('cmd-launch-agy')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">cd ~ &amp;&amp; agy --add-dir ~</span></div>
+    <div class="prompt-block" id="cmd-launch-agy"><button class="copy-btn" onclick="copyBlock('cmd-launch-agy')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">cd ~ &amp;&amp; agy --dangerously-skip-permissions --add-dir ~</span></div>
     <p>On first launch <code>agy</code> runs a brief setup (color theme, rendering mode, and a
     <strong>workspace-trust</strong> confirmation) and signs you in. Because Cloud Shell is a remote
     session, it can't open a browser for you &mdash; it prints an <strong>authorization URL</strong>: open it
     in a browser, sign in with your Google account, copy the code it displays, and paste it back into the
     terminal. After this one-time login, future <code>agy</code> sessions authenticate silently.</p>
     <p style="font-size:.9rem; color:var(--text-muted);"><code>--add-dir ~</code> lets the agent read and edit
-    files under your home directory (where the workshop project lives) instead of an internal scratch dir.
-    You're now ready for <strong>Setup in 5 Steps</strong>.</p>
+    files under your home directory (where the workshop project lives) instead of an internal scratch dir.</p>
+
+    <div class="callout callout-warning" style="margin-top:.75rem;">
+      <div class="callout-title">About <code>--dangerously-skip-permissions</code></div>
+      <p>We start AGY with <code>--dangerously-skip-permissions</code> so it runs the workshop's shell commands
+      and file edits <strong>without stopping to ask for approval on each one</strong> &mdash; otherwise you'd
+      be confirming dozens of prompts. <strong>Use it at your own risk:</strong> with that flag AGY executes
+      every command and edits files with <em>no confirmation</em>, so any mistaken or destructive action runs
+      unprompted. It's an easy call in a <strong>disposable Cloud Shell / lab project</strong>; outside that,
+      enable it only when you understand the trade-off and trust the workspace. To review each action instead,
+      just drop the flag (<code>agy --add-dir ~</code>).</p>
+    </div>
+
+    <div class="callout callout-warning" style="margin-top:.75rem;">
+      <div class="callout-title">Heads-up: Cloud Shell sessions expire when idle</div>
+      <p>Cloud Shell (and the Cloud Shell Editor) disconnect after a period of inactivity &mdash; roughly
+      <strong>20 minutes</strong> for the terminal, and the underlying VM is recycled after up to about
+      <strong>an hour</strong> of inactivity. When that happens your running <code>agy</code> stops. Your
+      <strong>5&nbsp;GB <code>$HOME</code> persists</strong> (so <code>agy</code>, its login, <code>plan.md</code>,
+      and your project files all survive) &mdash; just reconnect Cloud Shell and <strong>resume the same
+      conversation</strong> where you left off:</p>
+      <div class="prompt-block" id="cmd-continue-agy"><button class="copy-btn" onclick="copyBlock('cmd-continue-agy')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">cd ~ &amp;&amp; agy --dangerously-skip-permissions --add-dir ~ --continue</span></div>
+      <p style="font-size:.9rem; color:var(--text-muted);"><code>--continue</code> (alias <code>-c</code>) reloads the
+      most recent conversation for this directory, so AGY keeps the context and plan from before the timeout.</p>
+    </div>
+
+    <p style="margin-top:1rem;">You're now ready for <strong>Setup in 5 Steps</strong>.</p>
   </div>
 
   <div class="section-divider">
@@ -909,16 +934,10 @@ existing gcloud login (ADC) — do NOT create an API key. Do it end to end:
 
       <div class="callout callout-info" style="margin-top:.75rem;">
         <div class="callout-title">Then restart &mdash; run <code>agy</code></div>
-        <p>Once AGY has written the config and the allow rule, quit and <strong>run <code>agy</code></strong> to
-        start a fresh session so they take effect. Then type <code>/mcp</code> to confirm
-        <code>google-developer-knowledge</code> is connected and lists its tools, and continue with Step 2.</p>
-        <p style="margin-top:.5rem; font-size:.9rem; color:var(--text-muted);"><strong>Optional &mdash; skip the approval prompts.</strong>
-        During the lab AGY will ask you to approve many shell commands and file edits. If you'd prefer faster, hands-off
-        operation, you can start it instead with <code>agy --dangerously-skip-permissions</code>. <strong>Use this at your
-        own risk</strong> &mdash; with that flag AGY runs every command and edits files <em>without asking for your
-        approval</em>, so any mistaken or destructive action executes with no confirmation. It's an easy call in this
-        disposable Qwiklabs lab; outside it, enable the flag only when you understand the trade-off and trust the
-        workspace you're running in.</p>
+        <p>Once AGY has written the config and the allow rule, quit and <strong>run
+        <code>agy --dangerously-skip-permissions</code></strong> again to start a fresh session so they take
+        effect (same flags as in <a href="#prereqs-launch">Prerequisites</a>). Then type <code>/mcp</code> to
+        confirm <code>google-developer-knowledge</code> is connected and lists its tools, and continue with Step 2.</p>
       </div>
 
       <div class="step-expected">
