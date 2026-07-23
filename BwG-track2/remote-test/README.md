@@ -33,7 +33,7 @@ and the agent is published to Gemini Enterprise (`explore-ai`).
 
 | Module | Result | Elapsed\* | What it covers (latest run) |
 |---|---|---|---|
-| **M0 · Setup** (Cloud Shell 2026-07-23) | ✅\* | ~3.2 min | DK MCP install (overwrite from 0-byte) · project pin · `plan.md` · `agents-cli setup` (7 skills) · data download. **\*P1 finding:** DK MCP try-it 403s on Cloud Shell (ambient user ADC has no quota project) — fixed by adding `X-Goog-User-Project` header to the MCP config. AGY restart after Step 1 still load-bearing. |
+| **M0 · Setup** (Cloud Shell 2026-07-23, re-run 2) | ✅ | ~3.5 min | DK MCP install (overwrite from 0-byte) · project pin · `plan.md` · `agents-cli setup` (7 skills) · data download. **Fix now in `m0.html`:** the MCP config includes `X-Goog-User-Project` (agy substitutes the active project) → try-it passes with no manual patch. AGY restart after Step 1 still load-bearing. |
 | **M1 · Build** (Cloud Shell 2026-07-23) | ✅ | ~7 min | scaffold + 3 tools + 5-rule instruction; playground on :8080; **3/3 headless scenarios pass** (S1 cancel+reroute, S2 delay, S3 on-time); agent edited `tools.py` mid-validation |
 | **M2 · Scale** (Cloud Shell 2026-07-23) | ✅\* | ~15 min | sessions + Memory Bank + code-exec; **\*Step 3 (code exec) no-op'd on first run — needed a re-run** to add `BuiltInCodeExecutor`. Then smoke green → **one clean deploy** (~3 min, updates existing engine `4834…`); **4/4 deployed scenarios**; Memory Bank row confirmed via API |
 | **M3 · Govern** (Cloud Shell 2026-07-23) | ✅ | ~1.7 min | registry/identity verify (**SPIFFE** `…system.id.goog/…` + least-privilege PASS) + Model Armor `transit-shield` blocks DAN jailbreak + credit-card PII, passes benign |
