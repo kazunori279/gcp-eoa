@@ -754,6 +754,59 @@
 
   <div class="section-divider">
   <!-- ─────────────────────────────────────────────────────────────
+       PREREQUISITES & ENVIRONMENT SETUP
+       ───────────────────────────────────────────────────────────── -->
+    <h2>Prerequisites &amp; environment setup</h2>
+    <p>You run this whole workshop from <strong>Cloud Shell</strong> &mdash; a browser-based terminal with
+    <code>gcloud</code> preinstalled and already signed in &mdash; and drive every step through the
+    <strong>Antigravity CLI (<code>agy</code>)</strong>, a terminal coding agent. Do this one-time setup
+    before Step&nbsp;1.</p>
+
+    <div class="callout callout-info" style="margin-top:.75rem;">
+      <div class="callout-title">Using the Qwiklabs lab? Skip this section.</div>
+      <p>In the provided Qwiklabs lab the environment &mdash; project, <code>gcloud</code>, and a ready
+      <code>agy</code> &mdash; is already set up for you. Jump to <strong>Setup in 5 Steps</strong> and just
+      pin your project. The steps below are for running on <strong>your own Google Cloud project</strong> in
+      Cloud Shell.</p>
+    </div>
+
+    <p style="margin-top:1rem;"><strong>What you need:</strong> a Google Cloud project with <strong>billing
+    enabled</strong>, and rights to enable APIs and deploy &mdash; <em>Owner</em> or <em>Editor</em> is
+    simplest (otherwise: Vertex&nbsp;AI User, Discovery Engine Admin, and Service Usage Admin).</p>
+
+    <p style="font-weight:700; margin-top:1rem;">1. Open Cloud Shell</p>
+    <p>In the <a href="https://console.cloud.google.com" target="_blank">Google Cloud console</a>, pick your
+    project in the top bar, then click <strong>Activate Cloud Shell</strong> (the <code>&gt;_</code> icon,
+    top-right). Optional: click <strong>Open Editor</strong> for the <strong>Cloud Shell Editor</strong>
+    (a VS&nbsp;Code-style view) to watch the files <code>agy</code> creates.</p>
+
+    <p style="font-weight:700; margin-top:1rem;">2. Set your project</p>
+    <div class="prompt-block" id="cmd-prereq-project"><button class="copy-btn" onclick="copyBlock('cmd-prereq-project')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"</span></div>
+    <p>Cloud Shell is already authenticated as your account (ambient credentials), so no
+    <code>gcloud auth login</code> is needed.</p>
+
+    <p style="font-weight:700; margin-top:1rem;">3. Install the Antigravity CLI (<code>agy</code>)</p>
+    <div class="prompt-block" id="cmd-install-agy"><button class="copy-btn" onclick="copyBlock('cmd-install-agy')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">curl -fsSL https://antigravity.google/cli/install.sh | bash
+exec -l $SHELL          # reload your shell so ~/.local/bin/agy is on PATH</span></div>
+    <p>The installer drops <code>agy</code> into <code>~/.local/bin</code>. Confirm it with
+    <span class="cmd">agy --version</span>.</p>
+
+    <p style="font-weight:700; margin-top:1rem;">4. First launch &amp; sign in</p>
+    <p>Start the CLI from your home directory so it operates on the workshop files:</p>
+    <div class="prompt-block" id="cmd-launch-agy"><button class="copy-btn" onclick="copyBlock('cmd-launch-agy')">Copy</button><span class="prompt-label">terminal</span><span class="cmd">cd ~ &amp;&amp; agy --add-dir ~</span></div>
+    <p>On first launch <code>agy</code> runs a brief setup (color theme, rendering mode, and a
+    <strong>workspace-trust</strong> confirmation) and signs you in. Because Cloud Shell is a remote
+    session, it can't open a browser for you &mdash; it prints an <strong>authorization URL</strong>: open it
+    in a browser, sign in with your Google account, copy the code it displays, and paste it back into the
+    terminal. After this one-time login, future <code>agy</code> sessions authenticate silently.</p>
+    <p style="font-size:.9rem; color:var(--text-muted);"><code>--add-dir ~</code> lets the agent read and edit
+    files under your home directory (where the workshop project lives) instead of an internal scratch dir.
+    You're now ready for <strong>Setup in 5 Steps</strong>.</p>
+  </div>
+
+  <div class="section-divider">
+  <!-- ─────────────────────────────────────────────────────────────
        SETUP IN 5 STEPS
        ───────────────────────────────────────────────────────────── -->
     <h2>Setup in 5 Steps</h2>
