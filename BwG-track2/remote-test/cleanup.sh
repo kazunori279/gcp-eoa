@@ -51,17 +51,17 @@ for R in $REGIONS; do
 done
 
 echo "[cleanup] delete GE registered agents named '$GE_AGENT_NAME'"
-ENGINES=\$(curl -s "\${H[@]}" "https://discoveryengine.googleapis.com/v1alpha/projects/\$PNUM/locations/global/collections/default_collection/engines")
+ENGINES=\$(curl -s "\${H[@]}" "https://global-discoveryengine.googleapis.com/v1alpha/projects/\$PNUM/locations/global/collections/default_collection/engines")
 for ENG in \$(printf '%s' "\$ENGINES" | python3 -c "import sys,json;d=json.load(sys.stdin);[print(e['name']) for e in d.get('engines',[])]" 2>/dev/null); do
-  AG=\$(curl -s "\${H[@]}" "https://discoveryengine.googleapis.com/v1alpha/\$ENG/assistants/default_assistant/agents")
+  AG=\$(curl -s "\${H[@]}" "https://global-discoveryengine.googleapis.com/v1alpha/\$ENG/assistants/default_assistant/agents")
   for A in \$(printf '%s' "\$AG" | python3 -c "import sys,json;d=json.load(sys.stdin);[print(a['name']) for a in d.get('agents',[]) if a.get('displayName')=='$GE_AGENT_NAME']" 2>/dev/null); do
     echo "  deleting \$A"
-    curl -s -X DELETE "\${H[@]}" "https://discoveryengine.googleapis.com/v1alpha/\$A" -o /dev/null -w "    HTTP %{http_code}\n"
+    curl -s -X DELETE "\${H[@]}" "https://global-discoveryengine.googleapis.com/v1alpha/\$A" -o /dev/null -w "    HTTP %{http_code}\n"
   done
   if [ "$DEL_APPS" = "1" ]; then
     case "\$ENG" in *"/engines/transit-crisis"*)
       echo "  deleting GE app \$ENG"
-      curl -s -X DELETE "\${H[@]}" "https://discoveryengine.googleapis.com/v1alpha/\$ENG" -o /dev/null -w "    HTTP %{http_code}\n";;
+      curl -s -X DELETE "\${H[@]}" "https://global-discoveryengine.googleapis.com/v1alpha/\$ENG" -o /dev/null -w "    HTTP %{http_code}\n";;
     esac
   fi
 done

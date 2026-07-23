@@ -297,9 +297,11 @@ Enterprise sends, so it's ready to publish as-is.
    environments pre-provision one.) Look up the current <em>create-app</em> method via the
    <span class="kw">google-developer-knowledge</span> MCP, then create the Gemini Enterprise app
    <span class="kw">transit-crisis</span> in location <span class="kw">global</span> and
-   wait until it's ready before continuing. On any raw <span class="kw">discoveryengine</span>
-   call, pass <span class="kw">-H "X-Goog-User-Project: PROJECT_ID"</span> (the ambient ADC on
-   Cloud Shell has no quota project, so the call 403s without it).
+   wait until it's ready before continuing. For all Gemini Enterprise calls use the
+   <strong>regional endpoint</strong> <span class="kw">https://global-discoveryengine.googleapis.com/v1alpha/&hellip;</span>
+   (the plain <span class="kw">discoveryengine.googleapis.com</span> host can return an empty
+   list / 401 for these resources), and pass <span class="kw">-H "X-Goog-User-Project: PROJECT_ID"</span>
+   on every call (the ambient ADC on Cloud Shell has no quota project, so the call 403s without it).
 2) Register the existing deployed agent (from <span class="kw">deployment_metadata.json</span>) to that
    app, with the display name "Transit-Crisis Agent" (so it's easy to find in
    the portal's Agents list).
