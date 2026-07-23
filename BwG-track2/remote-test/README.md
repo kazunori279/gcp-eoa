@@ -38,8 +38,8 @@ and the agent is published to Gemini Enterprise (`explore-ai`).
 | **M2 · Scale** (Cloud Shell 2026-07-23) | ✅\* | ~15 min | sessions + Memory Bank + code-exec; **\*Step 3 (code exec) no-op'd on first run — needed a re-run** to add `BuiltInCodeExecutor`. Then smoke green → **one clean deploy** (~3 min, updates existing engine `4834…`); **4/4 deployed scenarios**; Memory Bank row confirmed via API |
 | **M3 · Govern** (Cloud Shell 2026-07-23) | ✅ | ~1.7 min | registry/identity verify (**SPIFFE** `…system.id.goog/…` + least-privilege PASS) + Model Armor `transit-shield` blocks DAN jailbreak + credit-card PII, passes benign |
 | **M4 · Optimize** (Cloud Shell 2026-07-23) | ⚠️ | — | **Step 2 crisis sim HUNG** on Scenario 8 (code-executor disables AFC → agy's custom sim harness stalls; ADK-Runner paths are unaffected). **Step 3 `adk eval` ran: 3/4** — grounding-trap case failed (agent hallucinated a platform). |
-| **M5 · Engage** | ✅ | ~2 min | published to Gemini Enterprise (`explore-ai`); `registration_results.md` written; registration confirmed headlessly via the discoveryengine API |
-| **End-to-end** | **✅ all 6** | **~55 min** | one deploy total; deployed agent serves correctly and is published to GE |
+| **M5 · Engage** (Cloud Shell 2026-07-23) | ✅ | ~1.5 min | published (registered) to Gemini Enterprise app `transit-crisis` as "Transit-Crisis Agent" (state ENABLED); `registration_results.md` written; registration confirmed headlessly via the discoveryengine API |
+| **End-to-end** (Cloud Shell 2026-07-23) | **5 pass / 1 partial** | ~1 hr | M0–M3 + M5 pass (M0/M2 needed the Cloud-Shell/quota + code-exec fixes); M4 sim hung (AFC), eval 3/4. One deploy total (engine `4834…`); deployed agent serves and is published to GE |
 
 \* Elapsed = agy working time per module (from the `agysend` `[done step=…]` markers). Server-side
 deploys (~6–10 min) overlap reading, so wall-clock is close to this.
