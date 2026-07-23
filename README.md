@@ -37,7 +37,3 @@ The five modules below walk this journey step by step.
 Each module's hands-on prompts are copy-paste blocks prefixed `Module X Step Y:`. In M0 the coding agent creates a `plan.md` checklist of every module/step and works one step at a time, so it doesn't run ahead.
 
 Open the HTML files in any browser — no dependencies or build step required.
-
-## For AI coding agents
-
-Before editing the html files, read [`.skills/html-first-output/SKILL.md`](.skills/html-first-output/SKILL.md) for the HTML-first output conventions used in this project.
