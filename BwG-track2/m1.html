@@ -516,7 +516,7 @@
   <div class="hero-pills">
     <span class="hero-pill">ADK</span>
     <span class="hero-pill">Agent Garden</span>
-    <span class="hero-pill">gemini-3.5-flash</span>
+    <span class="hero-pill">gemini-4-hydrogen</span>
   </div>
 </div>
 
@@ -558,8 +558,10 @@ Module 1 Step 1: scaffold the ADK project (scaffold only).
    "<span class="cmd">gcloud config get-value project</span>".
 2. Scaffold a new ADK agent project for a transit assistant that will
    answer commuter questions during a service disruption. Name the project
-   exactly "transit-assistant". Use Python, <span class="kw">gemini-3.5-flash</span> as the model,
-   and <span class="kw">uv</span> for dependency management.
+   exactly "transit-assistant". Use Python, <span class="kw">gemini-4-hydrogen</span> as the model,
+   and <span class="kw">uv</span> for dependency management. Require
+   <span class="kw">google-genai&gt;=2.34.0,&lt;3.0.0</span>; older SDKs can fail when
+   Hydrogen returns code-execution parts on Vertex AI.
 3. Move my existing <span class="kw">data/</span> folder (downloaded in M0) into the project root
    so the tools can read it later.
 
@@ -570,8 +572,8 @@ Scaffold only &mdash; do not write the tools yet; I'll describe them in the next
         <h4>Expected Result</h4>
         <p>AGY scaffolds the project, sets the model, and verifies with a smoke test:</p>
         <ul>
-          <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code>, managed by <code>uv</code></li>
-          <li><code>app/agent.py</code> &mdash; agent definition with <code>model="gemini-3.5-flash"</code></li>
+          <li><code>pyproject.toml</code> &mdash; dependencies including <code>google-adk</code> and <code>google-genai&gt;=2.34.0,&lt;3.0.0</code>, managed by <code>uv</code></li>
+          <li><code>app/agent.py</code> &mdash; agent definition with <code>model="gemini-4-hydrogen"</code></li>
           <li><code>app/tools.py</code> &mdash; starter tools module (we add the real tools next &mdash; here or inline in <code>app/agent.py</code>)</li>
           <li>GCP project ID resolved via <code>gcloud config</code> fallback</li>
           <li><strong><code>data/</code> at the project root</strong> &mdash; your M0 GTFS bundle and <code>disruptions.json</code> moved in, so the tools can read it</li>

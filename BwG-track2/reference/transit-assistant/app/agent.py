@@ -56,7 +56,7 @@ async def generate_memories_callback(callback_context: CallbackContext):
 root_agent = Agent(
     name="root_agent",
     model=Gemini(
-        model="gemini-3.5-flash",
+        model="gemini-4-hydrogen",
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
     code_executor=BuiltInCodeExecutor(),

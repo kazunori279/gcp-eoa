@@ -1,0 +1,329 @@
+==================================================
+STARTING CRISIS SIMULATION AT SCALE (10 SCENARIOS)
+==================================================
+
+==================================================
+RUNNING SCENARIO [S1]: 16:31 Paris Service Cancelled + Reroute
+Prompt: I'm booked on the 16:31 St Pancras to Paris service today. Is it still running, and if not, how do I still get to Paris?
+--------------------------------------------------
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/tools/function_tool.py:96: UserWarning: [EXPERIMENTAL] feature FeatureName.JSON_SCHEMA_FOR_FUNC_DECL is enabled.
+  build_function_declaration(
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: get_scheduled_departures
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (12.4s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: No, the **16:31 St-Pancras-International to Paris-Nord service (Train 9036)** is **cancelled**.  ### Service & Disruption Details * **Affected Service:** Train 9036 (16:31 St-Pancr...
+
+==================================================
+RUNNING SCENARIO [S2]: 18:04 Brussels Service Delayed Check
+Prompt: What's the status of the 18:04 Eurostar from St Pancras to Brussels?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: get_scheduled_departures
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (11.4s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: The **18:04 Eurostar from St-Pancras-International to Bruxelles-Midi (Train 9148)** is currently **delayed by 30 minutes**, with an estimated departure time of **18:34** and an est...
+
+==================================================
+RUNNING SCENARIO [S3]: Amsterdam Evening Departures Inquiry
+Prompt: What are all the evening Eurostar options from St Pancras to Amsterdam today?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: get_scheduled_departures
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (32.1s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Evening services from **St-Pancras-International** to **Amsterdam-Centraal** are heavily affected by a major signal failure at the St Pancras station throat (`DISRUPT-STP-2026-001`...
+
+==================================================
+RUNNING SCENARIO [S4]: Grounding Trap — Platform Assignment
+Prompt: Which platform does the 18:16 train to Paris depart from?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (12.9s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Platform assignments are **currently unavailable** in our system, so I cannot confirm which platform the **18:16** departure to Paris-Nord will use. Because of the ongoing major si...
+
+==================================================
+RUNNING SCENARIO [S5]: Disruption Analytics & Math Request
+Prompt: Across all currently disrupted St Pancras departures, calculate the average delay of delayed trains and the cancellation ratio.
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[CODE_EXECUTION]
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+Node execution failed with exception
+Traceback (most recent call last):
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 136, in run
+    await self._execute_node(ctx, node_input)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 274, in _execute_node
+    await self._run_node_loop(ctx, node_input)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 288, in _run_node_loop
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_base_node.py", line 166, in run
+    async for item in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/llm_agent.py", line 601, in _run_impl
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_llm_agent_wrapper.py", line 370, in run_llm_agent_as_node
+    async for event in run_iter:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/base_agent.py", line 306, in run_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/llm_agent.py", line 550, in _run_async_impl
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 932, in run_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1011, in _run_one_step_async
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1453, in _call_llm_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1431, in _call_llm_with_tracing
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1514, in _run_and_handle_error
+    async for response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 418, in _run_and_handle_error
+    raise model_error
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 395, in _run_and_handle_error
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/models/google_llm.py", line 282, in generate_content_async
+    response = await self.api_client.aio.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 8820, in generate_content
+    return await self._generate_content(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 7259, in _generate_content
+    request_dict = _GenerateContentParameters_to_vertex(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 1773, in _GenerateContentParameters_to_vertex
+    _Content_to_vertex(item, to_object, root_object)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 428, in _Content_to_vertex
+    _Part_to_vertex(item, to_object, root_object)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 3777, in _Part_to_vertex
+    _ExecutableCode_to_vertex(
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 1229, in _ExecutableCode_to_vertex
+    raise ValueError(
+ValueError: id parameter is only supported in Gemini Developer API mode, not in Gemini Enterprise Agent Platform mode.
+Root node root_agent failed.
+Traceback (most recent call last):
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/runners.py", line 601, in _drive_root_node
+    await root_ctx._run_node_internal(
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/context.py", line 603, in _run_node_internal
+    raise DynamicNodeFailError(
+google.adk.workflow._errors.DynamicNodeFailError: Dynamic node root_agent failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/runners.py", line 906, in _cleanup_root_task
+    await task
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/runners.py", line 610, in _drive_root_node
+    raise e.error
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 136, in run
+    await self._execute_node(ctx, node_input)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 274, in _execute_node
+    await self._run_node_loop(ctx, node_input)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_node_runner.py", line 288, in _run_node_loop
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_base_node.py", line 166, in run
+    async for item in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/llm_agent.py", line 601, in _run_impl
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/workflow/_llm_agent_wrapper.py", line 370, in run_llm_agent_as_node
+    async for event in run_iter:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/base_agent.py", line 306, in run_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/agents/llm_agent.py", line 550, in _run_async_impl
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 932, in run_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1011, in _run_one_step_async
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1453, in _call_llm_async
+    async for event in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1431, in _call_llm_with_tracing
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 1514, in _run_and_handle_error
+    async for response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 418, in _run_and_handle_error
+    raise model_error
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/flows/llm_flows/base_llm_flow.py", line 395, in _run_and_handle_error
+    async for llm_response in agen:
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/models/google_llm.py", line 282, in generate_content_async
+    response = await self.api_client.aio.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 8820, in generate_content
+    return await self._generate_content(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 7259, in _generate_content
+    request_dict = _GenerateContentParameters_to_vertex(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 1773, in _GenerateContentParameters_to_vertex
+    _Content_to_vertex(item, to_object, root_object)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 428, in _Content_to_vertex
+    _Part_to_vertex(item, to_object, root_object)
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 3777, in _Part_to_vertex
+    _ExecutableCode_to_vertex(
+  File "/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/genai/models.py", line 1229, in _ExecutableCode_to_vertex
+    raise ValueError(
+ValueError: id parameter is only supported in Gemini Developer API mode, not in Gemini Enterprise Agent Platform mode.
+[SCENARIO ERROR]: id parameter is only supported in Gemini Developer API mode, not in Gemini Enterprise Agent Platform mode.
+
+Status: ERROR: id parameter is only supported in Gemini Developer API mode, not in Gemini Enterprise Agent Platform mode. (8.1s)
+Tools Used: ['get_scheduled_departures', 'BuiltInCodeExecutor', 'check_disruptions']
+Summary Response: 
+
+==================================================
+RUNNING SCENARIO [S6]: Urgent Commute to Paris Meeting
+Prompt: I have an urgent meeting in Paris tonight. I'm at St Pancras after 15:00. What is my best option given the signal failure?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (15.6s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Given the ongoing major signal failure at the St Pancras station throat (`DISRUPT-STP-2026-001`), several direct afternoon and evening services to Paris-Nord are cancelled or delay...
+
+==================================================
+RUNNING SCENARIO [S7]: Home Station Personalization
+Prompt: Please set my home station to Paris Gare du Nord, and summarize my options for heading home from St Pancras this evening.
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: set_home_station
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (24.0s)
+Tools Used: ['check_disruptions', 'set_home_station', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Your home station has been saved as **Paris Gare du Nord**.  Evening departures from **St-Pancras-International** to **Paris-Nord** are affected by a major signal failure at the St...
+
+==================================================
+RUNNING SCENARIO [S8]: Disruption Feed Unavailability (HTTP 503)
+Prompt: Is my 17:31 St Pancras to Paris train running today?
+[Simulating Disruption Feed Outage: HTTP 503]
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (13.4s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Yes, the **17:31 St-Pancras-International to Paris-Nord service (Train 9040)** is still scheduled to run today, though it is **severely delayed by 45 minutes**.  ### Service & Disr...
+
+==================================================
+RUNNING SCENARIO [S9]: Lille Europe Evening Travel Check
+Prompt: Are there any disruptions affecting trains from St Pancras to Lille Europe this evening?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (30.9s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: Yes—while Lille-Europe is not listed as a final terminus in the disruption feed, **trains from St-Pancras-International to Lille-Europe are affected this evening** by a **major sig...
+
+==================================================
+RUNNING SCENARIO [S10]: Late Evening Paris Connection
+Prompt: What is the last available service from St Pancras to Paris after 19:00 today?
+--------------------------------------------------
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: compute_reroute
+[TOOL_CALL]: compute_reroute
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (13.4s)
+Tools Used: ['check_disruptions', 'compute_reroute', 'get_scheduled_departures']
+Summary Response: The last available service from **St-Pancras-International** to **Paris-Nord** today is **Train 9056**, departing at **21:31** and arriving at **Paris-Nord at 23:49** (direct, 0 ch...
+
+
+================================================================================
+FINAL SIMULATION REPORT TABLE
+================================================================================
+ID   | Title                            | Status     | Tools Used                               | Agent Summary
+------------------------------------------------------------------------------------------------------------------------
+S1   | 16:31 Paris Service Cancelled +  | RESOLVED   | check_disruptions, compute_reroute, get_ | No, the **16:31 St-Pancras-International
+S2   | 18:04 Brussels Service Delayed C | RESOLVED   | check_disruptions, compute_reroute, get_ | The **18:04 Eurostar from St-Pancras-Int
+S3   | Amsterdam Evening Departures Inq | RESOLVED   | check_disruptions, compute_reroute, get_ | Evening services from **St-Pancras-Inter
+S4   | Grounding Trap — Platform Assign | RESOLVED   | check_disruptions, compute_reroute, get_ | Platform assignments are **currently una
+S5   | Disruption Analytics & Math Requ | ERROR: id parameter is only supported in Gemini Developer API mode, not in Gemini Enterprise Agent Platform mode. | get_scheduled_departures, BuiltInCodeExe | 
+S6   | Urgent Commute to Paris Meeting  | RESOLVED   | check_disruptions, compute_reroute, get_ | Given the ongoing major signal failure a
+S7   | Home Station Personalization     | RESOLVED   | check_disruptions, set_home_station, com | Your home station has been saved as **Pa
+S8   | Disruption Feed Unavailability ( | RESOLVED   | check_disruptions, compute_reroute, get_ | Yes, the **17:31 St-Pancras-Internationa
+S9   | Lille Europe Evening Travel Chec | RESOLVED   | check_disruptions, compute_reroute, get_ | Yes—while Lille-Europe is not listed as 
+S10  | Late Evening Paris Connection    | RESOLVED   | check_disruptions, compute_reroute, get_ | The last available service from **St-Pan
+------------------------------------------------------------------------------------------------------------------------

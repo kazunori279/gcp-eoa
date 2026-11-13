@@ -417,7 +417,7 @@ line, the big `h1`, a `hero-sub`, and a rounded `hero-time` chip. Hands-on pages
   <div class="hero-time">30 minutes &middot; 0:10 &ndash; 0:40 &middot; Hands-on</div>
   <div class="hero-pills">           <!-- optional, hands-on pages only -->
     <span class="hero-pill">ADK</span>
-    <span class="hero-pill">gemini-3.5-flash</span>
+    <span class="hero-pill">gemini-4-hydrogen</span>
   </div>
 </div>
 ```

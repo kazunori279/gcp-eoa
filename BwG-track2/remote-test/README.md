@@ -20,6 +20,19 @@ watch it" task.
 
 ## Evaluation results & reports
 
+**Hydrogen re-evaluation (2026-11-14 JST):** existing Cloud Shell app upgraded to
+`gemini-4-hydrogen` for both agent and judge. HTTP/A2A E2E **5/5**; first graded
+run **3/4**, post-SDK-update run **4/4** (grounding trap 0.875). Initial crisis
+simulation **9/10 completed**; code execution recovered after upgrading
+`google-genai` from 2.14.0 to 2.34.0. A separate verified 503 injection passed;
+the legacy outage scenario was not actually injecting failure. Model Armor and
+existing Gemini Enterprise registration verified. Redeployment completed; cloud
+validation confirmed cross-session recall, rerouting, and code-executed analytics
+(26.25-minute average delay, 50% cancelled). Reroute timing inconsistencies remain.
+This reuses the existing app,
+not a fresh M0–M5 prompt replay. See the [detailed report and evidence](eval-report/hydrogen-2026-11-14/README.md).
+
+
 **Latest run: 2026-06-17** — fresh Qwiklabs lab (`student-02-c253a240c8cc`, project
 `qwiklabs-gcp-04-ebb916b610fa`), driven end-to-end through the real `agy` CLI
 (Antigravity CLI, Gemini 3.5 Flash). **All six modules pass** — one clean deploy

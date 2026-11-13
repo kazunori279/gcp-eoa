@@ -1,0 +1,116 @@
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/dependencies/vertexai.py:19: UserWarning: The `vertexai.preview.rag` module is deprecated and will be removed in a future version. Please migrate to the `agentplatform` client. For example:
+
+    import agentplatform
+
+    client = agentplatform.Client(project="your-project", location="us-central1")
+    client.rag.create_corpus(...)
+
+  from vertexai.preview import rag as rag
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/evaluation/metric_evaluator_registry.py:114: UserWarning: [EXPERIMENTAL] MetricEvaluatorRegistry: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  metric_evaluator_registry = MetricEvaluatorRegistry()
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/evaluation/local_eval_service.py:124: UserWarning: [EXPERIMENTAL] UserSimulatorProvider: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  user_simulator_provider: UserSimulatorProvider = UserSimulatorProvider(),
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/cli/cli_tools_click.py:1111: UserWarning: [EXPERIMENTAL] UserSimulatorProvider: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  user_simulator_provider = UserSimulatorProvider(
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/cli/cli_tools_click.py:1134: UserWarning: [EXPERIMENTAL] LocalEvalService: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  eval_service = LocalEvalService(
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/evaluation/simulation/user_simulator_provider.py:128: UserWarning: [EXPERIMENTAL] StaticUserSimulator: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  return StaticUserSimulator(static_conversation=eval_case.conversation)
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/evaluation/simulation/static_user_simulator.py:39: UserWarning: [EXPERIMENTAL] UserSimulator: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  super().__init__(
+2026-11-13 22:26:04,196 - INFO - plugin_manager.py:121 - Plugin 'request_intercepter_plugin' registered.
+2026-11-13 22:26:04,197 - INFO - plugin_manager.py:121 - Plugin 'ensure_retry_options' registered.
+2026-11-13 22:26:04,200 - INFO - plugin_manager.py:121 - Plugin 'request_intercepter_plugin' registered.
+2026-11-13 22:26:04,200 - INFO - plugin_manager.py:121 - Plugin 'ensure_retry_options' registered.
+2026-11-13 22:26:04,201 - INFO - plugin_manager.py:121 - Plugin 'request_intercepter_plugin' registered.
+2026-11-13 22:26:04,201 - INFO - plugin_manager.py:121 - Plugin 'ensure_retry_options' registered.
+2026-11-13 22:26:04,201 - INFO - plugin_manager.py:121 - Plugin 'request_intercepter_plugin' registered.
+2026-11-13 22:26:04,201 - INFO - plugin_manager.py:121 - Plugin 'ensure_retry_options' registered.
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/tools/function_tool.py:96: UserWarning: [EXPERIMENTAL] feature FeatureName.JSON_SCHEMA_FOR_FUNC_DECL is enabled.
+  build_function_declaration(
+2026-11-13 22:26:04,918 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:04,919 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:04,932 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:04,932 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:04,939 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:04,939 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:04,946 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:04,946 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:06,655 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:06,829 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:06,837 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:06,837 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:07,014 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:07,014 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:07,581 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:07,756 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:07,757 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:07,886 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:08,228 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:08,228 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:09,162 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:09,311 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:09,311 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:09,525 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:10,319 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:10,319 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:10,832 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:11,149 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:11,150 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:11,476 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:11,768 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:11,768 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:12,586 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:12,767 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:12,778 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:12,779 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:12,800 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:12,801 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:13,714 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:13,716 - INFO - runners.py:2265 - Closing runner...
+2026-11-13 22:26:13,716 - INFO - runners.py:2278 - Runner closed.
+2026-11-13 22:26:14,933 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:15,246 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:15,246 - WARNING - _extra_utils.py:163 - Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+2026-11-13 22:26:17,580 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:17,583 - INFO - runners.py:2265 - Closing runner...
+2026-11-13 22:26:17,583 - INFO - runners.py:2278 - Runner closed.
+2026-11-13 22:26:20,431 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:20,433 - INFO - runners.py:2265 - Closing runner...
+2026-11-13 22:26:20,434 - INFO - runners.py:2278 - Runner closed.
+2026-11-13 22:26:22,286 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:22,288 - INFO - runners.py:2265 - Closing runner...
+2026-11-13 22:26:22,289 - INFO - runners.py:2278 - Runner closed.
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/evaluation/metric_evaluator_registry.py:80: UserWarning: [EXPERIMENTAL] HallucinationsV1Evaluator: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+  return evaluator_type(eval_metric=eval_metric)
+2026-11-13 22:26:22,347 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:22,347 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:22,409 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:22,410 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:22,471 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:22,471 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:22,535 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:22,535 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:29,899 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:29,899 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:29,899 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:30,622 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:30,622 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:30,623 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:31,595 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:31,596 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:31,596 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:37,788 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:26:37,788 - INFO - google_llm.py:217 - Sending out request, model: gemini-4-hydrogen, backend: GoogleLLMVariant.VERTEX_AI, stream: False
+2026-11-13 22:26:37,788 - INFO - models.py:8596 - AFC is enabled with max remote calls: 10.
+2026-11-13 22:26:58,331 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:27:11,147 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:27:22,936 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:27:22,998 - INFO - google_llm.py:287 - Response received from the model.
+2026-11-13 22:27:23,000 - INFO - local_eval_set_results_manager.py:64 - Writing eval result to file: /home/kazunori279/transit-assistant/app/.adk/eval_history/app_rushhour_evalset_1794608843.0007663.evalset_result.json
+Using evaluation criteria: criteria={'hallucinations_v1': BaseCriterion(threshold=0.8, include_intermediate_responses_in_final=False, judge_model_options={'judge_model': 'gemini-4-hydrogen', 'num_samples': 1})} custom_metrics=None user_simulator_config=None
+*********************************************************************
+Eval Run Summary
+rushhour_evalset:
+  Tests passed: 4
+  Tests failed: 0

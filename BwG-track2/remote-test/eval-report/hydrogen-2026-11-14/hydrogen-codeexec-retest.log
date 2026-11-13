@@ -1,0 +1,30 @@
+==================================================
+STARTING CRISIS SIMULATION AT SCALE (10 SCENARIOS)
+==================================================
+
+==================================================
+RUNNING SCENARIO [S5]: Disruption Analytics & Math Request
+Prompt: Across all currently disrupted St Pancras departures, calculate the average delay of delayed trains and the cancellation ratio.
+--------------------------------------------------
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/tools/function_tool.py:96: UserWarning: [EXPERIMENTAL] feature FeatureName.JSON_SCHEMA_FOR_FUNC_DECL is enabled.
+  build_function_declaration(
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: get_scheduled_departures
+[TOOL_CALL]: check_disruptions
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+[TOOL_CALL]: check_disruptions
+[CODE_EXECUTION]
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+
+Status: RESOLVED (20.3s)
+Tools Used: ['check_disruptions', 'BuiltInCodeExecutor', 'get_scheduled_departures']
+Summary Response: Based on real-time disruption data (`DISRUPT-STP-2026-001`: major signal failure at the St Pancras station throat from 15:00 to 19:30) cross-referenced against the St-Pancras-Inter...
+
+
+================================================================================
+FINAL SIMULATION REPORT TABLE
+================================================================================
+ID   | Title                            | Status     | Tools Used                               | Agent Summary
+------------------------------------------------------------------------------------------------------------------------
+S5   | Disruption Analytics & Math Requ | RESOLVED   | check_disruptions, BuiltInCodeExecutor,  | Based on real-time disruption data (`DIS
+------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,27 @@
+/home/kazunori279/transit-assistant/.venv/lib/python3.12/site-packages/google/adk/tools/function_tool.py:96: UserWarning: [EXPERIMENTAL] feature FeatureName.JSON_SCHEMA_FOR_FUNC_DECL is enabled.
+  build_function_declaration(
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+Tools at indices [1] are not compatible with automatic function calling (AFC). AFC is disabled. If AFC is intended, please include python callables in the tool list, and do not include function declaration and MCP server in the tool list.
+{
+  "model": "gemini-4-hydrogen",
+  "injected_outage_observed": true,
+  "tool_responses": [
+    {
+      "status": "error",
+      "error": "HTTP 503 Service Unavailable",
+      "message": "Real-time disruption feed unavailable; live train status cannot be verified."
+    },
+    {
+      "status": "error",
+      "error": "HTTP 503 Service Unavailable",
+      "message": "Real-time disruption feed unavailable; live train status cannot be verified."
+    },
+    {
+      "status": "error",
+      "error": "HTTP 503 Service Unavailable",
+      "message": "Real-time disruption feed unavailable; live train status cannot be verified."
+    }
+  ],
+  "final_response": "According to the static timetable, train **9040** (`trip_id: 9040-0722`) is scheduled to depart **St-Pancras-International** at **17:31** for **Paris-Nord**.\n\nHowever, I cannot confirm whether the train is actually running today: the real-time disruption feed is currently unavailable (**HTTP 503 Service Unavailable**), so live operating status, potential delays, cancellations, and platform assignments cannot be verified at this time.\n\nRecommended Action: Check the live departure boards at St-Pancras-International or speak with station staff before boarding to confirm the real-time status of train 9040."
+}

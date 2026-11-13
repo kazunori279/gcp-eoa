@@ -1,0 +1,322 @@
+==================================================
+RUNNING DEPLOYED AGENT VALIDATION SCENARIOS (S1-S4)
+==================================================
+Created Session 1: 9096371297021067264
+
+>>> Scenario 1(a): Setting home station...
+
+==================================================
+QUERY: [User: hydrogen_e2e_20261114_2230 | Session: 9096371297021067264]
+User message: Hello, please set my home station to Paris Gare du Nord.
+--------------------------------------------------
+
+[TOOL_CALL: set_home_station({"station": "Paris Gare du Nord"})]
+
+
+[TOOL_RESPONSE: set_home_station]
+
+Your home station has been saved as **Paris Gare du Nord**. I will use this as your default departure station whenever you ask about departures or routes without specifying an origin.
+
+Recommended Action: Let me know your destination or preferred travel time so I can check live departures and any active disruptions from Paris Gare du Nord.
+--------------------------------------------------
+
+>>> Scenario 1(b): Recalling home station in SAME session...
+
+==================================================
+QUERY: [User: hydrogen_e2e_20261114_2230 | Session: 9096371297021067264]
+User message: What is my home station again?
+--------------------------------------------------
+
+[TOOL_CALL: get_home_station({})]
+
+
+[TOOL_RESPONSE: get_home_station]
+
+Your saved home station is **Paris Gare du Nord**.
+
+Recommended Action: Tell me where and when you would like to travel so I can check scheduled departures and live disruptions from Paris Gare du Nord.
+--------------------------------------------------
+
+Waiting 8 seconds for Memory Bank async indexing...
+Created Session 2: 3683044544921731072
+
+>>> Scenario 2: NEW session, SAME user (Memory Bank recall + disruptions)...
+
+==================================================
+QUERY: [User: hydrogen_e2e_20261114_2230 | Session: 3683044544921731072]
+User message: What is my home station and are there any active disruptions affecting Eurostar trains connected to it today?
+--------------------------------------------------
+
+[TOOL_CALL: get_home_station({})]
+
+
+[TOOL_CALL: check_disruptions({"station": "Paris Nord"})]
+
+
+[TOOL_CALL: check_disruptions({})]
+
+
+[TOOL_CALL: get_scheduled_departures({"station": "Paris Nord"})]
+
+
+[TOOL_RESPONSE: get_home_station]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_CALL: get_scheduled_departures({"station": "Paris Nord", "time_end": "23:59", "time_start": "00:00", "date": "2026-07-15"})]
+
+
+[TOOL_CALL: get_scheduled_departures({"time_start": "15:00", "time_end": "20:00", "date": "2026-07-15", "station": "St Pancras"})]
+
+
+[TOOL_CALL: compute_reroute({"departure_after": "15:00", "origin": "St Pancras", "destination": "Paris Nord"})]
+
+
+[TOOL_CALL: compute_reroute({"departure_after": "15:00", "destination": "St Pancras", "origin": "Paris Nord"})]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_CALL: compute_reroute({"departure_after": "15:30", "origin": "St Pancras", "destination": "Paris Nord"})]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+### Your Home Station
+* From our previous conversation, you identified your home station as **Paris Gare du Nord** (`Paris-Nord`).
+* Note: It is not currently saved in this session's active state. If you would like me to save it for this session, just let me know.
+
+---
+
+### Active Disruptions Connected to Paris-Nord
+There is currently a **major** disruption (**DISRUPT-STP-2026-001**) caused by a **signal failure** at the **St Pancras station throat**, blocking all platform approaches between **15:00 and 19:30** (`2026-07-15T15:00:00+01:00` to `2026-07-15T19:30:00+01:00`).
+
+While no departures *originating* from **Paris-Nord** are currently listed as disrupted in real-time disruption data, **5 inbound Eurostar services from St-Pancras-International to Paris-Nord** are affected (3 cancelled, 2 delayed):
+
+* **Train 9032-0715** (scheduled departure **15:31**): **Cancelled** — Cannot depart; all platform approaches blocked by signal failure.
+* **Train 9036-0715** (scheduled departure **16:31**): **Cancelled** — Cannot depart; all platform approaches blocked by signal failure.
+* **Train 9040-0715** (scheduled departure **17:31**): **Delayed 45 minutes** — Awaiting signal restoration (estimated departure **18:16**).
+* **Train 9044-0715** (scheduled departure **18:31**): **Delayed 15 minutes** — Signal partially restored; single-track operation.
+* **Train 9046-0715** (scheduled departure **19:01**): **Cancelled** — Cannot depart; residual signal issues and insufficient time to recover.
+
+*(Note: Platform assignment details are not available from the current system data.)*
+
+---
+
+### Available Alternatives (Reroute Check)
+* **Inbound to Paris-Nord (from St-Pancras-International):**
+  * **Train 9030**: Departs **15:01**, arrives Paris-Nord **17:19** (**0 changes**, status: **On time**).
+  * **Train 9038**: Departs **17:01**, arrives Paris-Nord **19:19** (**0 changes**, status: **On time**).
+* **Outbound from Paris-Nord (to St-Pancras-International):**
+  * **Train 9039**: Departs **15:12**, arrives St-Pancras-International **17:30** (**0 changes**, status: **On time**).
+
+Recommended Action: If you are traveling inbound to Paris-Nord during the 15:00–19:30 disruption window, take unaffected train 9038 departing St-Pancras-International at 17:01 (arriving Paris-Nord at 19:19, 0 changes), and let me know if you would like me to save Paris Gare du Nord to your active session.
+--------------------------------------------------
+Created Session 3: 6520312310165143552
+
+>>> Scenario 3: Proactive reroute for commuter going home...
+
+==================================================
+QUERY: [User: hydrogen_e2e_20261114_2230 | Session: 6520312310165143552]
+User message: I'm heading home from St Pancras this evening — what are my options given the disruption?
+--------------------------------------------------
+
+[TOOL_CALL: get_home_station({})]
+
+
+[TOOL_CALL: get_scheduled_departures({"time_end": "23:59", "station": "St Pancras", "time_start": "16:00"})]
+
+
+[TOOL_CALL: check_disruptions({"station": "St Pancras"})]
+
+
+[TOOL_CALL: check_disruptions({})]
+
+
+[TOOL_RESPONSE: get_home_station]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[TOOL_CALL: get_scheduled_departures({"time_end": "23:59", "station": "St Pancras", "date": "2026-07-15", "time_start": "16:00"})]
+
+
+[TOOL_CALL: compute_reroute({"origin": "St Pancras", "destination": "Paris Nord", "departure_after": "16:00"})]
+
+
+[TOOL_CALL: compute_reroute({"departure_after": "17:00", "origin": "St Pancras", "destination": "Paris Nord"})]
+
+
+[TOOL_CALL: compute_reroute({"destination": "Paris Nord", "origin": "St Pancras", "departure_after": "19:00"})]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_CALL: compute_reroute({"origin": "St Pancras", "destination": "Paris Nord", "departure_after": "17:30"})]
+
+
+[TOOL_CALL: compute_reroute({"destination": "Paris Nord", "departure_after": "18:30", "origin": "St Pancras"})]
+
+
+[TOOL_CALL: check_disruptions({"trip_id": "9038"})]
+
+
+[TOOL_CALL: check_disruptions({"trip_id": "9050"})]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+Based on your previously stated home station, I have checked your evening travel options from **St-Pancras-International** to **Paris Gare du Nord (Paris-Nord)**.
+
+### Current Disruption Overview
+* **Disruption (`DISRUPT-STP-2026-001` — Major):** A signal failure at the St Pancras station throat has blocked platform approaches, causing cancellations and delays during peak departures (disruption window **15:00–19:30**).
+* **Platform Information:** Specific platform assignments are currently unavailable in our system; please check the station departure boards at St Pancras.
+
+---
+
+### Evening Services: St-Pancras-International → Paris-Nord
+
+**Cancelled Services**
+* **Train 9036** (scheduled **16:31**): **Cancelled** — all platform approaches blocked by signal failure.
+* **Train 9046** (scheduled **19:01**): **Cancelled** — residual signal issues, insufficient time to recover.
+
+**Delayed Direct Services**
+* **Train 9040** (scheduled **17:31**): **Delayed (+45 mins)** — awaiting signal restoration. The disruption notice lists an estimated departure of **18:16** (reroute schedule shows **17:46** departing St-Pancras-International, arriving Paris-Nord at **20:05**, 0 changes).
+* **Train 9044** (scheduled **18:31**): **Delayed (+15 mins)** — minor delay due to partial signal restoration and single-track operation. Expected to depart **18:46** and arrive at Paris-Nord at **21:04** (0 changes).
+
+**Undisrupted / On-Time Direct Services**
+* **Train 9038** (scheduled **17:01**): **On time** — arrives at Paris-Nord at **19:19** (0 changes).
+* **Train 9050** (scheduled **20:01**): **On time** — arrives at Paris-Nord at **22:19** (0 changes; departs after the 15:00–19:30 disruption window).
+* **Later scheduled departures** (not listed as disrupted): **Train 9052** (**20:31**), **Train 9054** (**21:01**), and **Train 9056** (**21:31**).
+
+---
+
+**Recommended Action:** Take direct **Train 9038** departing **St-Pancras-International at 17:01** to **Paris-Nord** (arriving **19:19**, on time, 0 changes), and check the station boards for your platform assignment—or, if you are traveling later in the evening, take **Train 9050 at 20:01** (arriving **22:19**, on time).
+--------------------------------------------------
+Created Session 4: 6430240317617733632
+
+>>> Scenario 4: Code Execution Analytics...
+
+==================================================
+QUERY: [User: hydrogen_e2e_20261114_2230 | Session: 6430240317617733632]
+User message: Across the currently disrupted St Pancras departures, what's the average delay of the delayed trains, and what fraction are cancelled?
+--------------------------------------------------
+
+[TOOL_CALL: get_scheduled_departures({"station": "St Pancras"})]
+
+
+[TOOL_CALL: check_disruptions({"station": "St Pancras"})]
+
+
+[TOOL_RESPONSE: get_scheduled_departures]
+
+
+[TOOL_RESPONSE: check_disruptions]
+
+
+[EXECUTABLE_CODE]:
+affected_trips = [
+    {"trip_id": "9032-0715", "scheduled_departure": "15:31", "status": "cancelled", "delay_minutes": None},
+    {"trip_id": "9140-0715", "scheduled_departure": "16:04", "status": "cancelled", "delay_minutes": None},
+    {"trip_id": "9036-0715", "scheduled_departure": "16:31", "status": "cancelled", "delay_minutes": None},
+    {"trip_id": "9040-0715", "scheduled_departure": "17:31", "status": "delayed", "delay_minutes": 45},
+    {"trip_id": "9148-0715", "scheduled_departure": "18:04", "status": "delayed", "delay_minutes": 30},
+    {"trip_id": "9044-0715", "scheduled_departure": "18:31", "status": "delayed", "delay_minutes": 15},
+    {"trip_id": "9046-0715", "scheduled_departure": "19:01", "status": "cancelled", "delay_minutes": None},
+    {"trip_id": "9152-0715", "scheduled_departure": "19:04", "status": "delayed", "delay_minutes": 15},
+]
+
+total_disrupted = len(affected_trips)
+delayed_trips = [t for t in affected_trips if t["status"] == "delayed"]
+cancelled_trips = [t for t in affected_trips if t["status"] == "cancelled"]
+
+delays = [t["delay_minutes"] for t in delayed_trips]
+avg_delay = sum(delays) / len(delays)
+cancelled_fraction = len(cancelled_trips) / total_disrupted
+
+from fractions import Fraction
+frac = Fraction(len(cancelled_trips), total_disrupted)
+
+print(f"Total disrupted: {total_disrupted}")
+print(f"Delayed count: {len(delayed_trips)}, delays: {delays}, sum: {sum(delays)}, avg_delay: {avg_delay}")
+print(f"Cancelled count: {len(cancelled_trips)}, fraction: {frac} ({cancelled_fraction:.2%})")
+
+
+
+[CODE_EXECUTION_RESULT]:
+Total disrupted: 8
+Delayed count: 4, delays: [45, 30, 15, 15], sum: 105, avg_delay: 26.25
+Cancelled count: 4, fraction: 1/2 (50.00%)
+
+
+
+[TOOL_CALL: compute_reroute({"destination": "Paris Nord", "departure_after": "15:00", "origin": "St Pancras"})]
+
+
+[TOOL_RESPONSE: compute_reroute]
+
+Due to a major signal failure at the St Pancras station throat (`DISRUPT-STP-2026-001`, affecting the 15:00–19:30 window), **8 departures** from St Pancras International are currently disrupted:
+
+### Disruption Metrics
+* **Average delay of delayed trains:** **26.25 minutes** (total of 105 delay minutes across 4 delayed trains: 45, 30, 15, and 15 minutes)
+* **Fraction of disrupted departures cancelled:** **1/2** (4 out of 8 disrupted trains, or **50%**)
+
+### Breakdown of Disrupted St Pancras Departures
+**Delayed (4 trains):**
+* **9040** (17:31 to Paris-Nord): **45 min delay** (estimated departure 18:16)
+* **9148** (18:04 to Bruxelles-Midi): **30 min delay** (estimated departure 18:34)
+* **9044** (18:31 to Paris-Nord): **15 min delay**
+* **9152** (19:04 to Amsterdam-Centraal): **15 min delay**
+
+**Cancelled (4 trains):**
+* **9032** (15:31 to Paris-Nord)
+* **9140** (16:04 to Amsterdam-Centraal)
+* **9036** (16:31 to Paris-Nord)
+* **9046** (19:01 to Paris-Nord)
+
+Recommended Action: If you are traveling from St Pancras to Paris-Nord during this disruption window, take unaffected train 9030 departing at 15:01 (arriving at Paris-Nord at 17:19), or share your specific destination and earliest departure time so I can compute an alternative reroute for you.
+--------------------------------------------------

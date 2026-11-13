@@ -1,0 +1,39 @@
+⚠️  Warning: Version mismatch: project was scaffolded with agents-cli 1.1.0, running 1.12.0. Upgrade the project: agents-cli scaffold upgrade
+⚠️  Warning: Ignoring reserved Agent Runtime env var GOOGLE_CLOUD_PROJECT — it is set by the platform.
+Skipping artifact methods: this project was scaffolded with agents-cli 1.1.0. Run `agents-cli scaffold upgrade` to enable them.
+
+🤖 Deploying agent to Agent Runtime in Gemini platform...
+
+
+📋 Deployment Parameters:
+  Project: gcp-samples-ic0
+  Location: us-east1
+  Display Name: transit-assistant
+  Min Instances: (unchanged)
+  Max Instances: (unchanged)
+  CPU: (unchanged)
+  Memory: (unchanged)
+  Container Concurrency: (unchanged)
+
+🌍 Environment Variables:
+  ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS: false
+  AGENT_VERSION: 0.1.0
+  APP_URL: https://us-east1-aiplatform.googleapis.com/reasoningEngines/v1/projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456/api
+  GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY: true
+  GOOGLE_CLOUD_LOCATION: global
+  GOOGLE_GENAI_USE_VERTEXAI: true
+  OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT: NO_CONTENT
+
+🚀 Updating agent: transit-assistant (this can take a few minutes)...
+   Operation: projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456/operations/8465989876016218112
+   Monitor deploy logs: https://console.cloud.google.com/logs/query;query=resource.labels.reasoning_engine_id%3D%22183680014489747456%22?project=gcp-samples-ic0
+   If this command is interrupted, run 'agents-cli deploy --status' to check progress.
+Agent Runtime ID written to deployment_metadata.json
+
+✅ Deployment successful!
+🪪 Agent Card URL: https://us-east1-aiplatform.googleapis.com/reasoningEngines/v1/projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456/api/a2a/app/.well-known/agent-card.json
+Agent Runtime ID: projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456
+Agent Identity: principal://agents.global.org-202619080014.system.id.goog/resources/aiplatform/projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456
+
+📊 View in Console: https://console.cloud.google.com/vertex-ai/agents/agent-engines/locations/us-east1/agent-engines/183680014489747456?project=gcp-samples-ic0
+

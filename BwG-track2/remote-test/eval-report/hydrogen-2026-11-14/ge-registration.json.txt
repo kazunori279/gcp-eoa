@@ -1,0 +1,21 @@
+HTTP 200
+{
+  "name": "projects/761793285222/locations/global/collections/default_collection/engines/transit-crisis/assistants/default_assistant/agents/17803817446427307682",
+  "displayName": "Transit-Crisis Agent",
+  "description": "Crisis management and transit assist agent",
+  "icon": {
+    "uri": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/smart_toy/default/24px.svg"
+  },
+  "createTime": "2026-07-23T22:05:20.143260Z",
+  "updateTime": "2026-07-23T22:05:20.143260Z",
+  "adkAgentDefinition": {
+    "toolSettings": {
+      "toolDescription": "Handles passenger inquiries and disruption reroutes"
+    },
+    "provisionedReasoningEngine": {
+      "reasoningEngine": "projects/761793285222/locations/us-east1/reasoningEngines/183680014489747456"
+    }
+  },
+  "state": "ENABLED",
+  "agentIdentityInfo": {}
+}

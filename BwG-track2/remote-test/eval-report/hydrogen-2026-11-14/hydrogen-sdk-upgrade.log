@@ -1,0 +1,11 @@
+Resolved 157 packages in 13.30s
+   Building transit-assistant @ file:///home/kazunori279/transit-assistant
+Downloading google-genai (1.2MiB)
+ Downloaded google-genai
+      Built transit-assistant @ file:///home/kazunori279/transit-assistant
+Prepared 2 packages in 817ms
+Uninstalled 2 packages in 114ms
+Installed 2 packages in 9ms
+ - google-genai==2.14.0
+ + google-genai==2.34.0
+ ~ transit-assistant==0.1.0 (from file:///home/kazunori279/transit-assistant)

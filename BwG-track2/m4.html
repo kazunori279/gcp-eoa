@@ -460,10 +460,11 @@ adk eval fails with a missing-dependencies error.
    (scores the fraction of the answer's sentences grounded in the tool outputs,
    continuous 0-1, reference-free):
    <span class="cmd">{ "criteria": { "hallucinations_v1": { "threshold": 0.8,
-       "judge_model_options": { "judge_model": "gemini-2.5-flash",
+       "judge_model_options": { "judge_model": "gemini-4-hydrogen",
                                 "num_samples": 1 } } } }</span>
-   (<span class="kw">gemini-2.5-flash</span> is reliably enabled in lab projects; if you want a faster
-   judge and it's enabled, you can switch to <span class="kw">gemini-2.5-flash-lite</span>.)
+   Use <span class="kw">gemini-4-hydrogen</span> for both the agent and the judge. Confirm that
+   your lab project has access to this model before running the evaluation. After changing
+   the judge model, rerun the eval to establish a new baseline; earlier scores used a different judge.
 3) Finish writing BOTH files above before you run anything. Then run the eval
    once in the FOREGROUND and wait for it to finish — do NOT run it as a
    background task, or you'll lose the stdout score table. Use adk eval directly:
